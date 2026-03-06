@@ -1,0 +1,289 @@
+Pattern,Set,Problem,URL
+
+Sliding Window,Set 1,Longest Substring Without Repeating Characters,https://leetcode.com/problems/longest-substring-without-repeating-characters/
+Sliding Window,Set 1,Longest Repeating Character Replacement,https://leetcode.com/problems/longest-repeating-character-replacement/
+Sliding Window,Set 1,Minimum Size Subarray Sum,https://leetcode.com/problems/minimum-size-subarray-sum/
+Sliding Window,Set 1,Fruit Into Baskets,https://leetcode.com/problems/fruit-into-baskets/
+Sliding Window,Set 1,Permutation in String,https://leetcode.com/problems/permutation-in-string/
+
+Sliding Window,Set 2,Subarrays with K Different Integers,https://leetcode.com/problems/subarrays-with-k-different-integers/
+Sliding Window,Set 2,Max Consecutive Ones III,https://leetcode.com/problems/max-consecutive-ones-iii/
+Sliding Window,Set 2,Sliding Window Maximum,https://leetcode.com/problems/sliding-window-maximum/
+Sliding Window,Set 2,Minimum Window Substring,https://leetcode.com/problems/minimum-window-substring/
+Sliding Window,Set 2,Count Number of Nice Subarrays,https://leetcode.com/problems/count-number-of-nice-subarrays/
+
+Sliding Window,Set 3,Subarray Product Less Than K,https://leetcode.com/problems/subarray-product-less-than-k/
+Sliding Window,Set 3,Find All Anagrams in a String,https://leetcode.com/problems/find-all-anagrams-in-a-string/
+Sliding Window,Set 3,Longest Continuous Subarray Absolute Diff Limit,https://leetcode.com/problems/longest-continuous-subarray-with-absolute-diff-less-than-or-equal-to-limit/
+Sliding Window,Set 3,Max Avg Subarray I,https://leetcode.com/problems/maximum-average-subarray-i/
+Sliding Window,Set 3,Binary Subarrays With Sum,https://leetcode.com/problems/binary-subarrays-with-sum/
+
+Sliding Window,Set 4,Smallest Range Covering Elements of K Lists,https://leetcode.com/problems/smallest-range-covering-elements-from-k-lists/
+Sliding Window,Set 4,Max Sliding Window,https://leetcode.com/problems/sliding-window-maximum/
+Sliding Window,Set 4,Longest Turbulent Subarray,https://leetcode.com/problems/longest-turbulent-subarray/
+Sliding Window,Set 4,Shortest Subarray with Sum k,https://leetcode.com/problems/shortest-subarray-with-sum-at-least-k/
+Sliding Window,Set 4,Grumpy Bookstore Owner,https://leetcode.com/problems/grumpy-bookstore-owner/
+
+Two Pointers,Set 1,3Sum,https://leetcode.com/problems/3sum/
+Two Pointers,Set 1,Container With Most Water,https://leetcode.com/problems/container-with-most-water/
+Two Pointers,Set 1,Two Sum II,https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/
+Two Pointers,Set 1,Remove Duplicates from Sorted Array,https://leetcode.com/problems/remove-duplicates-from-sorted-array/
+Two Pointers,Set 1,Valid Palindrome II,https://leetcode.com/problems/valid-palindrome-ii/
+
+Two Pointers,Set 2,4Sum,https://leetcode.com/problems/4sum/
+Two Pointers,Set 2,Sort Colors,https://leetcode.com/problems/sort-colors/
+Two Pointers,Set 2,Remove Element,https://leetcode.com/problems/remove-element/
+Two Pointers,Set 2,Linked List Cycle,https://leetcode.com/problems/linked-list-cycle/
+Two Pointers,Set 2,Palindrome Linked List,https://leetcode.com/problems/palindrome-linked-list/
+
+Two Pointers,Set 3,Intersection of Two Linked Lists,https://leetcode.com/problems/intersection-of-two-linked-lists/
+Two Pointers,Set 3,Move Zeroes,https://leetcode.com/problems/move-zeroes/
+Two Pointers,Set 3,Middle of Linked List,https://leetcode.com/problems/middle-of-the-linked-list/
+Two Pointers,Set 3,Swap Nodes in Pairs,https://leetcode.com/problems/swap-nodes-in-pairs/
+Two Pointers,Set 3,Reverse String,https://leetcode.com/problems/reverse-string/
+
+Two Pointers,Set 4,Partition Labels,https://leetcode.com/problems/partition-labels/
+Two Pointers,Set 4,Trapping Rain Water,https://leetcode.com/problems/trapping-rain-water/
+Two Pointers,Set 4,Shortest Unsorted Subarray,https://leetcode.com/problems/shortest-unsorted-continuous-subarray/
+Two Pointers,Set 4,Minimum Window Subsequence,https://leetcode.com/problems/minimum-window-subsequence/
+Two Pointers,Set 4,Squares of Sorted Array,https://leetcode.com/problems/squares-of-a-sorted-array/
+
+Binary Search,Set 1,Binary Search,https://leetcode.com/problems/binary-search/
+Binary Search,Set 1,Search in Rotated Sorted Array,https://leetcode.com/problems/search-in-rotated-sorted-array/
+Binary Search,Set 1,Find Minimum in Rotated Sorted Array,https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/
+Binary Search,Set 1,Koko Eating Bananas,https://leetcode.com/problems/koko-eating-bananas/
+Binary Search,Set 1,Median of Two Sorted Arrays,https://leetcode.com/problems/median-of-two-sorted-arrays/
+
+Binary Search,Set 2,Guess Number Higher or Lower,https://leetcode.com/problems/guess-number-higher-or-lower/
+Binary Search,Set 2,Sqrt(x),https://leetcode.com/problems/sqrtx/
+Binary Search,Set 2,Search 2D Matrix,https://leetcode.com/problems/search-a-2d-matrix/
+Binary Search,Set 2,Time Based Key-Value Store,https://leetcode.com/problems/time-based-key-value-store/
+Binary Search,Set 2,Find K Closest Elements,https://leetcode.com/problems/find-k-closest-elements/
+
+Binary Search,Set 3,Split Array Largest Sum,https://leetcode.com/problems/split-array-largest-sum/
+Binary Search,Set 3,Capacity to Ship Packages,https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/
+Binary Search,Set 3,Search Insert Position,https://leetcode.com/problems/search-insert-position/
+Binary Search,Set 3,Find Peak Element,https://leetcode.com/problems/find-peak-element/
+Binary Search,Set 3,Rotated Array Search II,https://leetcode.com/problems/search-in-rotated-sorted-array-ii/
+
+Binary Search,Set 4,Median of Two Sorted Arrays,https://leetcode.com/problems/median-of-two-sorted-arrays/
+Binary Search,Set 4,Find Peak Element,https://leetcode.com/problems/find-peak-element/
+Binary Search,Set 4,Search Range,https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/
+Binary Search,Set 4,Single Element in a Sorted Array,https://leetcode.com/problems/single-element-in-a-sorted-array/
+Binary Search,Set 4,Successful Pairs of Spells and Potions,https://leetcode.com/problems/successful-pairs-of-spells-and-potions/
+
+Dynamic Programming,Set 1,Climbing Stairs,https://leetcode.com/problems/climbing-stairs/
+Dynamic Programming,Set 1,Coin Change,https://leetcode.com/problems/coin-change/
+Dynamic Programming,Set 1,Longest Increasing Subsequence,https://leetcode.com/problems/longest-increasing-subsequence/
+Dynamic Programming,Set 1,House Robber,https://leetcode.com/problems/house-robber/
+Dynamic Programming,Set 1,Edit Distance,https://leetcode.com/problems/edit-distance/
+
+Dynamic Programming,Set 2,Partition Equal Subset Sum,https://leetcode.com/problems/partition-equal-subset-sum/
+Dynamic Programming,Set 2,Decode Ways,https://leetcode.com/problems/decode-ways/
+Dynamic Programming,Set 2,Unique Paths,https://leetcode.com/problems/unique-paths/
+Dynamic Programming,Set 2,Longest Palindromic Subsequence,https://leetcode.com/problems/longest-palindromic-subsequence/
+Dynamic Programming,Set 2,Word Break,https://leetcode.com/problems/word-break/
+
+Dynamic Programming,Set 3,Maximum Subarray,https://leetcode.com/problems/maximum-subarray/
+Dynamic Programming,Set 3,Jump Game,https://leetcode.com/problems/jump-game/
+Dynamic Programming,Set 3,Triangle,https://leetcode.com/problems/triangle/
+Dynamic Programming,Set 3,Minimum Path Sum,https://leetcode.com/problems/minimum-path-sum/
+Dynamic Programming,Set 3,Palindrome Partitioning II,https://leetcode.com/problems/palindrome-partitioning-ii/
+
+Dynamic Programming,Set 4,Regular Expression Matching,https://leetcode.com/problems/regular-expression-matching/
+Dynamic Programming,Set 4,Wildcard Matching,https://leetcode.com/problems/wildcard-matching/
+Dynamic Programming,Set 4,Interleaving String,https://leetcode.com/problems/interleaving-string/
+Dynamic Programming,Set 4,Cat and Mouse,https://leetcode.com/problems/cat-and-mouse/
+Dynamic Programming,Set 4,Burst Balloons,https://leetcode.com/problems/burst-balloons/
+
+Graph BFS/DFS,Set 1,Number of Islands,https://leetcode.com/problems/number-of-islands/
+Graph BFS/DFS,Set 1,Rotting Oranges,https://leetcode.com/problems/rotting-oranges/
+Graph BFS/DFS,Set 1,Word Ladder,https://leetcode.com/problems/word-ladder/
+Graph BFS/DFS,Set 1,Clone Graph,https://leetcode.com/problems/clone-graph/
+Graph BFS/DFS,Set 1,Pacific Atlantic Water Flow,https://leetcode.com/problems/pacific-atlantic-water-flow/
+
+Graph BFS/DFS,Set 2,Course Schedule,https://leetcode.com/problems/course-schedule/
+Graph BFS/DFS,Set 2,Course Schedule II,https://leetcode.com/problems/course-schedule-ii/
+Graph BFS/DFS,Set 2,Island Perimeter,https://leetcode.com/problems/island-perimeter/
+Graph BFS/DFS,Set 2,Shortest Bridge,https://leetcode.com/problems/shortest-bridge/
+Graph BFS/DFS,Set 2,Graph Valid Tree,https://leetcode.com/problems/graph-valid-tree/
+
+Graph BFS/DFS,Set 3,Surrounded Regions,https://leetcode.com/problems/surrounded-regions/
+Graph BFS/DFS,Set 3,01 Matrix,https://leetcode.com/problems/01-matrix/
+Graph BFS/DFS,Set 3,Snakes and Ladders,https://leetcode.com/problems/snakes-and-ladders/
+Graph BFS/DFS,Set 3,Regions Cut By Slashes,https://leetcode.com/problems/regions-cut-by-slashes/
+Graph BFS/DFS,Set 3,All Paths From Source to Target,https://leetcode.com/problems/all-paths-from-source-to-target/
+
+Graph BFS/DFS,Set 4,Accounts Merge,https://leetcode.com/problems/accounts-merge/
+Graph BFS/DFS,Set 4,Alien Dictionary,https://leetcode.com/problems/alien-dictionary/
+Graph BFS/DFS,Set 4,Fire Spread,https://leetcode.com/problems/escape-the-spreading-fire/
+Graph BFS/DFS,Set 4,Minimum Genetic Mutation,https://leetcode.com/problems/minimum-genetic-mutation/
+Graph BFS/DFS,Set 4,Battleships in a Board,https://leetcode.com/problems/battleships-in-a-board/
+
+Trees DFS,Set 1,Binary Tree Inorder Traversal,https://leetcode.com/problems/binary-tree-inorder-traversal/
+Trees DFS,Set 1,Maximum Depth of Binary Tree,https://leetcode.com/problems/maximum-depth-of-binary-tree/
+Trees DFS,Set 1,Path Sum,https://leetcode.com/problems/path-sum/
+Trees DFS,Set 1,Binary Tree Maximum Path Sum,https://leetcode.com/problems/binary-tree-maximum-path-sum/
+Trees DFS,Set 1,Lowest Common Ancestor of BST,https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/
+
+Trees DFS,Set 2,Binary Tree Level Order Traversal,https://leetcode.com/problems/binary-tree-level-order-traversal/
+Trees DFS,Set 2,Symmetric Tree,https://leetcode.com/problems/symmetric-tree/
+Trees DFS,Set 2,Diameter of Binary Tree,https://leetcode.com/problems/diameter-of-binary-tree/
+Trees DFS,Set 2,Convert Sorted Array to BST,https://leetcode.com/problems/convert-sorted-array-to-binary-search-tree/
+Trees DFS,Set 2,Path Sum II,https://leetcode.com/problems/path-sum-ii/
+
+Trees DFS,Set 3,Same Tree,https://leetcode.com/problems/same-tree/
+Trees DFS,Set 3,Sum Root to Leaf Numbers,https://leetcode.com/problems/sum-root-to-leaf-numbers/
+Trees DFS,Set 3,Validate Binary Search Tree,https://leetcode.com/problems/validate-binary-search-tree/
+Trees DFS,Set 3,Binary Tree Zigzag Level Order,https://leetcode.com/problems/binary-tree-zigzag-level-order-traversal/
+Trees DFS,Set 3,Construct Binary Tree from Preorder-Inorder,https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/
+
+Trees DFS,Set 4,Binary Search Tree Iterator,https://leetcode.com/problems/binary-search-tree-iterator/
+Trees DFS,Set 4,Recover Binary Search Tree,https://leetcode.com/problems/recover-binary-search-tree/
+Trees DFS,Set 4,Populating Next Right Pointers,https://leetcode.com/problems/populating-next-right-pointers-in-each-node/
+Trees DFS,Set 4,Count Complete Tree Nodes,https://leetcode.com/problems/count-complete-tree-nodes/
+Trees DFS,Set 4,Flatten Binary Tree to Linked List,https://leetcode.com/problems/flatten-binary-tree-to-linked-list/
+
+Intervals,Set 1,Insert Interval,https://leetcode.com/problems/insert-interval/
+Intervals,Set 1,Merge Intervals,https://leetcode.com/problems/merge-intervals/
+Intervals,Set 1,Non-overlapping Intervals,https://leetcode.com/problems/non-overlapping-intervals/
+Intervals,Set 1,Meeting Rooms II,https://leetcode.com/problems/meeting-rooms-ii/
+Intervals,Set 1,Minimum Arrows to Burst Balloons,https://leetcode.com/problems/minimum-number-of-arrows-to-burst-balloons/
+
+Intervals,Set 2,Employee Free Time,https://leetcode.com/problems/employee-free-time/
+Intervals,Set 2,Interval List Intersections,https://leetcode.com/problems/interval-list-intersections/
+Intervals,Set 2,My Calendar I,https://leetcode.com/problems/my-calendar-i/
+Intervals,Set 2,Car Pooling,https://leetcode.com/problems/car-pooling/
+Intervals,Set 2,Find Right Interval,https://leetcode.com/problems/find-right-interval/
+
+Intervals,Set 3,Range Module,https://leetcode.com/problems/range-module/
+Intervals,Set 3,Video Stitching,https://leetcode.com/problems/video-stitching/
+Intervals,Set 3,Merge Sorted Array,https://leetcode.com/problems/merge-sorted-array/
+Intervals,Set 3,Minimum Meeting Rooms,https://leetcode.com/problems/meeting-rooms/
+Intervals,Set 3,Jump Game II,https://leetcode.com/problems/jump-game-ii/
+
+Intervals,Set 4,Interval Scheduling,https://leetcode.com/problems/minimum-number-of-arrows-to-burst-balloons/
+Intervals,Set 4,Split Intervals Array,https://leetcode.com/problems/remove-covered-intervals/
+Intervals,Set 4,Find Min Time to Finish Jobs,https://leetcode.com/problems/minimum-difficulty-of-a-job-schedule/
+Intervals,Set 4,Maximum CPU Load (LC VIP),https://leetcode.com/
+Intervals,Set 4,Non Overlapping Intervals,https://leetcode.com/problems/non-overlapping-intervals/
+
+Backtracking,Set 1,Combination Sum,https://leetcode.com/problems/combination-sum/
+Backtracking,Set 1,Permutations,https://leetcode.com/problems/permutations/
+Backtracking,Set 1,Subsets,https://leetcode.com/problems/subsets/
+Backtracking,Set 1,Letter Combinations,https://leetcode.com/problems/letter-combinations-of-a-phone-number/
+Backtracking,Set 1,N-Queens,https://leetcode.com/problems/n-queens/
+
+Backtracking,Set 2,Combination Sum II,https://leetcode.com/problems/combination-sum-ii/
+Backtracking,Set 2,Permutations II,https://leetcode.com/problems/permutations-ii/
+Backtracking,Set 2,Word Search,https://leetcode.com/problems/word-search/
+Backtracking,Set 2,Restore IP Addresses,https://leetcode.com/problems/restore-ip-addresses/
+Backtracking,Set 2,Generate Parentheses,https://leetcode.com/problems/generate-parentheses/
+
+Backtracking,Set 3,Palindrome Partitioning,https://leetcode.com/problems/palindrome-partitioning/
+Backtracking,Set 3,Combination Sum III,https://leetcode.com/problems/combination-sum-iii/
+Backtracking,Set 3,Target Sum,https://leetcode.com/problems/target-sum/
+Backtracking,Set 3,Subset Sum,https://leetcode.com/problems/subsets/
+Backtracking,Set 3,Count Sorted Vowel Strings,https://leetcode.com/problems/count-sorted-vowel-strings/
+
+Backtracking,Set 4,Word Search II,https://leetcode.com/problems/word-search-ii/
+Backtracking,Set 4,Expression Add Operators,https://leetcode.com/problems/expression-add-operators/
+Backtracking,Set 4,Beautiful Arrangement,https://leetcode.com/problems/beautiful-arrangement/
+Backtracking,Set 4,Stickers to Spell Word,https://leetcode.com/problems/stickers-to-spell-word/
+Backtracking,Set 4,Matchsticks to Square,https://leetcode.com/problems/matchsticks-to-square/
+
+Greedy,Set 1,Gas Station,https://leetcode.com/problems/gas-station/
+Greedy,Set 1,Jump Game,https://leetcode.com/problems/jump-game/
+Greedy,Set 1,Partition Labels,https://leetcode.com/problems/partition-labels/
+Greedy,Set 1,Task Scheduler,https://leetcode.com/problems/task-scheduler/
+Greedy,Set 1,Minimum Arrows to Burst Balloons,https://leetcode.com/problems/minimum-number-of-arrows-to-burst-balloons/
+
+Greedy,Set 2,Erase Overlap Intervals,https://leetcode.com/problems/non-overlapping-intervals/
+Greedy,Set 2,Non-decreasing Array,https://leetcode.com/problems/non-decreasing-array/
+Greedy,Set 2,Queue Reconstruction by Height,https://leetcode.com/problems/queue-reconstruction-by-height/
+Greedy,Set 2,Hand of Straights,https://leetcode.com/problems/hand-of-straights/
+Greedy,Set 2,Boats to Save People,https://leetcode.com/problems/boats-to-save-people/
+
+Greedy,Set 3,Maximum Subsequence Score,https://leetcode.com/problems/maximum-subsequence-score/
+Greedy,Set 3,Maximum Units on a Truck,https://leetcode.com/problems/maximum-units-on-a-truck/
+Greedy,Set 3,Largest Perimeter Triangle,https://leetcode.com/problems/largest-perimeter-triangle/
+Greedy,Set 3,Minimum Add to Make Parentheses Valid,https://leetcode.com/problems/minimum-add-to-make-parentheses-valid/
+Greedy,Set 3,Split Array into Consecutive Subsequences,https://leetcode.com/problems/split-array-into-consecutive-subsequences/
+
+Greedy,Set 4,Maximize Sum of Array After K Negations,https://leetcode.com/problems/maximize-sum-of-array-after-k-negations/
+Greedy,Set 4,Minimum Cost to Connect Sticks,https://leetcode.com/problems/minimum-cost-to-connect-sticks/
+Greedy,Set 4,Minimum Days to Make Bouquets,https://leetcode.com/problems/minimum-number-of-days-to-make-m-bouquets/
+Greedy,Set 4,Jump Game II,https://leetcode.com/problems/jump-game-ii/
+Greedy,Set 4,Meeting Rooms,https://leetcode.com/problems/meeting-rooms/
+
+Heap,Set 1,Top K Frequent Elements,https://leetcode.com/problems/top-k-frequent-elements/
+Heap,Set 1,K Closest Points to Origin,https://leetcode.com/problems/k-closest-points-to-origin/
+Heap,Set 1,Merge K Sorted Lists,https://leetcode.com/problems/merge-k-sorted-lists/
+Heap,Set 1,Reorganize String,https://leetcode.com/problems/reorganize-string/
+Heap,Set 1,Find Median from Data Stream,https://leetcode.com/problems/find-median-from-data-stream/
+
+Heap,Set 2,Task Scheduler,https://leetcode.com/problems/task-scheduler/
+Heap,Set 2,Ugly Number II,https://leetcode.com/problems/ugly-number-ii/
+Heap,Set 2,Kth Largest Element in Stream,https://leetcode.com/problems/kth-largest-element-in-a-stream/
+Heap,Set 2,Kth Smallest Element in Sorted Matrix,https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/
+Heap,Set 2,Sort Characters by Frequency,https://leetcode.com/problems/sort-characters-by-frequency/
+
+Heap,Set 3,Maximum Score After Splitting String,https://leetcode.com/problems/maximum-score-after-splitting-a-string/
+Heap,Set 3,Furthest Building You Can Reach,https://leetcode.com/problems/furthest-building-you-can-reach/
+Heap,Set 3,Minimum Cost to Hire K Workers,https://leetcode.com/problems/minimum-cost-to-hire-k-workers/
+Heap,Set 3,The Skyline Problem,https://leetcode.com/problems/the-skyline-problem/
+Heap,Set 3,Find K Pairs With Smallest Sums,https://leetcode.com/problems/find-k-pairs-with-smallest-sums/
+
+Heap,Set 4,IPO,https://leetcode.com/problems/ipo/
+Heap,Set 4,Reduce Array Size to Half,https://leetcode.com/problems/reduce-array-size-to-half/
+Heap,Set 4,Frequency Sort,https://leetcode.com/problems/sort-characters-by-frequency/
+Heap,Set 4,Maximum Product After K Increments,https://leetcode.com/problems/maximum-product-after-k-increments/
+Heap,Set 4,Make Array Zero by Subtracting Equal Amounts,https://leetcode.com/problems/make-array-zero-by-subtracting-equal-amounts/
+
+Tries,Set 1,Implement Trie,https://leetcode.com/problems/implement-trie-prefix-tree/
+Tries,Set 1,Word Search II,https://leetcode.com/problems/word-search-ii/
+Tries,Set 1,Replace Words,https://leetcode.com/problems/replace-words/
+Tries,Set 1,Longest Word in Dictionary,https://leetcode.com/problems/longest-word-in-dictionary/
+Tries,Set 1,Design Add and Search Words Data Structure,https://leetcode.com/problems/design-add-and-search-words-data-structure/
+
+Tries,Set 2,Stream of Characters,https://leetcode.com/problems/stream-of-characters/
+Tries,Set 2,Add and Search Words,https://leetcode.com/problems/design-add-and-search-words-data-structure/
+Tries,Set 2,Magic Dictionary,https://leetcode.com/problems/implement-magic-dictionary/
+Tries,Set 2,Palindrome Pairs,https://leetcode.com/problems/palindrome-pairs/
+Tries,Set 2,Search Suggestions System,https://leetcode.com/problems/search-suggestions-system/
+
+Tries,Set 3,Replace Words,https://leetcode.com/problems/replace-words/
+Tries,Set 3,Longest Word in Dictionary,https://leetcode.com/problems/longest-word-in-dictionary/
+Tries,Set 3,Implement Trie,https://leetcode.com/problems/implement-trie-prefix-tree/
+Tries,Set 3,Prefix and Suffix Search,https://leetcode.com/problems/prefix-and-suffix-search/
+Tries,Set 3,Concatenated Words,https://leetcode.com/problems/concatenated-words/
+
+Tries,Set 4,Word Squares,https://leetcode.com/problems/word-squares/
+Tries,Set 4,Search Suggestions System,https://leetcode.com/problems/search-suggestions-system/
+Tries,Set 4,Replace Words,https://leetcode.com/problems/replace-words/
+Tries,Set 4,Word Break II,https://leetcode.com/problems/word-break-ii/
+Tries,Set 4,Design Search Autocomplete,https://leetcode.com/problems/design-search-autocomplete-system/
+
+Bit Manipulation,Set 1,Single Number,https://leetcode.com/problems/single-number/
+Bit Manipulation,Set 1,Number of 1 Bits,https://leetcode.com/problems/number-of-1-bits/
+Bit Manipulation,Set 1,Missing Number,https://leetcode.com/problems/missing-number/
+Bit Manipulation,Set 1,Sum of Two Integers,https://leetcode.com/problems/sum-of-two-integers/
+Bit Manipulation,Set 1,Counting Bits,https://leetcode.com/problems/counting-bits/
+
+Bit Manipulation,Set 2,Single Number II,https://leetcode.com/problems/single-number-ii/
+Bit Manipulation,Set 2,Single Number III,https://leetcode.com/problems/single-number-iii/
+Bit Manipulation,Set 2,Power of Two,https://leetcode.com/problems/power-of-two/
+Bit Manipulation,Set 2,Reverse Bits,https://leetcode.com/problems/reverse-bits/
+Bit Manipulation,Set 2,Total Hamming Distance,https://leetcode.com/problems/total-hamming-distance/
+
+Bit Manipulation,Set 3,Hamming Distance,https://leetcode.com/problems/hamming-distance/
+Bit Manipulation,Set 3,Bitwise AND of Numbers Range,https://leetcode.com/problems/bitwise-and-of-numbers-range/
+Bit Manipulation,Set 3,Max XOR of Two Numbers in Array,https://leetcode.com/problems/maximum-xor-of-two-numbers-in-an-array/
+Bit Manipulation,Set 3,Counting Bits,https://leetcode.com/problems/counting-bits/
+Bit Manipulation,Set 3,Find the Duplicate Number,https://leetcode.com/problems/find-the-duplicate-number/
+
+Bit Manipulation,Set 4,Find XOR of Numbers From L to R,https://leetcode.com/
+Bit Manipulation,Set 4,Minimum Flips to Make OR Equal,https://leetcode.com/
+Bit Manipulation,Set 4,Minimum Operations to Reduce X to Zero,https://leetcode.com/
+Bit Manipulation,Set 4,Minimize XOR,https://leetcode.com/
+Bit Manipulation,Set 4,Maximum XOR Queries,https://leetcode.com/

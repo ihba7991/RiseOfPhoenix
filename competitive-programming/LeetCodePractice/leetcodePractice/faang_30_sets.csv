@@ -1,0 +1,121 @@
+Set Number,Problem,URL
+1,Sliding Window Maximum,https://leetcode.com/problems/sliding-window-maximum/
+1,Longest Substring Without Repeating Characters,https://leetcode.com/problems/longest-substring-without-repeating-characters/
+1,Partition Labels,https://leetcode.com/problems/partition-labels/
+1,Sudoku Solver,https://leetcode.com/problems/sudoku-solver/
+2,N-Queens,https://leetcode.com/problems/n-queens/
+2,Coin Change,https://leetcode.com/problems/coin-change/
+2,Trapping Rain Water,https://leetcode.com/problems/trapping-rain-water/
+2,Rotate Image,https://leetcode.com/problems/rotate-image/
+3,Binary Tree Maximum Path Sum,https://leetcode.com/problems/binary-tree-maximum-path-sum/
+3,Word Ladder,https://leetcode.com/problems/word-ladder/
+3,Longest Substring Without Repeating Characters,https://leetcode.com/problems/longest-substring-without-repeating-characters/
+3,Rotate Image,https://leetcode.com/problems/rotate-image/
+4,Permutations,https://leetcode.com/problems/permutations/
+4,N-Queens,https://leetcode.com/problems/n-queens/
+4,Longest Substring Without Repeating Characters,https://leetcode.com/problems/longest-substring-without-repeating-characters/
+4,Combination Sum,https://leetcode.com/problems/combination-sum/
+5,Longest Valid Parentheses,https://leetcode.com/problems/longest-valid-parentheses/
+5,N-Queens,https://leetcode.com/problems/n-queens/
+5,Longest Repeating Character Replacement,https://leetcode.com/problems/longest-repeating-character-replacement/
+5,Partition Labels,https://leetcode.com/problems/partition-labels/
+6,Number of Islands,https://leetcode.com/problems/number-of-islands/
+6,Edit Distance,https://leetcode.com/problems/edit-distance/
+6,Binary Tree Maximum Path Sum,https://leetcode.com/problems/binary-tree-maximum-path-sum/
+6,Insert Interval,https://leetcode.com/problems/insert-interval/
+7,Partition Labels,https://leetcode.com/problems/partition-labels/
+7,Longest Increasing Subsequence,https://leetcode.com/problems/longest-increasing-subsequence/
+7,Permutations,https://leetcode.com/problems/permutations/
+7,Insert Interval,https://leetcode.com/problems/insert-interval/
+8,Trapping Rain Water,https://leetcode.com/problems/trapping-rain-water/
+8,Rotate Image,https://leetcode.com/problems/rotate-image/
+8,House Robber,https://leetcode.com/problems/house-robber/
+8,Minimum Cost to Hire K Workers,https://leetcode.com/problems/minimum-cost-to-hire-k-workers/
+9,Minimum Cost to Hire K Workers,https://leetcode.com/problems/minimum-cost-to-hire-k-workers/
+9,Search in Rotated Sorted Array,https://leetcode.com/problems/search-in-rotated-sorted-array/
+9,Word Ladder,https://leetcode.com/problems/word-ladder/
+9,01 Matrix,https://leetcode.com/problems/01-matrix/
+10,Sliding Window Maximum,https://leetcode.com/problems/sliding-window-maximum/
+10,House Robber,https://leetcode.com/problems/house-robber/
+10,Rotate Image,https://leetcode.com/problems/rotate-image/
+10,Median of Two Sorted Arrays,https://leetcode.com/problems/median-of-two-sorted-arrays/
+11,The Skyline Problem,https://leetcode.com/problems/the-skyline-problem/
+11,Combination Sum,https://leetcode.com/problems/combination-sum/
+11,Binary Tree Level Order Traversal,https://leetcode.com/problems/binary-tree-level-order-traversal/
+11,Word Ladder,https://leetcode.com/problems/word-ladder/
+12,N-Queens,https://leetcode.com/problems/n-queens/
+12,Median of Two Sorted Arrays,https://leetcode.com/problems/median-of-two-sorted-arrays/
+12,Rotate Image,https://leetcode.com/problems/rotate-image/
+12,Trapping Rain Water,https://leetcode.com/problems/trapping-rain-water/
+13,House Robber,https://leetcode.com/problems/house-robber/
+13,Partition Labels,https://leetcode.com/problems/partition-labels/
+13,01 Matrix,https://leetcode.com/problems/01-matrix/
+13,The Skyline Problem,https://leetcode.com/problems/the-skyline-problem/
+14,Edit Distance,https://leetcode.com/problems/edit-distance/
+14,The Skyline Problem,https://leetcode.com/problems/the-skyline-problem/
+14,Minimum Cost to Hire K Workers,https://leetcode.com/problems/minimum-cost-to-hire-k-workers/
+14,Permutations,https://leetcode.com/problems/permutations/
+15,Partition Labels,https://leetcode.com/problems/partition-labels/
+15,Binary Tree Level Order Traversal,https://leetcode.com/problems/binary-tree-level-order-traversal/
+15,Edit Distance,https://leetcode.com/problems/edit-distance/
+15,Sudoku Solver,https://leetcode.com/problems/sudoku-solver/
+16,Edit Distance,https://leetcode.com/problems/edit-distance/
+16,01 Matrix,https://leetcode.com/problems/01-matrix/
+16,House Robber,https://leetcode.com/problems/house-robber/
+16,Partition Labels,https://leetcode.com/problems/partition-labels/
+17,N-Queens,https://leetcode.com/problems/n-queens/
+17,K Closest Points to Origin,https://leetcode.com/problems/k-closest-points-to-origin/
+17,Merge k Sorted Lists,https://leetcode.com/problems/merge-k-sorted-lists/
+17,Word Ladder,https://leetcode.com/problems/word-ladder/
+18,K Closest Points to Origin,https://leetcode.com/problems/k-closest-points-to-origin/
+18,Validate Binary Search Tree,https://leetcode.com/problems/validate-binary-search-tree/
+18,Partition Labels,https://leetcode.com/problems/partition-labels/
+18,Binary Tree Level Order Traversal,https://leetcode.com/problems/binary-tree-level-order-traversal/
+19,Permutations,https://leetcode.com/problems/permutations/
+19,K Closest Points to Origin,https://leetcode.com/problems/k-closest-points-to-origin/
+19,Shortest Bridge,https://leetcode.com/problems/shortest-bridge/
+19,Validate Binary Search Tree,https://leetcode.com/problems/validate-binary-search-tree/
+20,01 Matrix,https://leetcode.com/problems/01-matrix/
+20,Longest Increasing Subsequence,https://leetcode.com/problems/longest-increasing-subsequence/
+20,Search in Rotated Sorted Array,https://leetcode.com/problems/search-in-rotated-sorted-array/
+20,Coin Change,https://leetcode.com/problems/coin-change/
+21,Sudoku Solver,https://leetcode.com/problems/sudoku-solver/
+21,Search in Rotated Sorted Array,https://leetcode.com/problems/search-in-rotated-sorted-array/
+21,Binary Tree Maximum Path Sum,https://leetcode.com/problems/binary-tree-maximum-path-sum/
+21,Validate Binary Search Tree,https://leetcode.com/problems/validate-binary-search-tree/
+22,The Skyline Problem,https://leetcode.com/problems/the-skyline-problem/
+22,N-Queens,https://leetcode.com/problems/n-queens/
+22,Coin Change,https://leetcode.com/problems/coin-change/
+22,Shortest Bridge,https://leetcode.com/problems/shortest-bridge/
+23,Rotate Image,https://leetcode.com/problems/rotate-image/
+23,Merge k Sorted Lists,https://leetcode.com/problems/merge-k-sorted-lists/
+23,Sliding Window Maximum,https://leetcode.com/problems/sliding-window-maximum/
+23,Longest Increasing Subsequence,https://leetcode.com/problems/longest-increasing-subsequence/
+24,Edit Distance,https://leetcode.com/problems/edit-distance/
+24,Binary Tree Maximum Path Sum,https://leetcode.com/problems/binary-tree-maximum-path-sum/
+24,Binary Tree Level Order Traversal,https://leetcode.com/problems/binary-tree-level-order-traversal/
+24,House Robber,https://leetcode.com/problems/house-robber/
+25,House Robber,https://leetcode.com/problems/house-robber/
+25,01 Matrix,https://leetcode.com/problems/01-matrix/
+25,Search in Rotated Sorted Array,https://leetcode.com/problems/search-in-rotated-sorted-array/
+25,Number of Islands,https://leetcode.com/problems/number-of-islands/
+26,Sliding Window Maximum,https://leetcode.com/problems/sliding-window-maximum/
+26,Partition Labels,https://leetcode.com/problems/partition-labels/
+26,Insert Interval,https://leetcode.com/problems/insert-interval/
+26,Median of Two Sorted Arrays,https://leetcode.com/problems/median-of-two-sorted-arrays/
+27,Binary Tree Maximum Path Sum,https://leetcode.com/problems/binary-tree-maximum-path-sum/
+27,Edit Distance,https://leetcode.com/problems/edit-distance/
+27,01 Matrix,https://leetcode.com/problems/01-matrix/
+27,Number of Islands,https://leetcode.com/problems/number-of-islands/
+28,Search in Rotated Sorted Array,https://leetcode.com/problems/search-in-rotated-sorted-array/
+28,Regular Expression Matching,https://leetcode.com/problems/regular-expression-matching/
+28,Trapping Rain Water,https://leetcode.com/problems/trapping-rain-water/
+28,Minimum Window Substring,https://leetcode.com/problems/minimum-window-substring/
+29,Combination Sum,https://leetcode.com/problems/combination-sum/
+29,Longest Increasing Subsequence,https://leetcode.com/problems/longest-increasing-subsequence/
+29,The Skyline Problem,https://leetcode.com/problems/the-skyline-problem/
+29,Edit Distance,https://leetcode.com/problems/edit-distance/
+30,Number of Islands,https://leetcode.com/problems/number-of-islands/
+30,K Closest Points to Origin,https://leetcode.com/problems/k-closest-points-to-origin/
+30,Shortest Bridge,https://leetcode.com/problems/shortest-bridge/
+30,Longest Substring Without Repeating Characters,https://leetcode.com/problems/longest-substring-without-repeating-characters/

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CopilotDiffPersistence">
+    <option name="pendingDiffs">
+      <map>
+        <entry key="$PROJECT_DIR$/README.md">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/README.md" />
+              <option name="originalContent" value="# Connection Pool Demo&#10;&#10;This small project demonstrates a basic JDBC connection pool and a tiny HTTP server to compare pooled vs direct connections using an in-memory H2 database.&#10;&#10;Build and run (requires Java 17+ and Maven):&#10;&#10;```bash&#10;mvn package&#10;java -jar target/connection-pool-0.1.0.jar&#10;```&#10;&#10;Endpoints:&#10;- http://localhost:8080/direct - opens a new JDBC connection per request&#10;- http://localhost:8080/pooled - reuses connections from the pool&#10;&#10;You can run a simple benchmark with curl in a loop or use a load tester to compare the X-Duration-ms header returned.&#10;" />
+              <option name="updatedContent" value="# Connection Pool Demo&#10;&#10;This small project demonstrates a basic JDBC connection pool and a tiny HTTP server to compare pooled vs direct connections using an in-memory H2 database.&#10;&#10;Build and run (requires Java 17+ and Maven):&#10;&#10;```bash&#10;mvn package&#10;java -jar target/connection-pool-0.1.0.jar&#10;```&#10;&#10;Endpoints:&#10;- http://localhost:8080/direct - opens a new JDBC connection per request&#10;- http://localhost:8080/pooled - reuses connections from the pool&#10;&#10;You can run a simple benchmark with curl in a loop or use a load tester to compare the X-Duration-ms header returned.&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

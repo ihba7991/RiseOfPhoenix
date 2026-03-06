@@ -1,0 +1,19 @@
+====bb
+This is input: bb
+current: 
+current length: 0
+Palindrome found: 
+current: b
+current length: 1
+Palindrome found: b
+current: bb
+current length: 2
+Comparing b and b
+Palindrome found: bb
+current: 
+current length: 0
+Palindrome found: 
+current: b
+current length: 1
+Palindrome found: b
+Answer + bb
