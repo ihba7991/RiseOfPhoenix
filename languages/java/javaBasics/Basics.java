@@ -1,5 +1,3 @@
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 
@@ -9,12 +7,13 @@ public class Basics {
 
 
     public boolean isPalindrome(String s){
-        // if(s.length() == 0) return false;
+        if(s == null) return false;
+        if(s.length() == 0) return false;
         if(s.length() == 1) return true;
         int low = 0; 
         int high = s.length()-1;
         while(low<high){
-            System.out.println("Comparing " + s.charAt(low) + " and " + s.charAt(high));
+            // Reduced debug output for clarity
             if(s.charAt(low) != s.charAt(high)){
                 return false;
             }
@@ -24,20 +23,19 @@ public class Basics {
         return true;
     }
     public String longestPalindrome(String s) {
+        if(s == null) return "";
         int n = s.length();
         if(n == 0) return "";
         if(n == 1) return s;
         String ans = "";
-        int maxLen = Integer.MIN_VALUE;
+        int maxLen = 0;
 
         for(int i =0; i<n ; i++){
-            for(int j = i; j<=n; j++){
+            // ensure we consider substrings of length >= 1
+            for(int j = i+1; j<=n; j++){
                 String curr = s.substring(i,j);
-                System.out.println("current: " + curr);
                 int currLen = curr.length();
-                System.out.println("current length: " + currLen);
                 if(isPalindrome(curr)){
-                    System.out.println("Palindrome found: " + curr);
                     if(currLen>maxLen){
                         ans = curr;
                         maxLen = currLen;
@@ -60,11 +58,11 @@ public class Basics {
     // }
 
     public boolean scoreBalance(String s) {
+        if(s == null) return false;
         int n = s.length();
+        if(n < 2) return false; // cannot split
         int leftSum = 0;
         int rightSum = 0;
-        int left = 0;
-        int right = n-1;
         int[] postSum = new int[n];
         int[] preSum = new int[n];
         for(int i =0; i<n; i++){
@@ -75,17 +73,9 @@ public class Basics {
             rightSum += (s.charAt(j) - 'a') + 1;
             postSum[j] = rightSum;
         }
-        System.out.println("Prefix sum array: ");
-        for(int i =0; i<n; i++){
-            System.out.print(preSum[i] + " ");
-        }
-        
-        System.out.println("Post sum array: ");
-        for(int i =0; i<n; i++){
-            System.out.print(postSum[i] + " ");
-        }
-        for(int i =0; i<n; i++){
-            if(preSum[i] == postSum[n-1-i]){
+        // compare prefix sum up to i with suffix sum starting at i+1
+        for(int i =0; i<n-1; i++){
+            if(preSum[i] == postSum[i+1]){
                 return true;
             }
         }
@@ -94,16 +84,28 @@ public class Basics {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        String input = scanner.nextLine();
-        System.out.println("===="+input.substring(0,2));
+        String input = null;
+        if(scanner.hasNextLine()){
+            input = scanner.nextLine().trim();
+        }
+        if(input == null || input.length() == 0){
+            // fallback/default
+            input = "abccba";
+            System.out.println("No input provided. Using default: " + input);
+        }
+
+        // Safe substring printing
+        if(input.length() >= 2){
+            System.out.println("===="+input.substring(0,2));
+        } else {
+            System.out.println("===="+input);
+        }
         System.out.println("This is input: "+input);
         String ans = new Basics().longestPalindrome(input);
-        System.out.println("Answer + " + ans);
-        String config = "324";
-        int x = 2;
-        int y = 3;
-        boolean res = new Basics().scoreBalance("abccba");
-        // System.out.println(num % 2 == 0 ? "Even" : "Odd");
+        System.out.println("Longest palindrome: " + (ans.isEmpty() ? "(none)" : ans));
+
+        boolean res = new Basics().scoreBalance(input);
+        System.out.println("scoreBalance result: " + res);
         scanner.close();
 
     }
