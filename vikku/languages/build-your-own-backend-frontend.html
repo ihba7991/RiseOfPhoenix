@@ -1,0 +1,2022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BUILD YOUR OWN — Backend & Frontend From Scratch</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&family=Syne+Mono&display=swap');
+
+:root {
+  --bg: #080c10;
+  --surface: #0d1117;
+  --surface2: #161b22;
+  --border: #21262d;
+  --text: #e6edf3;
+  --muted: #7d8590;
+  --dim: #3d444d;
+
+  --tier1: #f0c040;
+  --tier2: #e07020;
+  --tier3: #c03050;
+  --tier4: #7040e0;
+
+  --cat-go: #00ADD8;
+  --cat-python: #3572A5;
+  --cat-node: #68A063;
+  --cat-react: #61DAFB;
+  --cat-infra: #ffa657;
+
+  --mono: 'Space Mono', monospace;
+  --display: 'Syne', sans-serif;
+  --code: 'Syne Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--mono);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px);
+  pointer-events: none;
+  z-index: 9999;
+}
+
+header {
+  padding: 48px 40px 32px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+header::before {
+  content: 'BUILD YOUR OWN';
+  position: absolute;
+  top: -20px; right: -20px;
+  font-family: var(--display);
+  font-size: 10rem;
+  font-weight: 800;
+  color: rgba(255,255,255,0.02);
+  letter-spacing: -0.05em;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.header-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+h1 {
+  font-family: var(--display);
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+h1 .accent { color: var(--tier1); }
+h1 .dim { color: var(--muted); font-weight: 400; }
+
+.header-meta {
+  font-size: 0.7rem;
+  color: var(--muted);
+  letter-spacing: 0.12em;
+  margin-top: 12px;
+  text-transform: uppercase;
+}
+
+.stats-row {
+  display: flex;
+  gap: 24px;
+  margin-top: 32px;
+  flex-wrap: wrap;
+}
+
+.stat-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.stat-pill .n {
+  font-family: var(--display);
+  font-size: 1.2rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.tier-legend {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.tier-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.tier-dot { width: 8px; height: 8px; border-radius: 1px; }
+
+.controls {
+  padding: 20px 40px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  background: rgba(13,17,23,0.8);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+}
+
+.filter-group { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.filter-btn {
+  padding: 5px 12px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.filter-btn:hover { border-color: var(--dim); color: var(--text); }
+.filter-btn.active { color: var(--bg); border-color: transparent; }
+
+.filter-btn[data-cat="all"].active { background: var(--text); }
+.filter-btn[data-cat="go"].active { background: var(--cat-go); }
+.filter-btn[data-cat="python"].active { background: var(--cat-python); }
+.filter-btn[data-cat="node"].active { background: var(--cat-node); }
+.filter-btn[data-cat="react"].active { background: var(--cat-react); color: #000; }
+.filter-btn[data-cat="infra"].active { background: var(--cat-infra); }
+
+.tier-filter-group { display: flex; gap: 6px; }
+
+.tier-btn {
+  padding: 5px 12px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.15s;
+}
+.tier-btn:hover { color: var(--text); }
+.tier-btn.active[data-tier="1"] { background: var(--tier1); color: #000; border-color: transparent; }
+.tier-btn.active[data-tier="2"] { background: var(--tier2); color: #fff; border-color: transparent; }
+.tier-btn.active[data-tier="3"] { background: var(--tier3); color: #fff; border-color: transparent; }
+.tier-btn.active[data-tier="4"] { background: var(--tier4); color: #fff; border-color: transparent; }
+
+.sep { width: 1px; height: 24px; background: var(--border); flex-shrink: 0; }
+
+.search-box {
+  padding: 5px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  outline: none;
+  border-radius: 2px;
+  width: 200px;
+  transition: border-color 0.15s;
+}
+.search-box:focus { border-color: var(--dim); }
+.search-box::placeholder { color: var(--dim); }
+
+.grid-container {
+  padding: 32px 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 2px;
+  background: var(--border);
+}
+
+.project-card {
+  background: var(--surface);
+  padding: 24px;
+  cursor: pointer;
+  transition: background 0.15s;
+  position: relative;
+  border-left: 3px solid transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.project-card:hover { background: var(--surface2); }
+.project-card.hidden { display: none; }
+.project-card.done { opacity: 0.5; }
+.project-card.done .card-title { text-decoration: line-through; }
+
+.card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.card-num {
+  font-size: 0.6rem;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+}
+
+.card-badges { display: flex; gap: 5px; align-items: center; }
+
+.badge {
+  padding: 2px 7px;
+  font-size: 0.55rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 1px;
+}
+
+.tier-badge-1 { background: rgba(240,192,64,0.15); color: var(--tier1); border: 1px solid rgba(240,192,64,0.3); }
+.tier-badge-2 { background: rgba(224,112,32,0.15); color: var(--tier2); border: 1px solid rgba(224,112,32,0.3); }
+.tier-badge-3 { background: rgba(192,48,80,0.15); color: var(--tier3); border: 1px solid rgba(192,48,80,0.3); }
+.tier-badge-4 { background: rgba(112,64,224,0.15); color: var(--tier4); border: 1px solid rgba(112,64,224,0.3); }
+
+.cat-badge { font-size: 0.55rem; padding: 2px 7px; border-radius: 1px; }
+
+.card-title {
+  font-family: var(--display);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+.card-tagline {
+  font-size: 0.72rem;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.card-stack { display: flex; gap: 4px; flex-wrap: wrap; }
+.stack-tag {
+  padding: 2px 6px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  font-size: 0.55rem;
+  color: var(--dim);
+  border-radius: 1px;
+  font-family: var(--code);
+  letter-spacing: 0.05em;
+}
+
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.card-time { font-size: 0.6rem; color: var(--dim); letter-spacing: 0.06em; }
+.card-deps { font-size: 0.55rem; color: var(--dim); }
+
+.done-btn {
+  width: 18px; height: 18px;
+  border: 1px solid var(--border);
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.55rem;
+  color: var(--dim);
+  border-radius: 2px;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.done-btn:hover { border-color: #3fb950; color: #3fb950; }
+.project-card.done .done-btn { background: rgba(63,185,80,0.15); border-color: #3fb950; color: #3fb950; }
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(8,12,16,0.92);
+  z-index: 1000;
+  display: none;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.open { display: flex; }
+
+.modal {
+  width: min(680px, 95vw);
+  max-height: calc(100vh - 40px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  overflow-y: auto;
+  animation: slideIn 0.2s ease;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.modal-header {
+  padding: 24px 28px 20px;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.modal-close {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  padding: 4px 10px;
+  cursor: pointer;
+  border-radius: 2px;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.modal-close:hover { border-color: var(--tier3); color: var(--tier3); }
+
+.modal-body { padding: 28px; display: flex; flex-direction: column; gap: 24px; }
+
+.modal-title {
+  font-family: var(--display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.modal-section-title {
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 6px;
+}
+
+.guide-step {
+  display: flex;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.guide-step:last-child { border-bottom: none; }
+
+.step-num {
+  font-family: var(--display);
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--dim);
+  min-width: 32px;
+  line-height: 1;
+  padding-top: 3px;
+}
+
+.step-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+  font-family: var(--display);
+}
+.step-desc {
+  font-size: 0.72rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.step-code {
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  font-family: var(--code);
+  font-size: 0.68rem;
+  color: var(--tier1);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+
+.resource-list { display: flex; flex-direction: column; gap: 6px; }
+.resource-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 8px 10px;
+  background: var(--surface2);
+  border-radius: 2px;
+}
+.resource-type {
+  font-size: 0.58rem;
+  padding: 2px 6px;
+  border-radius: 1px;
+  font-family: var(--code);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.rtype-paper { background: rgba(121,192,255,0.12); color: var(--cat-react); }
+.rtype-repo { background: rgba(63,185,80,0.12); color: #3fb950; }
+.rtype-video { background: rgba(255,123,114,0.12); color: #ff7b72; }
+.rtype-blog { background: rgba(210,168,255,0.12); color: #d2a8ff; }
+.rtype-docs { background: rgba(88,166,255,0.12); color: #58a6ff; }
+
+.resource-name { font-size: 0.75rem; color: var(--text); margin-bottom: 2px; }
+.resource-detail { font-size: 0.6rem; color: var(--muted); }
+
+.diff-seg {
+  height: 6px;
+  width: 28px;
+  border-radius: 1px;
+  background: var(--border);
+}
+.diff-seg.filled { background: var(--tier1); }
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.info-box {
+  background: var(--surface2);
+  padding: 12px 14px;
+  border-radius: 2px;
+}
+.info-label {
+  font-size: 0.58rem;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.info-val {
+  font-size: 0.8rem;
+  color: var(--text);
+  font-family: var(--display);
+  font-weight: 700;
+}
+
+.btn-primary {
+  background: var(--tier4);
+  border: none;
+  color: #fff;
+  border-radius: 2px;
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  padding: 10px 20px;
+  cursor: pointer;
+  letter-spacing: 0.08em;
+  transition: opacity 0.15s;
+}
+.btn-primary:hover { opacity: 0.8; }
+
+.progress-bar-container {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--border);
+  z-index: 500;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--tier4), var(--tier3), var(--tier2), var(--tier1));
+  transition: width 0.4s ease;
+}
+
+.count-label {
+  position: fixed;
+  bottom: 10px;
+  right: 20px;
+  font-size: 0.58rem;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  z-index: 501;
+  background: var(--bg);
+  padding: 3px 8px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+}
+
+.empty-state {
+  grid-column: 1/-1;
+  padding: 80px;
+  text-align: center;
+  color: var(--dim);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  display: none;
+}
+
+.resume-banner {
+  margin: 24px 40px 0;
+  padding: 14px 20px;
+  background: rgba(112,64,224,0.08);
+  border: 1px solid rgba(112,64,224,0.25);
+  border-radius: 2px;
+  font-size: 0.68rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.resume-banner strong { color: var(--text); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div>
+      <h1>BUILD YOUR OWN<br><span class="accent">— Backend &amp; Frontend</span> <span class="dim">from scratch</span></h1>
+      <div class="header-meta">Abhimanyu Singh Shekhawat · Go · Python · Node.js · React · 50 Projects</div>
+    </div>
+    <div class="tier-legend">
+      <div class="tier-item"><div class="tier-dot" style="background:#f0c040"></div>Tier 1 — Foundation</div>
+      <div class="tier-item"><div class="tier-dot" style="background:#e07020"></div>Tier 2 — Solidify</div>
+      <div class="tier-item"><div class="tier-dot" style="background:#c03050"></div>Tier 3 — Production</div>
+      <div class="tier-item"><div class="tier-dot" style="background:#7040e0"></div>Tier 4 — Mastery</div>
+    </div>
+  </div>
+  <div class="stats-row">
+    <div class="stat-pill"><span class="n" style="color:#00ADD8">15</span> Go Projects</div>
+    <div class="stat-pill"><span class="n" style="color:#3572A5">13</span> Python Projects</div>
+    <div class="stat-pill"><span class="n" style="color:#68A063">12</span> Node.js Projects</div>
+    <div class="stat-pill"><span class="n" style="color:#61DAFB">10</span> React Projects</div>
+    <div class="stat-pill"><span class="n" style="color:#ffa657">0</span> / <span class="n">50</span>&nbsp;Done</div>
+  </div>
+</header>
+
+<div class="resume-banner">
+  <strong>Your Plan:</strong> You already own Java/Spring Boot, Redis, Kafka, Kubernetes, and API Gateway. These 50 projects expand your breadth into <strong>Go</strong> (concurrency, CLIs, microservices), <strong>Python</strong> (async, data pipelines, ML APIs), <strong>Node.js</strong> (event-loop mastery, real-time), and <strong>React</strong> (interactive UIs) — making you a true full-stack systems engineer. Tier 1–2 = learn the language. Tier 3–4 = production builds that go on your resume.
+</div>
+
+<div class="controls" id="controls">
+  <div class="filter-group">
+    <button class="filter-btn active" data-cat="all" onclick="setCat('all',this)">All</button>
+    <button class="filter-btn" data-cat="go" onclick="setCat('go',this)">Go</button>
+    <button class="filter-btn" data-cat="python" onclick="setCat('python',this)">Python</button>
+    <button class="filter-btn" data-cat="node" onclick="setCat('node',this)">Node.js</button>
+    <button class="filter-btn" data-cat="react" onclick="setCat('react',this)">React</button>
+  </div>
+  <div class="sep"></div>
+  <div class="tier-filter-group">
+    <button class="tier-btn" data-tier="1" onclick="toggleTier(1,this)">T1</button>
+    <button class="tier-btn" data-tier="2" onclick="toggleTier(2,this)">T2</button>
+    <button class="tier-btn" data-tier="3" onclick="toggleTier(3,this)">T3</button>
+    <button class="tier-btn" data-tier="4" onclick="toggleTier(4,this)">T4</button>
+  </div>
+  <div class="sep"></div>
+  <input class="search-box" id="searchBox" placeholder="search projects..." oninput="applyFilters()">
+</div>
+
+<div class="grid-container" id="grid">
+  <div class="empty-state" id="emptyState">No projects match your filters.</div>
+</div>
+
+<div class="progress-bar-container">
+  <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+</div>
+<div class="count-label" id="countLabel">0 / 50 DONE</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOnBg(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modalTitle"></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px" id="modalBadges"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕ close</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+const TOTAL = 50;
+
+const CAT_COLORS = {
+  go: '#00ADD8',
+  python: '#3572A5',
+  node: '#68A063',
+  react: '#61DAFB',
+  infra: '#ffa657'
+};
+const TIER_COLORS = { 1: '#f0c040', 2: '#e07020', 3: '#c03050', 4: '#7040e0' };
+
+const PROJECTS = [
+
+// ─── GO PROJECTS (1–15) ───────────────────────────────────────────────────────
+
+{
+  id: 1, num: '01', cat: 'go', tier: 1,
+  title: 'TCP Chat Server', sub: 'in Go',
+  tagline: 'Multi-client chat server using raw TCP sockets, goroutines per connection, and channels to broadcast messages.',
+  stack: ['Go', 'net', 'goroutines', 'channels'],
+  time: '8–12 hrs', deps: [],
+  guide: {
+    overview: 'Build a real-time TCP chat server. Each client gets its own goroutine. A hub goroutine manages the broadcast channel. This is the canonical "learn goroutines" project and directly maps to your existing messaging/async experience in Java.',
+    steps: [
+      { n:'01', title:'TCP listener', desc:'net.Listen("tcp", ":8080"), accept connections in a loop, spawn goroutine per conn.', code:'ln, _ := net.Listen("tcp", ":8080")\nfor {\n  conn, _ := ln.Accept()\n  go handleConn(conn)\n}' },
+      { n:'02', title:'Hub with broadcast channel', desc:'Central hub struct with register/unregister/broadcast channels. Run hub in its own goroutine.', code:'' },
+      { n:'03', title:'Read loop per client', desc:'bufio.Scanner on conn. On message, send to hub broadcast channel.', code:'' },
+      { n:'04', title:'Write loop per client', desc:'Range over per-client channel, write to conn. Disconnect on error.', code:'' },
+      { n:'05', title:'Graceful shutdown', desc:'os/signal, context.WithCancel, drain channels before exit.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'net package', detail:'pkg.go.dev/net' },
+      { type:'blog', name:'Go by Example — Goroutines', detail:'gobyexample.com/goroutines' },
+      { type:'repo', name:'olahol/melody (reference)', detail:'github.com/olahol/melody' }
+    ],
+    difficulty: 2, hours: '8–12 hrs', lang: 'Go'
+  }
+},
+
+{
+  id: 2, num: '02', cat: 'go', tier: 1,
+  title: 'CLI Task Manager', sub: 'in Go',
+  tagline: 'A persistent command-line task manager using Cobra for CLI flags and JSON file storage. Your first real Go binary.',
+  stack: ['Go', 'cobra', 'encoding/json', 'os'],
+  time: '6–10 hrs', deps: [],
+  guide: {
+    overview: 'Build a `todo` CLI: add, list, done, delete commands. Persist tasks to ~/.todo.json. Great intro to Go modules, cobra, and file I/O.',
+    steps: [
+      { n:'01', title:'Init module + cobra', desc:'go mod init todo && go get github.com/spf13/cobra. Scaffold root command.', code:'' },
+      { n:'02', title:'Task struct + JSON persistence', desc:'type Task struct { ID int; Title string; Done bool; CreatedAt time.Time }. Marshal/Unmarshal to file.', code:'' },
+      { n:'03', title:'Add, list, done commands', desc:'cobra subcommands. add takes string arg, list prints table, done takes ID.', code:'' },
+      { n:'04', title:'Pretty table output', desc:'Use tabwriter to align columns. Color done tasks with ANSI codes.', code:'' },
+      { n:'05', title:'Due dates + filtering', desc:'Add --due flag, filter by --all or --today.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'Cobra CLI library', detail:'cobra.dev' },
+      { type:'blog', name:'Go modules tutorial', detail:'go.dev/blog/using-go-modules' }
+    ],
+    difficulty: 1, hours: '6–10 hrs', lang: 'Go'
+  }
+},
+
+{
+  id: 3, num: '03', cat: 'go', tier: 1,
+  title: 'REST API with Fiber', sub: 'in Go',
+  tagline: 'A full CRUD REST API using Fiber (Express-style) with PostgreSQL and sqlx. Mirrors your Spring Boot API work — but in Go.',
+  stack: ['Go', 'fiber', 'sqlx', 'PostgreSQL', 'Docker'],
+  time: '10–16 hrs', deps: ['02'],
+  guide: {
+    overview: 'Build a Books API. GET/POST/PUT/DELETE /books. This directly compares to what you do in Spring Boot. Notice the difference: no reflection, explicit error handling, goroutines instead of thread pools.',
+    steps: [
+      { n:'01', title:'Fiber router setup', desc:'go get github.com/gofiber/fiber/v2. Create app, define routes, listen.', code:'app := fiber.New()\napp.Get("/books", getBooks)\napp.Post("/books", createBook)\napp.Listen(":3000")' },
+      { n:'02', title:'PostgreSQL with sqlx', desc:'go get github.com/jmoiron/sqlx. DB connection pool, ping on startup.', code:'' },
+      { n:'03', title:'CRUD handlers', desc:'Each handler: parse body with c.BodyParser, run SQL, return c.JSON.', code:'' },
+      { n:'04', title:'Validation middleware', desc:'Custom middleware to validate Content-Type. Struct tags for field validation.', code:'' },
+      { n:'05', title:'Docker Compose', desc:'Dockerfile for Go binary (multi-stage). docker-compose.yml with postgres service.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'Fiber docs', detail:'docs.gofiber.io' },
+      { type:'docs', name:'sqlx', detail:'jmoiron.net/sqlx' },
+      { type:'blog', name:'Go REST API patterns', detail:'grafana.com/blog/go-rest-api-patterns' }
+    ],
+    difficulty: 2, hours: '10–16 hrs', lang: 'Go'
+  }
+},
+
+{
+  id: 4, num: '04', cat: 'go', tier: 2,
+  title: 'Rate Limiter Library', sub: 'in Go',
+  tagline: 'Build a reusable rate limiter package implementing token bucket and sliding window algorithms. You already use Redis for this — now own the algorithm.',
+  stack: ['Go', 'sync', 'time', 'generics'],
+  time: '10–15 hrs', deps: ['03'],
+  guide: {
+    overview: 'Implement TokenBucket and SlidingWindow rate limiters as a standalone Go package. Write table-driven tests. Export a middleware for Fiber. This deepens your existing rate limiting knowledge from the Finacle work.',
+    steps: [
+      { n:'01', title:'Token bucket algorithm', desc:'Struct: tokens float64, maxTokens, refillRate, lastRefill. Allow() method replenishes tokens based on elapsed time.', code:'func (tb *TokenBucket) Allow() bool {\n  now := time.Now()\n  elapsed := now.Sub(tb.lastRefill).Seconds()\n  tb.tokens = min(tb.maxTokens, tb.tokens + elapsed*tb.refillRate)\n  tb.lastRefill = now\n  if tb.tokens >= 1 { tb.tokens--; return true }\n  return false\n}' },
+      { n:'02', title:'Sliding window counter', desc:'Use sync.Map with time-bucketed counters. Purge expired buckets on each Allow() call.', code:'' },
+      { n:'03', title:'Thread-safe with sync.Mutex', desc:'Wrap state mutations. Benchmark with go test -bench to verify no races with -race flag.', code:'' },
+      { n:'04', title:'Fiber middleware', desc:'limiter.NewMiddleware(config) returns fiber.Handler. Key by IP or JWT sub.', code:'' },
+      { n:'05', title:'Table-driven tests', desc:'Test Allow() sequences: burst, steady state, refill. Use testing.T and assert.', code:'' }
+    ],
+    resources: [
+      { type:'blog', name:'Rate Limiting Algorithms Explained', detail:'blog.cloudflare.com/counting-things-a-lot-of-different-things' },
+      { type:'docs', name:'Go sync package', detail:'pkg.go.dev/sync' }
+    ],
+    difficulty: 3, hours: '10–15 hrs', lang: 'Go'
+  }
+},
+
+{
+  id: 5, num: '05', cat: 'go', tier: 2,
+  title: 'Worker Pool + Job Queue', sub: 'in Go',
+  tagline: 'Generic worker pool with job queue, graceful drain, retry logic, and metrics. The Go-native version of your async processing patterns.',
+  stack: ['Go', 'channels', 'sync.WaitGroup', 'context'],
+  time: '12–18 hrs', deps: ['03'],
+  guide: {
+    overview: 'Build a reusable worker pool package. Jobs go in, results come out. Workers pick up jobs via channels. Implements graceful shutdown (drain queue before exit), retry with backoff, and emits metrics via a callback.',
+    steps: [
+      { n:'01', title:'Job and Result types', desc:'type Job[T any] struct { ID string; Payload T; Retries int }. Use Go generics.', code:'' },
+      { n:'02', title:'Pool struct + Start()', desc:'Pool has jobCh chan Job, resultCh chan Result, workerCount. Start() launches N goroutines ranging over jobCh.', code:'' },
+      { n:'03', title:'Retry with backoff', desc:'On handler error, if job.Retries < maxRetries, re-enqueue with delay using time.AfterFunc.', code:'' },
+      { n:'04', title:'Graceful shutdown', desc:'context.WithCancel. On cancel, close(jobCh). Workers drain remaining jobs then wg.Done().', code:'' },
+      { n:'05', title:'Metrics callback', desc:'OnComplete(fn func(Job, Result, duration)) hook. Caller can push to Prometheus or log.', code:'' }
+    ],
+    resources: [
+      { type:'blog', name:'Concurrency Patterns in Go', detail:'go.dev/blog/pipelines' },
+      { type:'repo', name:'gammazero/workerpool', detail:'github.com/gammazero/workerpool — reference impl' }
+    ],
+    difficulty: 3, hours: '12–18 hrs', lang: 'Go'
+  }
+},
+
+{
+  id: 6, num: '06', cat: 'go', tier: 2,
+  title: 'Redis-backed Session Store', sub: 'in Go',
+  tagline: 'Build a production session manager on top of Redis with TTL, session rotation, and token fingerprinting. Extends your Redis expertise into Go.',
+  stack: ['Go', 'redis/go-redis', 'fiber', 'crypto/rand'],
+  time: '10–14 hrs', deps: ['03'],
+  guide: {
+    overview: 'Implement a session store that issues opaque session tokens, stores data in Redis with configurable TTL, rotates tokens on privilege escalation, and fingerprints sessions by User-Agent + IP hash.',
+    steps: [
+      { n:'01', title:'go-redis client + ping', desc:'go get github.com/redis/go-redis/v9. Connect, ping on startup.', code:'' },
+      { n:'02', title:'Create session', desc:'Generate 32-byte crypto/rand token, base64url encode. HSET sessionID field value, EXPIRE ttl.', code:'' },
+      { n:'03', title:'Get/Set/Delete', desc:'HGETALL for read, HDEL for field delete, DEL for full session.', code:'' },
+      { n:'04', title:'Token rotation', desc:'On sensitive operations: copy old session to new key, delete old key, set new cookie.', code:'' },
+      { n:'05', title:'Fiber middleware', desc:'Intercept request, load session from cookie, attach to ctx.Locals. Auto-renew expiry on activity.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'go-redis docs', detail:'redis.uptrace.dev' },
+      { type:'blog', name:'OWASP Session Management Cheat Sheet', detail:'cheatsheetseries.owasp.org' }
+    ],
+    difficulty: 2, hours: '10–14 hrs', lang: 'Go'
+  }
+},
+
+{
+  id: 7, num: '07', cat: 'go', tier: 2,
+  title: 'gRPC Microservice', sub: 'in Go',
+  tagline: 'Define a Protobuf schema, generate Go code, and build a gRPC service with unary + server-streaming RPCs and interceptors for auth.',
+  stack: ['Go', 'gRPC', 'protobuf', 'protoc-gen-go'],
+  time: '14–20 hrs', deps: ['03'],
+  guide: {
+    overview: 'Build a UserService with CreateUser (unary) and WatchUserEvents (server-stream). Auth interceptor validates JWTs. This is the Go way to build the microservices you currently build in Spring Boot.',
+    steps: [
+      { n:'01', title:'Define .proto file', desc:'service UserService { rpc CreateUser(CreateUserReq) returns (User); rpc WatchEvents(WatchReq) returns (stream Event); }', code:'' },
+      { n:'02', title:'Generate code', desc:'protoc --go_out=. --go-grpc_out=. user.proto. Implement the generated interface.', code:'' },
+      { n:'03', title:'Implement handlers', desc:'CreateUser: validate, save to DB, return. WatchEvents: range over event channel, stream.Send() each.', code:'' },
+      { n:'04', title:'Unary interceptor for JWT', desc:'grpc.UnaryInterceptor(authInterceptor). Parse Authorization header, validate JWT, inject claims to ctx.', code:'' },
+      { n:'05', title:'gRPC client + test', desc:'Build a CLI client that calls both RPCs. Test with grpcurl tool.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'gRPC Go quickstart', detail:'grpc.io/docs/languages/go/quickstart' },
+      { type:'docs', name:'Protocol Buffers', detail:'protobuf.dev' }
+    ],
+    difficulty: 3, hours: '14–20 hrs', lang: 'Go'
+  }
+},
+
+{
+  id: 8, num: '08', cat: 'go', tier: 3,
+  title: 'HTTP/2 Reverse Proxy', sub: 'in Go',
+  tagline: 'Build a programmable reverse proxy: route by header/path, circuit breaker, connection pooling, and OpenTelemetry traces. Similar to what you own in Finacle but in Go.',
+  stack: ['Go', 'net/http/httputil', 'otel', 'circuit-breaker'],
+  time: '20–30 hrs', deps: ['04','05'],
+  guide: {
+    overview: 'Build a reverse proxy that routes requests to upstream services based on configurable rules. Adds circuit breaking (mirrors your Spring patterns), connection pool tuning, and distributed tracing. Deploy with Docker.',
+    steps: [
+      { n:'01', title:'httputil.ReverseProxy baseline', desc:'Parse upstream config from YAML. Create one ReverseProxy per upstream with custom Transport.', code:'' },
+      { n:'02', title:'Routing rules engine', desc:'Match by Header, Path prefix, or Method. Chain matchers in priority order.', code:'' },
+      { n:'03', title:'Circuit breaker', desc:'Track error rate per upstream. On threshold breach, fail-fast for N seconds. Use atomic counters.', code:'' },
+      { n:'04', title:'OpenTelemetry traces', desc:'Inject trace context into upstream requests. Export to Jaeger or OTLP endpoint.', code:'tracer := otel.Tracer("proxy")\nctx, span := tracer.Start(r.Context(), "proxy.request")\ndefer span.End()' },
+      { n:'05', title:'Admin API', desc:'GET /admin/upstreams returns health of each upstream. POST /admin/circuit-reset reopens a circuit.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'net/http/httputil', detail:'pkg.go.dev/net/http/httputil' },
+      { type:'docs', name:'OpenTelemetry Go', detail:'opentelemetry.io/docs/languages/go' }
+    ],
+    difficulty: 4, hours: '20–30 hrs', lang: 'Go'
+  }
+},
+
+{
+  id: 9, num: '09', cat: 'go', tier: 3,
+  title: 'Kafka Consumer Service', sub: 'in Go',
+  tagline: 'Consume Kafka topics in Go with franz-go, implement exactly-once semantics, dead letter queue, and consumer group rebalancing.',
+  stack: ['Go', 'franz-go', 'Kafka', 'PostgreSQL', 'Docker'],
+  time: '18–25 hrs', deps: ['05'],
+  guide: {
+    overview: 'Build an order-processing consumer. Consume orders topic, apply business logic, write to DB idempotently, route failed messages to DLQ. This extends your existing Kafka/messaging knowledge into Go idioms.',
+    steps: [
+      { n:'01', title:'franz-go consumer setup', desc:'go get github.com/twmb/franz-go. Create client, assign group, fetch and poll loop.', code:'' },
+      { n:'02', title:'Idempotent DB writes', desc:'Use PostgreSQL INSERT ... ON CONFLICT DO NOTHING with message offset as idempotency key.', code:'' },
+      { n:'03', title:'Manual offset commit', desc:'Only commit after successful DB write. On failure, seek back to uncommitted offset.', code:'' },
+      { n:'04', title:'Dead letter queue', desc:'After N retries, produce to orders-dlq topic with error metadata header.', code:'' },
+      { n:'05', title:'Graceful shutdown', desc:'os/signal SIGTERM handler. Stop polling, process in-flight batch, commit offsets, close client.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'franz-go docs', detail:'github.com/twmb/franz-go/wiki' },
+      { type:'blog', name:'Kafka Consumer Patterns', detail:'confluent.io/blog/kafka-consumer-design-patterns' }
+    ],
+    difficulty: 3, hours: '18–25 hrs', lang: 'Go'
+  }
+},
+
+{
+  id: 10, num: '10', cat: 'go', tier: 3,
+  title: 'Distributed Config Service', sub: 'in Go',
+  tagline: 'A config server with etcd-backed storage, watch/notify semantics, and versioned key-value namespaces. Practical distributed systems in Go.',
+  stack: ['Go', 'etcd/clientv3', 'gRPC', 'Kubernetes'],
+  time: '20–28 hrs', deps: ['07','09'],
+  guide: {
+    overview: 'Build a config service backed by etcd. Clients GET /config/{namespace}/{key}, PUT to update, and WATCH for real-time change notifications via SSE or gRPC stream. This solves a real problem you face in multi-region banking deployments.',
+    steps: [
+      { n:'01', title:'etcd client + CRUD', desc:'go.etcd.io/etcd/client/v3. Put, Get, Delete with key prefixes as namespaces.', code:'' },
+      { n:'02', title:'REST API wrapper', desc:'Fiber API over etcd. GET returns value + version. PUT requires If-Match header for optimistic locking.', code:'' },
+      { n:'03', title:'Watch API via SSE', desc:'GET /watch/{namespace}?keys=* — use etcd Watch(), push changes as server-sent events.', code:'' },
+      { n:'04', title:'Access control', desc:'Namespace-level ACL: JWT claims map to allowed namespaces. Middleware enforces read/write permissions.', code:'' },
+      { n:'05', title:'Deploy to Kubernetes', desc:'Helm chart or raw manifests. ConfigMap for bootstrapping, Secret for etcd credentials.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'etcd Go client', detail:'etcd.io/docs/v3.5/dev-guide/api_grpc_gateway' },
+      { type:'blog', name:'Building a Config Service', detail:'medium.com/@distributed-config-patterns' }
+    ],
+    difficulty: 4, hours: '20–28 hrs', lang: 'Go'
+  }
+},
+
+{
+  id: 11, num: '11', cat: 'go', tier: 3,
+  title: 'In-Memory Cache Engine', sub: 'in Go',
+  tagline: 'Build a thread-safe in-memory cache with LRU eviction, TTL expiry, sharding for reduced lock contention, and a Prometheus metrics endpoint.',
+  stack: ['Go', 'sync', 'container/list', 'prometheus/client_golang'],
+  time: '16–22 hrs', deps: ['04'],
+  guide: {
+    overview: 'Implement a production-grade in-memory cache. Sharded into N buckets (each with its own RWMutex) to avoid single global lock. LRU eviction per shard. TTL via background goroutine. This is foundational for Go systems programming.',
+    steps: [
+      { n:'01', title:'Shard + LRU per shard', desc:'Cache has []Shard. Each shard has map + doubly-linked list. Get promotes to front, Set evicts LRU tail if at capacity.', code:'' },
+      { n:'02', title:'Sharding by key hash', desc:'FNV-1a hash of key, mod numShards. Each shard has independent sync.RWMutex.', code:'func (c *Cache) getShard(key string) *Shard {\n  h := fnv.New32a()\n  h.Write([]byte(key))\n  return c.shards[h.Sum32()%uint32(len(c.shards))]\n}' },
+      { n:'03', title:'TTL background cleaner', desc:'Per-shard goroutine ticks every cleanInterval, ranges over map, deletes expired entries.', code:'' },
+      { n:'04', title:'Prometheus metrics', desc:'Expose hits, misses, evictions, size per shard. /metrics endpoint.', code:'' },
+      { n:'05', title:'Benchmark tests', desc:'go test -bench=. Compare single-lock vs sharded under GOMAXPROCS concurrency.', code:'' }
+    ],
+    resources: [
+      { type:'repo', name:'patrickmn/go-cache (reference)', detail:'github.com/patrickmn/go-cache' },
+      { type:'blog', name:'Sharded Caching in Go', detail:'ristretto paper — dgraph.io/blog' }
+    ],
+    difficulty: 3, hours: '16–22 hrs', lang: 'Go'
+  }
+},
+
+{
+  id: 12, num: '12', cat: 'go', tier: 4,
+  title: 'API Gateway (Mini Finacle)', sub: 'in Go',
+  tagline: 'A programmable API gateway: JWT auth, routing, request transformation, rate limiting, and plugin pipeline. Build what you maintain — from scratch.',
+  stack: ['Go', 'fiber', 'go-redis', 'otel', 'yaml', 'Docker'],
+  time: '30–45 hrs', deps: ['08','06','04'],
+  guide: {
+    overview: 'The capstone Go project. You know this domain — you built it in Java. Now rebuild it in Go. Declarative YAML config, plugin chain per route (auth → ratelimit → transform → proxy), admin API, and full telemetry. This is your most impressive portfolio piece.',
+    steps: [
+      { n:'01', title:'YAML config schema', desc:'Routes: { path, method, upstream, plugins: [jwt, ratelimit, transform] }. Parse with gopkg.in/yaml.v3.', code:'' },
+      { n:'02', title:'Plugin interface', desc:'type Plugin interface { Name() string; Execute(ctx *RequestContext) error }. Chain is []Plugin.', code:'' },
+      { n:'03', title:'JWT plugin', desc:'Parse Bearer token, validate with JWKS endpoint (cache public keys). Inject claims to ctx.', code:'' },
+      { n:'04', title:'Rate limit plugin', desc:'Token bucket per (userID, routeID), stored in Redis. Return 429 on exhaustion.', code:'' },
+      { n:'05', title:'Request transform plugin', desc:'Add/remove/rename headers. Body transformation via JSONPath rules. Forward to upstream.', code:'' },
+      { n:'06', title:'Admin API + hot reload', desc:'SIGHUP triggers config reload without downtime. Admin /routes endpoint shows live state.', code:'' }
+    ],
+    resources: [
+      { type:'blog', name:'Building an API Gateway from Scratch', detail:'nginx.com/blog/building-api-gateway' },
+      { type:'repo', name:'Kong/go-pdk', detail:'github.com/Kong/go-pdk — plugin patterns' }
+    ],
+    difficulty: 5, hours: '30–45 hrs', lang: 'Go'
+  }
+},
+
+{
+  id: 13, num: '13', cat: 'go', tier: 4,
+  title: 'Raft Consensus (subset)', sub: 'in Go',
+  tagline: 'Implement leader election and log replication from the Raft paper. The hardest Go project — proves you understand distributed systems at a deep level.',
+  stack: ['Go', 'gRPC', 'protobuf', 'sync/atomic'],
+  time: '35–55 hrs', deps: ['07','10'],
+  guide: {
+    overview: 'Implement Raft leader election + log replication (not snapshotting). 3-node cluster communicating via gRPC. Each node has a state machine (follower/candidate/leader) driven by an election timeout goroutine and an AppendEntries RPC. This proves deep distributed systems knowledge.',
+    steps: [
+      { n:'01', title:'Node state machine', desc:'Follower (default), Candidate (timeout → RequestVote), Leader (send heartbeats). Use atomic state transitions.', code:'' },
+      { n:'02', title:'RequestVote RPC', desc:'Candidate increments term, votes for self, sends RequestVote to peers. Win majority → become Leader.', code:'' },
+      { n:'03', title:'AppendEntries RPC', desc:'Leader sends log entries + heartbeats. Follower resets election timer on valid AppendEntries.', code:'' },
+      { n:'04', title:'Log replication', desc:'Leader appends to local log, sends to followers in parallel, commits when majority acknowledges.', code:'' },
+      { n:'05', title:'Test: kill leader', desc:'Kill leader node. Verify new leader elected within 2x election timeout. Verify log consistency.', code:'' }
+    ],
+    resources: [
+      { type:'paper', name:'In Search of an Understandable Consensus Algorithm (Raft)', detail:'raft.github.io/raft.pdf' },
+      { type:'repo', name:'hashicorp/raft (reference)', detail:'github.com/hashicorp/raft' }
+    ],
+    difficulty: 5, hours: '35–55 hrs', lang: 'Go'
+  }
+},
+
+{
+  id: 14, num: '14', cat: 'go', tier: 2,
+  title: 'OpenTelemetry SDK wrapper', sub: 'in Go',
+  tagline: 'Build a thin otel wrapper library that auto-instruments Fiber, sqlx, and go-redis — matching the observability workflows you built in Java.',
+  stack: ['Go', 'otel', 'fiber', 'sqlx', 'Jaeger'],
+  time: '12–18 hrs', deps: ['03','06'],
+  guide: {
+    overview: 'Build an internal observability package that your other Go services import. One-line setup: obs.Init(serviceName). Auto-instruments HTTP, SQL queries, and Redis commands with trace + span. Exports to Jaeger. Directly mirrors your Finacle observability work.',
+    steps: [
+      { n:'01', title:'OTLP exporter setup', desc:'otlptracegrpc or otlptracehttp exporter. TracerProvider with resource attributes (service.name, version).', code:'' },
+      { n:'02', title:'Fiber middleware', desc:'otelfiber.Middleware() — wraps handler, creates span per request, sets HTTP attributes, propagates W3C trace context.', code:'' },
+      { n:'03', title:'sqlx wrapper', desc:'Wrap db.QueryContext to start child span with db.statement attribute.', code:'' },
+      { n:'04', title:'Redis hook', desc:'Implement go-redis Hook interface — BeforeProcess starts span, AfterProcess ends it.', code:'' },
+      { n:'05', title:'Structured logging with trace ID', desc:'slog handler that injects trace_id and span_id from context into every log entry.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'OpenTelemetry Go SDK', detail:'opentelemetry.io/docs/languages/go' },
+      { type:'docs', name:'otelfiber', detail:'github.com/gofiber/contrib/otelfiber' }
+    ],
+    difficulty: 3, hours: '12–18 hrs', lang: 'Go'
+  }
+},
+
+{
+  id: 15, num: '15', cat: 'go', tier: 3,
+  title: 'Database Migration CLI', sub: 'in Go',
+  tagline: 'Build a goose-style migration tool: versioned SQL files, up/down, status, lock-based concurrent migration safety.',
+  stack: ['Go', 'cobra', 'database/sql', 'PostgreSQL'],
+  time: '14–20 hrs', deps: ['02','03'],
+  guide: {
+    overview: 'Build a database migration CLI. migrations/ directory of {version}_{name}.up.sql / .down.sql files. Tracks applied migrations in schema_migrations table. Advisory lock prevents concurrent migrations. Useful in every production Go service you build.',
+    steps: [
+      { n:'01', title:'Migration file discovery', desc:'Walk migrations/ dir, parse version from filename, sort numerically. Return []Migration structs.', code:'' },
+      { n:'02', title:'schema_migrations table', desc:'CREATE IF NOT EXISTS. Each row: version bigint PK, applied_at timestamp.', code:'' },
+      { n:'03', title:'up command', desc:'Find unapplied migrations (version not in schema_migrations), execute in transaction, record.', code:'' },
+      { n:'04', title:'down command', desc:'Run latest .down.sql in transaction. Remove from schema_migrations.', code:'' },
+      { n:'05', title:'Advisory lock', desc:'pg_try_advisory_lock(lockID) at start of migrate. Fail with clear error if locked.', code:'' }
+    ],
+    resources: [
+      { type:'repo', name:'pressly/goose (reference)', detail:'github.com/pressly/goose' },
+      { type:'docs', name:'PostgreSQL Advisory Locks', detail:'postgresql.org/docs/current/explicit-locking.html#ADVISORY-LOCKS' }
+    ],
+    difficulty: 3, hours: '14–20 hrs', lang: 'Go'
+  }
+},
+
+// ─── PYTHON PROJECTS (16–28) ──────────────────────────────────────────────────
+
+{
+  id: 16, num: '16', cat: 'python', tier: 1,
+  title: 'Async REST API', sub: 'with FastAPI',
+  tagline: 'Build a fully async REST API with FastAPI, async SQLAlchemy 2.0, Pydantic v2 validation, and pytest integration tests.',
+  stack: ['Python', 'FastAPI', 'SQLAlchemy 2.0', 'asyncpg', 'pytest'],
+  time: '10–15 hrs', deps: [],
+  guide: {
+    overview: 'The Python equivalent of your Spring Boot REST work. FastAPI + async SQLAlchemy. You will understand why Python async is single-threaded (event loop) vs Java multi-threaded. Build a Products API.',
+    steps: [
+      { n:'01', title:'FastAPI app + async lifespan', desc:'@asynccontextmanager lifespan: create DB pool on startup, close on shutdown. Include router.', code:'from contextlib import asynccontextmanager\n@asynccontextmanager\nasync def lifespan(app: FastAPI):\n  await db.connect(); yield; await db.disconnect()' },
+      { n:'02', title:'Async SQLAlchemy models', desc:'AsyncEngine, AsyncSession. Declarative Base. Product model with id, name, price, created_at.', code:'' },
+      { n:'03', title:'Pydantic v2 schemas', desc:'ProductCreate, ProductRead, ProductUpdate. Field validators. model_config for ORM mode.', code:'' },
+      { n:'04', title:'CRUD endpoints', desc:'GET/POST/PUT/DELETE /products. Dependency injection for DB session (Depends).', code:'' },
+      { n:'05', title:'pytest + httpx async tests', desc:'AsyncClient from httpx. Fixture sets up test DB, rolls back after each test.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'FastAPI docs', detail:'fastapi.tiangolo.com' },
+      { type:'docs', name:'SQLAlchemy 2.0 async', detail:'docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html' }
+    ],
+    difficulty: 2, hours: '10–15 hrs', lang: 'Python'
+  }
+},
+
+{
+  id: 17, num: '17', cat: 'python', tier: 1,
+  title: 'Web Scraper + ETL Pipeline', sub: 'with Python',
+  tagline: 'Scrape structured data with httpx + BeautifulSoup, transform it with Pydantic, and load into PostgreSQL. Async concurrency for speed.',
+  stack: ['Python', 'httpx', 'BeautifulSoup4', 'Pydantic', 'asyncio'],
+  time: '8–12 hrs', deps: [],
+  guide: {
+    overview: 'Build a data pipeline that scrapes a public site (e.g. books.toscrape.com), extracts structured data, validates with Pydantic, and loads into a DB. Classic Python ETL work that every Python dev knows.',
+    steps: [
+      { n:'01', title:'Async HTTP client', desc:'httpx.AsyncClient with semaphore to limit concurrency. Retry on 429/503.', code:'async with asyncio.Semaphore(10):\n  resp = await client.get(url)' },
+      { n:'02', title:'BeautifulSoup parsing', desc:'soup.select("article.product_pod"). Extract title, price, rating, availability.', code:'' },
+      { n:'03', title:'Pydantic validation', desc:'class Book(BaseModel): title: str; price: Decimal; rating: int (1-5). Validator normalizes price string.', code:'' },
+      { n:'04', title:'Async batch DB insert', desc:'asyncpg executemany() for batch insert. Upsert on title conflict.', code:'' },
+      { n:'05', title:'CLI + progress bar', desc:'typer CLI with --pages flag. tqdm progress bar over scraped pages.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'httpx async', detail:'www.python-httpx.org/async' },
+      { type:'docs', name:'Beautiful Soup 4', detail:'beautiful-soup-4.readthedocs.io' }
+    ],
+    difficulty: 1, hours: '8–12 hrs', lang: 'Python'
+  }
+},
+
+{
+  id: 18, num: '18', cat: 'python', tier: 2,
+  title: 'Celery Task Queue', sub: 'with Redis broker',
+  tagline: 'Distributed task queue with Celery + Redis broker: periodic tasks, chaining, retry with exponential backoff, and Flower monitoring.',
+  stack: ['Python', 'Celery', 'Redis', 'FastAPI', 'Docker'],
+  time: '12–18 hrs', deps: ['16'],
+  guide: {
+    overview: 'Your async processing expertise in Python. Build a Celery worker service triggered by FastAPI. Email sending, PDF generation, CSV export tasks. Uses Redis as broker (familiar from your Finacle work). Flower for real-time monitoring.',
+    steps: [
+      { n:'01', title:'Celery app config', desc:'celery = Celery(broker=REDIS_URL, backend=REDIS_URL). Configure task serializer, timezone.', code:'' },
+      { n:'02', title:'Define tasks', desc:'@celery.task(bind=True, max_retries=3) def send_email(self, ...): ... self.retry(exc=e, countdown=2**self.request.retries)', code:'' },
+      { n:'03', title:'Chain + group', desc:'chain(fetch_data.s(), process.s(), notify.s()). group() for parallel fan-out.', code:'' },
+      { n:'04', title:'Beat scheduler', desc:'celery beat with crontab schedule. Daily report generation task.', code:'' },
+      { n:'05', title:'Docker Compose + Flower', desc:'Services: api, worker, beat, flower, redis. Flower exposes task dashboard on :5555.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'Celery docs', detail:'docs.celeryq.dev' },
+      { type:'blog', name:'Celery Best Practices', detail:'denibertovic.com/posts/celery-best-practices' }
+    ],
+    difficulty: 2, hours: '12–18 hrs', lang: 'Python'
+  }
+},
+
+{
+  id: 19, num: '19', cat: 'python', tier: 2,
+  title: 'Data Validation Pipeline', sub: 'with Pydantic + Pandera',
+  tagline: 'Schema-driven validation pipeline for CSV/JSON data: column-level rules, error reporting, quarantine bad records, publish metrics.',
+  stack: ['Python', 'Pydantic', 'Pandera', 'pandas', 'FastAPI'],
+  time: '10–14 hrs', deps: ['17'],
+  guide: {
+    overview: 'Build a data quality service. Clients POST a CSV, you validate each row against a schema, quarantine invalid records with error reasons, and return a validation report. Useful in banking data ingestion pipelines.',
+    steps: [
+      { n:'01', title:'Pandera schema definition', desc:'pa.DataFrameSchema with column checks: pa.Column(float, pa.Check.ge(0)). Custom check functions.', code:'' },
+      { n:'02', title:'Row-level error capture', desc:'validate(df, lazy=True) catches all errors instead of first. SchemaErrors.failure_cases DataFrame.', code:'' },
+      { n:'03', title:'Quarantine + valid split', desc:'Split df into valid_df and quarantine_df. Quarantine gets extra error_reason column.', code:'' },
+      { n:'04', title:'FastAPI upload endpoint', desc:'POST /validate accepts multipart CSV. Returns ValidationReport: {total, valid, quarantined, errors[{row, col, reason}]}.', code:'' },
+      { n:'05', title:'Prometheus metrics', desc:'Expose validation_passed_total and validation_failed_total counters per schema type.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'Pandera', detail:'pandera.readthedocs.io' },
+      { type:'docs', name:'Pydantic v2', detail:'docs.pydantic.dev' }
+    ],
+    difficulty: 2, hours: '10–14 hrs', lang: 'Python'
+  }
+},
+
+{
+  id: 20, num: '20', cat: 'python', tier: 2,
+  title: 'JWT Auth Service', sub: 'with FastAPI',
+  tagline: 'Standalone auth microservice: register, login, refresh tokens, JWKS endpoint, and revocation list in Redis. Mirrors your Spring Security work.',
+  stack: ['Python', 'FastAPI', 'python-jose', 'Redis', 'bcrypt'],
+  time: '12–16 hrs', deps: ['16'],
+  guide: {
+    overview: 'Build an auth service that other microservices can validate against. Issues RS256 JWTs (asymmetric keys). Exposes /.well-known/jwks.json for public key distribution. Token revocation via Redis blocklist. This complements your Spring Security knowledge.',
+    steps: [
+      { n:'01', title:'RSA key generation', desc:'Generate 2048-bit RSA keypair with cryptography lib. Store private key securely (env var / secret).', code:'' },
+      { n:'02', title:'Issue JWT', desc:'jose.jwt.encode with RS256. Claims: sub, iat, exp, jti (unique ID for revocation).', code:'' },
+      { n:'03', title:'JWKS endpoint', desc:'GET /.well-known/jwks.json returns public key as JWK. Used by downstream services to validate.', code:'' },
+      { n:'04', title:'Refresh token flow', desc:'Opaque refresh token stored in Redis. POST /refresh: validate, issue new access token, rotate refresh token.', code:'' },
+      { n:'05', title:'Revocation', desc:'POST /logout: add jti to Redis blocklist with TTL = remaining token lifetime. Validate middleware checks blocklist.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'python-jose', detail:'python-jose.readthedocs.io' },
+      { type:'blog', name:'JWT Best Practices', detail:'auth0.com/blog/a-look-at-the-latest-draft-for-jwt-bcp' }
+    ],
+    difficulty: 3, hours: '12–16 hrs', lang: 'Python'
+  }
+},
+
+{
+  id: 21, num: '21', cat: 'python', tier: 3,
+  title: 'LLM Streaming API', sub: 'with FastAPI + SSE',
+  tagline: 'Build a streaming chat API that proxies to OpenAI/Anthropic, implements token streaming via SSE, tracks usage, and enforces per-user rate limits.',
+  stack: ['Python', 'FastAPI', 'anthropic SDK', 'Redis', 'SSE'],
+  time: '14–20 hrs', deps: ['20','18'],
+  guide: {
+    overview: 'Build what powers many AI products. POST /chat returns a streaming SSE response from an LLM. Rate limit by user token budget (not requests). Track usage in PostgreSQL. Cache common prompts in Redis with semantic similarity shortcut.',
+    steps: [
+      { n:'01', title:'StreamingResponse + SSE', desc:'FastAPI StreamingResponse with media_type="text/event-stream". Generator yields "data: {chunk}\\n\\n".', code:'async def stream_gen():\n  async for chunk in client.messages.stream(...):\n    yield f"data: {chunk.text}\\n\\n"\nreturn StreamingResponse(stream_gen(), media_type="text/event-stream")' },
+      { n:'02', title:'Anthropic/OpenAI SDK', desc:'anthropic.AsyncAnthropic(). messages.stream() async context manager. Handle stop_reason.', code:'' },
+      { n:'03', title:'Token budget rate limiting', desc:'Per-user token counter in Redis. Deduct on completion. Reject if budget exhausted. Refill daily with cron.', code:'' },
+      { n:'04', title:'Usage logging', desc:'On stream complete, log {user_id, model, prompt_tokens, completion_tokens, cost} to PostgreSQL async.', code:'' },
+      { n:'05', title:'Prompt caching', desc:'Hash prompt to Redis key. Cache response for exact matches. TTL 1hr. Return cached without LLM call.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'Anthropic Python SDK', detail:'docs.anthropic.com/en/api/getting-started' },
+      { type:'docs', name:'FastAPI StreamingResponse', detail:'fastapi.tiangolo.com/advanced/custom-response/#streamingresponse' }
+    ],
+    difficulty: 3, hours: '14–20 hrs', lang: 'Python'
+  }
+},
+
+{
+  id: 22, num: '22', cat: 'python', tier: 3,
+  title: 'Apache Camel Replacement', sub: 'with Python',
+  tagline: 'Build a lightweight integration routing engine inspired by Apache Camel: routes with source→transform→sink, error handlers, and dead letter channels.',
+  stack: ['Python', 'asyncio', 'FastAPI', 'Kafka', 'Redis'],
+  time: '20–28 hrs', deps: ['18','17'],
+  guide: {
+    overview: 'You know Apache Camel. Now build a simplified version in Python. Routes defined programmatically: from_source → through filters → to_sink. Supports Kafka, HTTP, and file sources/sinks. This demonstrates deep integration architecture understanding.',
+    steps: [
+      { n:'01', title:'Route DSL', desc:'route = Route().from_(KafkaSource(topic)).filter(is_valid).transform(normalize).to(HttpSink(url)). Python method chaining.', code:'' },
+      { n:'02', title:'Source/Sink interfaces', desc:'Abstract Source (async generator) and Sink (async write). Implementations: KafkaSource, HttpSink, FileSink.', code:'' },
+      { n:'03', title:'Processor pipeline', desc:'Each step is async callable. Chain with asyncio.Queue between steps for backpressure.', code:'' },
+      { n:'04', title:'Error handler + DLC', desc:'OnException config: max retries, retry delay, dead letter sink. Decorator on route.', code:'' },
+      { n:'05', title:'Route registry + admin API', desc:'Register/start/stop routes via FastAPI admin API. Health per route: messages_processed, errors, lag.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'Apache Camel EIP patterns', detail:'camel.apache.org/components/latest/eips/enterprise-integration-patterns.html' },
+      { type:'blog', name:'Building Event-Driven Pipelines in Python', detail:'bytewax.io/blog/event-driven-pipelines' }
+    ],
+    difficulty: 4, hours: '20–28 hrs', lang: 'Python'
+  }
+},
+
+{
+  id: 23, num: '23', cat: 'python', tier: 3,
+  title: 'RAG Document Search', sub: 'with FastAPI + pgvector',
+  tagline: 'Retrieval-augmented generation: chunk documents, embed with sentence-transformers, store in pgvector, and answer questions with an LLM using retrieved context.',
+  stack: ['Python', 'FastAPI', 'pgvector', 'sentence-transformers', 'Anthropic'],
+  time: '16–24 hrs', deps: ['21'],
+  guide: {
+    overview: 'Build a document Q&A service. Upload PDFs → chunk → embed → store in pgvector. At query time: embed question → vector search → pass top-K chunks to LLM as context → stream answer. Foundational AI engineering skill.',
+    steps: [
+      { n:'01', title:'PDF ingestion + chunking', desc:'PyMuPDF to extract text. Chunk by sentence with overlap. Target ~400 tokens per chunk.', code:'' },
+      { n:'02', title:'Embedding generation', desc:'sentence-transformers all-MiniLM-L6-v2. Batch embed chunks. Returns numpy arrays.', code:'' },
+      { n:'03', title:'pgvector storage', desc:'CREATE EXTENSION vector. Column: embedding vector(384). CREATE INDEX USING ivfflat.', code:'' },
+      { n:'04', title:'Semantic search', desc:'Embed query, SELECT ... ORDER BY embedding <=> $1 LIMIT 5. Cosine distance.', code:'' },
+      { n:'05', title:'LLM answer generation', desc:'Build prompt: "Context: {chunks}\\n\\nQuestion: {q}\\n\\nAnswer:". Stream response to client.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'pgvector', detail:'github.com/pgvector/pgvector' },
+      { type:'docs', name:'sentence-transformers', detail:'sbert.net' }
+    ],
+    difficulty: 3, hours: '16–24 hrs', lang: 'Python'
+  }
+},
+
+{
+  id: 24, num: '24', cat: 'python', tier: 4,
+  title: 'ML Model Serving Platform', sub: 'with FastAPI + BentoML',
+  tagline: 'Serve ML models as REST APIs with BentoML: versioned model registry, batching for throughput, A/B routing, and GPU-aware deployment.',
+  stack: ['Python', 'BentoML', 'FastAPI', 'scikit-learn', 'Docker'],
+  time: '20–30 hrs', deps: ['23'],
+  guide: {
+    overview: 'Build a platform to serve ML models. Train a model, register it in BentoML model store, create a Service with adaptive batching, expose REST + gRPC endpoints, and add a traffic splitter for A/B testing between model versions.',
+    steps: [
+      { n:'01', title:'Train + save model', desc:'scikit-learn RandomForest. bentoml.sklearn.save_model("fraud_classifier", model, signatures={...}).', code:'' },
+      { n:'02', title:'BentoML Service', desc:'@bentoml.service(). @bentoml.api(). Input/output types. runner = bentoml.sklearn.get("fraud_classifier:latest").to_runner().', code:'' },
+      { n:'03', title:'Adaptive batching', desc:'@bentoml.service(traffic={"max_batch_size": 100, "max_latency_ms": 10}). Batches requests automatically.', code:'' },
+      { n:'04', title:'A/B traffic splitter', desc:'Custom service that routes 10% to v2 model, 90% to v1. Logs which version served each request.', code:'' },
+      { n:'05', title:'Docker + k8s deploy', desc:'bentoml build → bentoml containerize. K8s Deployment + HPA on CPU/custom metrics.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'BentoML docs', detail:'docs.bentoml.com' },
+      { type:'blog', name:'ML Model Serving Patterns', detail:'huyenchip.com/2022/01/02/four-architectures-for-real-time-ml-systems.html' }
+    ],
+    difficulty: 4, hours: '20–30 hrs', lang: 'Python'
+  }
+},
+
+{
+  id: 25, num: '25', cat: 'python', tier: 4,
+  title: 'Event Sourcing Engine', sub: 'with Python + PostgreSQL',
+  tagline: 'Implement event sourcing with aggregate versioning, event store, projections, and a snapshot mechanism. Domain-driven design in Python.',
+  stack: ['Python', 'FastAPI', 'PostgreSQL', 'asyncpg', 'dataclasses'],
+  time: '24–36 hrs', deps: ['22','16'],
+  guide: {
+    overview: 'Build a true event sourcing engine. Aggregates (e.g. BankAccount) only store events, never state. The store is immutable append-only. Projections rebuild read models. Snapshots skip replaying old events. This connects directly to your distributed systems background.',
+    steps: [
+      { n:'01', title:'Event store table', desc:'events(id, aggregate_id, aggregate_type, event_type, payload jsonb, version, occurred_at). Version per aggregate.', code:'' },
+      { n:'02', title:'Aggregate base class', desc:'load_from_events(events) → apply each, track version. raise_event() appends to uncommitted events.', code:'class Aggregate:\n  def raise_event(self, event):\n    self._events.append(event)\n    self._apply(event)' },
+      { n:'03', title:'Optimistic concurrency', desc:'INSERT with expected_version check. Raise ConcurrencyException on version mismatch.', code:'' },
+      { n:'04', title:'Projections', desc:'Async event handlers rebuild read models. E.g. AccountBalance table updated on MoneyDeposited events.', code:'' },
+      { n:'05', title:'Snapshots', desc:'Every N events, serialize aggregate state as snapshot. Load: get latest snapshot + events after it.', code:'' }
+    ],
+    resources: [
+      { type:'blog', name:'Event Sourcing — Martin Fowler', detail:'martinfowler.com/eaaDev/EventSourcing.html' },
+      { type:'blog', name:'Event Sourcing in Python', detail:'eventstore.com/blog/event-sourcing-and-cqrs-in-python' }
+    ],
+    difficulty: 5, hours: '24–36 hrs', lang: 'Python'
+  }
+},
+
+{
+  id: 26, num: '26', cat: 'python', tier: 1,
+  title: 'Typer CLI Toolkit', sub: 'with Python',
+  tagline: 'Build a developer toolkit CLI: HTTP tester, JSON prettifier, base64 encoder, UUID generator, and JWT inspector — all in one binary.',
+  stack: ['Python', 'typer', 'rich', 'httpx'],
+  time: '6–8 hrs', deps: [],
+  guide: {
+    overview: 'Learn Typer (FastAPI for CLIs) by building a dev toolkit. Rich for beautiful terminal output. This teaches you Python packaging, entry points, and type-annotated CLI development.',
+    steps: [
+      { n:'01', title:'Typer app setup', desc:'app = typer.Typer(). Subcommand groups: http, jwt, encode. Install with pip install -e .', code:'' },
+      { n:'02', title:'HTTP tester command', desc:'http get <url> --headers. httpx.get(), rich.print_json(resp.text).', code:'' },
+      { n:'03', title:'JWT inspector', desc:'jwt decode <token> — decode without verify, pretty-print header + claims with rich.', code:'' },
+      { n:'04', title:'UUID + base64 commands', desc:'uuid generate --count 5. encode/decode base64 from stdin or arg.', code:'' },
+      { n:'05', title:'Package + publish', desc:'pyproject.toml with [project.scripts]. Build with python -m build. Push to TestPyPI.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'Typer docs', detail:'typer.tiangolo.com' },
+      { type:'docs', name:'Rich docs', detail:'rich.readthedocs.io' }
+    ],
+    difficulty: 1, hours: '6–8 hrs', lang: 'Python'
+  }
+},
+
+{
+  id: 27, num: '27', cat: 'python', tier: 2,
+  title: 'Async Websocket Server', sub: 'with FastAPI',
+  tagline: 'Real-time websocket server: connection manager, rooms, presence tracking, and message history replay. Python async under the hood.',
+  stack: ['Python', 'FastAPI', 'websockets', 'Redis', 'asyncio'],
+  time: '10–14 hrs', deps: ['16'],
+  guide: {
+    overview: 'Build a WebSocket-based chat backend. Rooms, join/leave events, presence (who is online), and message history replay on reconnect. Redis pub/sub for multi-instance message fan-out.',
+    steps: [
+      { n:'01', title:'ConnectionManager', desc:'Dict[room_id, Set[WebSocket]]. connect(), disconnect(), broadcast_to_room().', code:'' },
+      { n:'02', title:'WebSocket endpoint', desc:'@app.websocket("/ws/{room_id}"). Accept, register, loop receive_text, broadcast, handle disconnect.', code:'' },
+      { n:'03', title:'Redis pub/sub for multi-instance', desc:'On message receive: PUBLISH room:{id} message. Each instance SUBSCRIBEs and forwards to local websockets.', code:'' },
+      { n:'04', title:'Presence tracking', desc:'On connect: SADD room:{id}:members user_id. On disconnect: SREM. SMEMBERS for online list.', code:'' },
+      { n:'05', title:'History replay', desc:'Store last N messages in Redis List (LPUSH + LTRIM). On join: LRANGE and replay to new connection.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'FastAPI WebSockets', detail:'fastapi.tiangolo.com/advanced/websockets' },
+      { type:'docs', name:'Redis pub/sub', detail:'redis.io/docs/latest/develop/interact/pubsub' }
+    ],
+    difficulty: 2, hours: '10–14 hrs', lang: 'Python'
+  }
+},
+
+{
+  id: 28, num: '28', cat: 'python', tier: 3,
+  title: 'API Mocking + Contract Testing', sub: 'with Python',
+  tagline: 'Build a contract-driven mock server: ingest OpenAPI spec, generate mock responses, record real traffic, and run contract validation.',
+  stack: ['Python', 'FastAPI', 'schemathesis', 'openapi-spec-validator', 'pytest'],
+  time: '14–20 hrs', deps: ['16'],
+  guide: {
+    overview: 'Inspired by your Finacle API Gateway ownership — build a tool that auto-generates mock APIs from OpenAPI specs. Supports response overrides, record/replay mode, and runs schemathesis property-based contract tests against any API.',
+    steps: [
+      { n:'01', title:'OpenAPI spec parser', desc:'Load YAML/JSON spec. Extract paths, methods, response schemas. Use jsonschema for schema objects.', code:'' },
+      { n:'02', title:'Mock response generation', desc:'For each path+method: generate fake response matching response schema using faker + hypothesis.', code:'' },
+      { n:'03', title:'Dynamic Fastapi routes', desc:'Programmatically add_api_route() for each OpenAPI path. Handler returns generated mock.', code:'' },
+      { n:'04', title:'Record/replay mode', desc:'Proxy to real upstream, record request/response pairs to SQLite. Replay mode matches incoming requests and returns recorded responses.', code:'' },
+      { n:'05', title:'Contract testing', desc:'schemathesis.from_path(spec_url). Run against mock + real server. Report schema violations.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'Schemathesis', detail:'schemathesis.readthedocs.io' },
+      { type:'docs', name:'OpenAPI Specification', detail:'spec.openapis.org/oas/v3.1.0' }
+    ],
+    difficulty: 3, hours: '14–20 hrs', lang: 'Python'
+  }
+},
+
+// ─── NODE.JS PROJECTS (29–40) ─────────────────────────────────────────────────
+
+{
+  id: 29, num: '29', cat: 'node', tier: 1,
+  title: 'Express REST API', sub: 'with Node.js',
+  tagline: 'Classic Express API with Zod validation, Prisma ORM, JWT auth middleware, and error handling middleware. Node.js fundamentals.',
+  stack: ['Node.js', 'Express', 'Prisma', 'Zod', 'JWT'],
+  time: '10–14 hrs', deps: [],
+  guide: {
+    overview: 'The Node.js foundation project. Build a User + Posts API. Understand the event loop model vs Java thread pools. Middleware chain pattern mirrors Spring interceptors. Prisma is the Node equivalent of Spring Data JPA.',
+    steps: [
+      { n:'01', title:'Express app + middleware chain', desc:'express(), cors(), helmet(), express.json(). Understand middleware execution order.', code:'app.use(cors())\napp.use(helmet())\napp.use(express.json())\napp.use("/api", router)' },
+      { n:'02', title:'Prisma schema + migrations', desc:'schema.prisma with User and Post models. npx prisma migrate dev.', code:'' },
+      { n:'03', title:'Zod request validation middleware', desc:'validateBody(schema) middleware: schema.parse(req.body), catch ZodError → 400.', code:'' },
+      { n:'04', title:'JWT auth middleware', desc:'Bearer token extraction, jsonwebtoken.verify(), attach decoded user to req.user.', code:'' },
+      { n:'05', title:'Global error handler', desc:'4-param express error handler. Differentiate ZodError, PrismaClientKnownRequestError, generic 500.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'Express.js', detail:'expressjs.com' },
+      { type:'docs', name:'Prisma ORM', detail:'prisma.io/docs' },
+      { type:'docs', name:'Zod', detail:'zod.dev' }
+    ],
+    difficulty: 1, hours: '10–14 hrs', lang: 'Node.js'
+  }
+},
+
+{
+  id: 30, num: '30', cat: 'node', tier: 1,
+  title: 'Real-time Chat with Socket.io', sub: 'with Node.js',
+  tagline: 'WebSocket chat server with Socket.io: rooms, typing indicators, read receipts, and horizontal scaling with Redis adapter.',
+  stack: ['Node.js', 'Socket.io', 'Express', 'Redis', 'Docker'],
+  time: '10–14 hrs', deps: ['29'],
+  guide: {
+    overview: 'Socket.io is the dominant real-time library in the Node ecosystem. Build a chat server with rooms, private messages, typing indicators, and online presence. Redis adapter enables multi-process scaling — mirrors your Redis expertise.',
+    steps: [
+      { n:'01', title:'Socket.io server setup', desc:'const io = new Server(httpServer, { cors }). io.on("connection", socket => { ... }).', code:'' },
+      { n:'02', title:'Rooms + join/leave', desc:'socket.join(roomId). io.to(roomId).emit(). socket.on("leave-room", ...).', code:'' },
+      { n:'03', title:'Typing indicators', desc:'socket.on("typing", () => socket.to(room).emit("user-typing", {user})). Debounce on client.', code:'' },
+      { n:'04', title:'Read receipts', desc:'Emit "message-delivered" on receive, "message-read" on visibility. Store status in Redis Hash.', code:'' },
+      { n:'05', title:'Redis adapter', desc:'@socket.io/redis-adapter. Enables multiple Node instances to share events. Test with 2 server instances.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'Socket.io docs', detail:'socket.io/docs/v4' },
+      { type:'docs', name:'Socket.io Redis adapter', detail:'socket.io/docs/v4/redis-adapter' }
+    ],
+    difficulty: 2, hours: '10–14 hrs', lang: 'Node.js'
+  }
+},
+
+{
+  id: 31, num: '31', cat: 'node', tier: 2,
+  title: 'Event-Driven Microservice', sub: 'with Node.js + Kafka',
+  tagline: 'Node.js Kafka consumer + producer with KafkaJS: consume orders, process, emit events, and implement saga orchestration pattern.',
+  stack: ['Node.js', 'KafkaJS', 'Express', 'PostgreSQL', 'Docker'],
+  time: '14–20 hrs', deps: ['29'],
+  guide: {
+    overview: 'Build an order processing microservice in Node.js. Consume order-placed events from Kafka, validate stock, charge payment (stub), emit order-confirmed or order-failed events. Implements a simple saga. Parallels your Java Kafka experience.',
+    steps: [
+      { n:'01', title:'KafkaJS consumer', desc:'kafka.consumer({ groupId }). consumer.subscribe({ topic, fromBeginning: false }). consumer.run({ eachMessage }).', code:'' },
+      { n:'02', title:'Idempotent processing', desc:'Check events table for messageId before processing. INSERT ... ON CONFLICT DO NOTHING.', code:'' },
+      { n:'03', title:'Saga steps', desc:'validateStock() → chargePayment() → fulfillOrder(). On any step failure, emit compensating event.', code:'' },
+      { n:'04', title:'Producer with retry', desc:'kafka.producer({ retry: { retries: 3 } }). producer.send({ topic, messages }).', code:'' },
+      { n:'05', title:'Dead letter topic', desc:'On max retries exceeded, produce to orders-dlq with error metadata.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'KafkaJS docs', detail:'kafka.js.org' },
+      { type:'blog', name:'Saga Pattern Explained', detail:'microservices.io/patterns/data/saga.html' }
+    ],
+    difficulty: 3, hours: '14–20 hrs', lang: 'Node.js'
+  }
+},
+
+{
+  id: 32, num: '32', cat: 'node', tier: 2,
+  title: 'GraphQL API', sub: 'with Node.js + Apollo',
+  tagline: 'Full GraphQL API: schema-first design, resolvers, DataLoader for N+1 prevention, subscriptions, and persisted queries.',
+  stack: ['Node.js', 'Apollo Server', 'Prisma', 'DataLoader', 'GraphQL'],
+  time: '14–18 hrs', deps: ['29'],
+  guide: {
+    overview: 'GraphQL is increasingly common in fintech APIs. Build a Blog API with queries, mutations, and subscriptions. DataLoader batches DB queries (like JPA @BatchSize). Compare mental model to REST — tradeoffs you should be able to articulate.',
+    steps: [
+      { n:'01', title:'Apollo Server + schema', desc:'type Query, Mutation, Subscription. Schema-first SDL. ApolloServer({ typeDefs, resolvers }).', code:'' },
+      { n:'02', title:'Resolvers + Prisma', desc:'Query.posts → prisma.post.findMany(). Mutation.createPost → prisma.post.create(). Relay pagination.', code:'' },
+      { n:'03', title:'DataLoader for N+1', desc:'userLoader = new DataLoader(ids => prisma.user.findMany({ where: { id: { in: ids } } })). Use in Post.author resolver.', code:'const userLoader = new DataLoader(async (ids) =>\n  prisma.user.findMany({ where: { id: { in: ids } } })\n)' },
+      { n:'04', title:'Subscriptions via WebSocket', desc:'PubSub. Mutation publishes event. Subscription resolver yields async iterator.', code:'' },
+      { n:'05', title:'Persisted queries', desc:'Apollo registered operations. Client sends only SHA256 hash, server looks up query. Smaller payloads.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'Apollo Server docs', detail:'www.apollographql.com/docs/apollo-server' },
+      { type:'docs', name:'DataLoader', detail:'github.com/graphql/dataloader' }
+    ],
+    difficulty: 3, hours: '14–18 hrs', lang: 'Node.js'
+  }
+},
+
+{
+  id: 33, num: '33', cat: 'node', tier: 2,
+  title: 'BullMQ Job Queue Dashboard', sub: 'with Node.js',
+  tagline: 'Build a job queue system with BullMQ (Redis-backed), priority queues, job dependencies, and a real-time dashboard.',
+  stack: ['Node.js', 'BullMQ', 'Redis', 'Express', 'Bull Board'],
+  time: '10–14 hrs', deps: ['29'],
+  guide: {
+    overview: 'BullMQ is the Node.js equivalent of Celery. Build an email + PDF generation queue. Priority lanes (critical/normal/bulk). Job dependencies (PDF after data export). Bull Board visual dashboard. Mirrors your async processing architecture.',
+    steps: [
+      { n:'01', title:'BullMQ queue + worker', desc:'new Queue("emails", { connection }). new Worker("emails", processor, { connection, concurrency: 5 }).', code:'' },
+      { n:'02', title:'Priority queues', desc:'queue.add("send", data, { priority: 1 }) for critical. Higher priority runs first.', code:'' },
+      { n:'03', title:'Job dependencies (flows)', desc:'FlowProducer: parent job waits for all children to complete before processing.', code:'' },
+      { n:'04', title:'Retry + backoff', desc:'Worker options: { attempts: 3, backoff: { type: "exponential", delay: 1000 } }.', code:'' },
+      { n:'05', title:'Bull Board dashboard', desc:'@bull-board/express. Mount at /admin/queues. Shows queues, jobs, status, retries in real-time.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'BullMQ docs', detail:'docs.bullmq.io' },
+      { type:'repo', name:'bull-board', detail:'github.com/felixmosh/bull-board' }
+    ],
+    difficulty: 2, hours: '10–14 hrs', lang: 'Node.js'
+  }
+},
+
+{
+  id: 34, num: '34', cat: 'node', tier: 3,
+  title: 'Multi-tenant SaaS API', sub: 'with Node.js',
+  tagline: 'Row-level multi-tenancy in PostgreSQL: tenant isolation via RLS, tenant-aware connection pooling, and per-tenant rate limiting.',
+  stack: ['Node.js', 'Express', 'PostgreSQL', 'RLS', 'Redis', 'Prisma'],
+  time: '18–26 hrs', deps: ['29','33'],
+  guide: {
+    overview: 'Multi-tenancy is a critical skill in BFSI SaaS. Build an API where each request is scoped to a tenant. PostgreSQL Row-Level Security policies enforce data isolation at the DB layer. Per-tenant rate limits in Redis. This complements your banking client onboarding experience.',
+    steps: [
+      { n:'01', title:'Tenant model + middleware', desc:'tenants table. JWT contains tenant_id claim. Middleware extracts + validates tenant, attaches to req.', code:'' },
+      { n:'02', title:'PostgreSQL RLS policies', desc:'CREATE POLICY tenant_isolation ON resources USING (tenant_id = current_setting("app.tenant_id")::uuid). SET LOCAL.', code:'' },
+      { n:'03', title:'Tenant-aware DB session', desc:'Before each query: SET LOCAL app.tenant_id = $tenantId in same transaction/session.', code:'' },
+      { n:'04', title:'Per-tenant rate limiting', desc:'Redis key: ratelimit:{tenantId}:{endpoint}. Token bucket with tenant-specific limits from DB config.', code:'' },
+      { n:'05', title:'Tenant provisioning API', desc:'POST /tenants: create tenant, run migrations for tenant schema, set default rate limits.', code:'' }
+    ],
+    resources: [
+      { type:'blog', name:'PostgreSQL Row-Level Security', detail:'postgresql.org/docs/current/ddl-rowsecurity.html' },
+      { type:'blog', name:'Multi-tenancy Patterns', detail:'microsoft.com/en-us/azure/architecture/guide/multitenant/overview' }
+    ],
+    difficulty: 4, hours: '18–26 hrs', lang: 'Node.js'
+  }
+},
+
+{
+  id: 35, num: '35', cat: 'node', tier: 3,
+  title: 'Webhook Delivery Engine', sub: 'with Node.js',
+  tagline: 'Build a reliable webhook delivery system: HMAC signing, exponential retry with jitter, delivery log, and subscriber management API.',
+  stack: ['Node.js', 'BullMQ', 'PostgreSQL', 'Express', 'Redis'],
+  time: '16–22 hrs', deps: ['33','31'],
+  guide: {
+    overview: 'Webhooks are everywhere in fintech integrations. Build the delivery infrastructure: subscribe endpoints, sign payloads with HMAC-SHA256, deliver with retry, log all attempts, expose a delivery dashboard. Production-grade webhook service.',
+    steps: [
+      { n:'01', title:'Subscriber management', desc:'POST /webhooks/subscribe: store {endpoint_url, events[], secret}. CRUD for subscriptions.', code:'' },
+      { n:'02', title:'HMAC signature', desc:'crypto.createHmac("sha256", secret).update(JSON.stringify(payload)).digest("hex"). Send as X-Signature-SHA256 header.', code:'const sig = crypto\n  .createHmac("sha256", secret)\n  .update(body)\n  .digest("hex")' },
+      { n:'03', title:'BullMQ delivery queue', desc:'On event: fan-out to all matching subscribers, enqueue one delivery job per subscriber.', code:'' },
+      { n:'04', title:'Retry with exponential backoff', desc:'attempts: 7. Backoff: 30s, 1m, 5m, 30m, 2h, 8h, 24h. On 410 Gone: auto-disable subscription.', code:'' },
+      { n:'05', title:'Delivery log API', desc:'GET /webhooks/deliveries?status=failed. Per-delivery: attempt count, response code, response body, next retry.', code:'' }
+    ],
+    resources: [
+      { type:'blog', name:'Webhook Best Practices — Stripe', detail:'stripe.com/docs/webhooks/best-practices' },
+      { type:'docs', name:'BullMQ retries', detail:'docs.bullmq.io/guide/retrying-failing-jobs' }
+    ],
+    difficulty: 3, hours: '16–22 hrs', lang: 'Node.js'
+  }
+},
+
+{
+  id: 36, num: '36', cat: 'node', tier: 3,
+  title: 'Server-Side Rendering App', sub: 'with Next.js',
+  tagline: 'Full-stack Next.js app with SSR, ISR, API routes, Prisma DB, and NextAuth.js — bridging your backend knowledge to the JS fullstack.',
+  stack: ['Next.js', 'TypeScript', 'Prisma', 'NextAuth.js', 'Tailwind'],
+  time: '16–22 hrs', deps: ['29'],
+  guide: {
+    overview: 'Next.js is the dominant full-stack JS framework. Build a fintech dashboard: SSR for data pages, ISR for cached public pages, API routes as backend, NextAuth for OAuth. After this you can talk fluently to frontend teams.',
+    steps: [
+      { n:'01', title:'Next.js + TypeScript setup', desc:'npx create-next-app@latest --typescript. App router (not pages). Understand server vs client components.', code:'' },
+      { n:'02', title:'Server Components + data fetching', desc:'async component fetches from DB directly (no useEffect). Cache and revalidate strategies.', code:'export default async function Dashboard() {\n  const data = await prisma.account.findMany()\n  return <AccountList data={data} />\n}' },
+      { n:'03', title:'API routes', desc:'app/api/transactions/route.ts. GET/POST handlers. Same JWT middleware pattern.', code:'' },
+      { n:'04', title:'NextAuth.js', desc:'Google + GitHub OAuth. Session strategy. Protect routes with middleware.ts.', code:'' },
+      { n:'05', title:'ISR for public pages', desc:'revalidate = 3600 for public data pages. Manual revalidation via POST /api/revalidate.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'Next.js App Router', detail:'nextjs.org/docs/app' },
+      { type:'docs', name:'NextAuth.js', detail:'next-auth.js.org' }
+    ],
+    difficulty: 3, hours: '16–22 hrs', lang: 'Node.js'
+  }
+},
+
+{
+  id: 37, num: '37', cat: 'node', tier: 4,
+  title: 'Distributed Tracing Collector', sub: 'with Node.js',
+  tagline: 'Build an OpenTelemetry-compatible trace collector: accept OTLP spans, store in ClickHouse, query API, and a trace viewer UI.',
+  stack: ['Node.js', 'gRPC', 'ClickHouse', 'OTLP', 'Express'],
+  time: '24–36 hrs', deps: ['35','34'],
+  guide: {
+    overview: 'You already built observability workflows at Finacle. Now build the infrastructure. An OTLP gRPC collector receives spans, stores them in ClickHouse (columnar DB for time-series), and serves a query API for trace search and waterfall view. This is a Jaeger-lite.',
+    steps: [
+      { n:'01', title:'OTLP gRPC receiver', desc:'Implement opentelemetry-proto CollectorService. Accept ExportTraceServiceRequest, parse spans.', code:'' },
+      { n:'02', title:'ClickHouse schema', desc:'traces table: traceId, spanId, parentSpanId, serviceName, operationName, startTime, duration, status, attributes (Map). MergeTree engine ordered by (traceId, startTime).', code:'' },
+      { n:'03', title:'Batch insert', desc:'Buffer spans in memory, flush to ClickHouse every 1s or 1000 spans. Use ClickHouse HTTP interface for bulk insert.', code:'' },
+      { n:'04', title:'Query API', desc:'GET /traces?service=gateway&minDuration=100ms&from=now-1h. Returns trace list with root span summary.', code:'' },
+      { n:'05', title:'Trace detail endpoint', desc:'GET /traces/:traceId — return all spans sorted by startTime for waterfall rendering.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'OTLP proto spec', detail:'github.com/open-telemetry/opentelemetry-proto' },
+      { type:'docs', name:'ClickHouse Node.js client', detail:'clickhouse.com/docs/en/integrations/javascript' }
+    ],
+    difficulty: 4, hours: '24–36 hrs', lang: 'Node.js'
+  }
+},
+
+{
+  id: 38, num: '38', cat: 'node', tier: 2,
+  title: 'OAuth 2.0 Authorization Server', sub: 'with Node.js',
+  tagline: 'Build a spec-compliant OAuth 2.0 + OIDC authorization server: authorization code flow, PKCE, token introspection, and dynamic client registration.',
+  stack: ['Node.js', 'Express', 'node-oidc-provider', 'Redis', 'PostgreSQL'],
+  time: '14–20 hrs', deps: ['29'],
+  guide: {
+    overview: 'Auth is central to your banking platform work. Build a real OAuth 2.0 + OpenID Connect server using node-oidc-provider. Support authorization code + PKCE flow. Token introspection endpoint. This gives you authoritative knowledge of how Spring Security OAuth2 works under the hood.',
+    steps: [
+      { n:'01', title:'node-oidc-provider setup', desc:'new Provider(issuerURL, configuration). Mount to Express. Configure clients, scopes, claims.', code:'' },
+      { n:'02', title:'Authorization code + PKCE', desc:'S256 code challenge. Validate code_verifier on token exchange. PKCE required for public clients.', code:'' },
+      { n:'03', title:'Custom account adapter', desc:'Implement findAccount() — look up user from DB. Return claims(use, scope) for OIDC claims.', code:'' },
+      { n:'04', title:'Token introspection', desc:'POST /token/introspect. Returns active: true/false + token metadata. Used by resource servers.', code:'' },
+      { n:'05', title:'Dynamic client registration', desc:'POST /register — create new client programmatically. Returns client_id + client_secret.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'node-oidc-provider', detail:'github.com/panva/node-oidc-provider' },
+      { type:'docs', name:'RFC 6749 — OAuth 2.0', detail:'rfc-editor.org/rfc/rfc6749' }
+    ],
+    difficulty: 3, hours: '14–20 hrs', lang: 'Node.js'
+  }
+},
+
+{
+  id: 39, num: '39', cat: 'node', tier: 4,
+  title: 'Banking Transaction Ledger', sub: 'with Node.js',
+  tagline: 'Double-entry bookkeeping engine: accounts, journal entries, balance computation, reconciliation, and audit trail. Fintech-relevant mastery project.',
+  stack: ['Node.js', 'TypeScript', 'PostgreSQL', 'Express', 'BullMQ'],
+  time: '24–36 hrs', deps: ['34','35'],
+  guide: {
+    overview: 'The Node.js capstone for your BFSI background. Implement double-entry bookkeeping: every transaction has equal debits and credits. Balance sheets are always consistent. Reconciliation jobs verify sums. Audit trail is immutable. This is directly applicable to Finacle.',
+    steps: [
+      { n:'01', title:'Chart of accounts schema', desc:'accounts(id, code, name, type: ASSET|LIABILITY|EQUITY|INCOME|EXPENSE, currency). Hierarchical with parent_id.', code:'' },
+      { n:'02', title:'Journal entries (immutable)', desc:'journal_entries(id, date, description, created_by). journal_lines(entry_id, account_id, debit, credit). Sum(debit) must equal Sum(credit).', code:'' },
+      { n:'03', title:'Balance computation', desc:'Account balance = SUM(debit) - SUM(credit) for ASSET/EXPENSE. Reversed for others. Materialized view with incremental update.', code:'' },
+      { n:'04', title:'Optimistic locking on posting', desc:'Version column on accounts. Check before balance update to prevent double-posting race condition.', code:'' },
+      { n:'05', title:'Reconciliation job', desc:'BullMQ daily job: verify Sum(all debits) == Sum(all credits). Alert on mismatch. Generate trial balance report.', code:'' }
+    ],
+    resources: [
+      { type:'blog', name:'Double-Entry Bookkeeping for Engineers', detail:'beancount.io/docs/the-double-entry-counting-method.html' },
+      { type:'blog', name:'Ledger Architecture at Stripe', detail:'stripe.com/blog/ledger-stripe-system-of-record' }
+    ],
+    difficulty: 5, hours: '24–36 hrs', lang: 'Node.js'
+  }
+},
+
+{
+  id: 40, num: '40', cat: 'node', tier: 1,
+  title: 'TypeScript + Zod API Boilerplate', sub: 'with Node.js',
+  tagline: 'Production-grade Express TypeScript boilerplate: structured logging, error classes, env validation with Zod, and health check endpoint.',
+  stack: ['Node.js', 'TypeScript', 'Express', 'Zod', 'pino'],
+  time: '6–10 hrs', deps: [],
+  guide: {
+    overview: 'The starting template for every Node.js project you build. TypeScript strict mode. Zod for env validation (not just request validation). Pino structured JSON logging. AppError hierarchy. Health check with DB ping. This is the "right way" to start Node.js projects.',
+    steps: [
+      { n:'01', title:'TypeScript strict config', desc:'tsconfig.json: strict, noUncheckedIndexedAccess, exactOptionalPropertyTypes. ts-node-dev for dev.', code:'' },
+      { n:'02', title:'Env validation with Zod', desc:'const envSchema = z.object({ DATABASE_URL: z.string().url(), PORT: z.coerce.number().default(3000) }). Parse on startup, fail fast.', code:'' },
+      { n:'03', title:'AppError hierarchy', desc:'class AppError extends Error { statusCode: number; isOperational: boolean }. ValidationError, NotFoundError, AuthError.', code:'' },
+      { n:'04', title:'Pino structured logging', desc:'pino({ level: env.LOG_LEVEL }). Log request_id via AsyncLocalStorage context. JSON in prod, pretty in dev.', code:'' },
+      { n:'05', title:'Health check endpoint', desc:'GET /health: ping DB, check Redis, return { status, db, redis, uptime, version }.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'TypeScript strict mode', detail:'typescriptlang.org/tsconfig#strict' },
+      { type:'docs', name:'Pino logger', detail:'getpino.io' }
+    ],
+    difficulty: 1, hours: '6–10 hrs', lang: 'Node.js'
+  }
+},
+
+// ─── REACT PROJECTS (41–50) ───────────────────────────────────────────────────
+
+{
+  id: 41, num: '41', cat: 'react', tier: 1,
+  title: 'API Explorer UI', sub: 'in React',
+  tagline: 'A Postman-lite: send HTTP requests, view responses, save collections, and replay history. React fundamentals through a practical tool.',
+  stack: ['React', 'TypeScript', 'Tailwind', 'Zustand', 'axios'],
+  time: '12–18 hrs', deps: [],
+  guide: {
+    overview: 'Build your own lightweight API testing tool. URL bar, method selector, headers/body editors, response viewer with syntax highlight. Save collections to localStorage. This uses React state management, controlled forms, and data fetching in a realistic context.',
+    steps: [
+      { n:'01', title:'Request builder form', desc:'Controlled inputs for method, URL, headers (key-value pairs), body. useState for all fields.', code:'' },
+      { n:'02', title:'Axios request execution', desc:'On submit: axios({ method, url, headers, data }). Catch error for response.', code:'' },
+      { n:'03', title:'Response viewer', desc:'Status badge (color by 2xx/4xx/5xx). Pretty-print JSON with react-json-view. Response time + size.', code:'' },
+      { n:'04', title:'Request history', desc:'Zustand store persisted to localStorage. Last 50 requests. Click to replay.', code:'' },
+      { n:'05', title:'Collections', desc:'Group requests into named collections. Export/import as JSON. Drag-to-reorder with @dnd-kit.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'Zustand', detail:'docs.pmnd.rs/zustand' },
+      { type:'docs', name:'Tailwind CSS', detail:'tailwindcss.com/docs' }
+    ],
+    difficulty: 2, hours: '12–18 hrs', lang: 'React + TypeScript'
+  }
+},
+
+{
+  id: 42, num: '42', cat: 'react', tier: 1,
+  title: 'Real-time Dashboard', sub: 'in React',
+  tagline: 'Live metrics dashboard consuming WebSocket or SSE stream: sparklines, live counters, threshold alerts, and auto-reconnect.',
+  stack: ['React', 'TypeScript', 'Recharts', 'Tailwind', 'WebSocket'],
+  time: '10–14 hrs', deps: ['41'],
+  guide: {
+    overview: 'Build the frontend you would show in a production war room. Metrics stream in via WebSocket. Recharts sparklines update in real-time. Threshold alerts with toast notifications. Custom hook useMetricsStream encapsulates WebSocket lifecycle.',
+    steps: [
+      { n:'01', title:'useMetricsStream hook', desc:'WebSocket setup in useEffect. onmessage updates state. Auto-reconnect with exponential backoff on close.', code:'const useMetricsStream = (url: string) => {\n  const [data, setData] = useState([])\n  useEffect(() => {\n    const ws = new WebSocket(url)\n    ws.onmessage = e => setData(prev => [...prev.slice(-60), JSON.parse(e.data)])\n    return () => ws.close()\n  }, [url])\n  return data\n}' },
+      { n:'02', title:'Sparkline cards', desc:'Recharts ResponsiveContainer + AreaChart. Animate={false} for performance. Color by threshold.', code:'' },
+      { n:'03', title:'Threshold alerts', desc:'useEffect watching latest value. If value > threshold, push to alerts array. Toast component.', code:'' },
+      { n:'04', title:'Time range selector', desc:'Toggle 1m / 5m / 30m. Slice data array by selected window. Update chart domain.', code:'' },
+      { n:'05', title:'Dark theme + responsive', desc:'Tailwind dark mode. Grid layout collapses to 1-col on mobile. useWindowSize hook.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'Recharts', detail:'recharts.org' },
+      { type:'docs', name:'WebSocket API', detail:'developer.mozilla.org/en-US/docs/Web/API/WebSocket' }
+    ],
+    difficulty: 2, hours: '10–14 hrs', lang: 'React + TypeScript'
+  }
+},
+
+{
+  id: 43, num: '43', cat: 'react', tier: 2,
+  title: 'Authentication Flow UI', sub: 'in React',
+  tagline: 'Complete auth UI: login, register, forgot password, MFA prompt, OAuth buttons, and protected route HOC. JWT token management.',
+  stack: ['React', 'TypeScript', 'React Router v6', 'React Query', 'Tailwind'],
+  time: '12–16 hrs', deps: ['41'],
+  guide: {
+    overview: 'The auth UI that every app needs. Pairs perfectly with your JWT Auth Service (project 20). Login/register forms with Zod validation. Token storage in memory (not localStorage). Silent refresh. Protected route wrapper. OAuth redirect handling.',
+    steps: [
+      { n:'01', title:'Auth context + token management', desc:'AuthContext stores user + accessToken in memory (not localStorage). Refresh token in httpOnly cookie.', code:'' },
+      { n:'02', title:'axios interceptor for silent refresh', desc:'On 401, call /auth/refresh, retry original request with new token. Queue concurrent 401s during refresh.', code:'' },
+      { n:'03', title:'Login/Register forms', desc:'react-hook-form + Zod resolver. Field-level error messages. Loading state on submit.', code:'' },
+      { n:'04', title:'Protected route wrapper', desc:'<RequireAuth> component: if !user redirect to /login with from location. Restore after login.', code:'' },
+      { n:'05', title:'MFA prompt', desc:'After login if MFA required: show TOTP input screen. Verify before issuing full access token.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'React Router v6', detail:'reactrouter.com/en/main' },
+      { type:'blog', name:'JWT Auth in React — The Right Way', detail:'hasura.io/blog/best-practices-of-using-jwt-with-graphql' }
+    ],
+    difficulty: 2, hours: '12–16 hrs', lang: 'React + TypeScript'
+  }
+},
+
+{
+  id: 44, num: '44', cat: 'react', tier: 2,
+  title: 'Data Table with TanStack', sub: 'in React',
+  tagline: 'Feature-rich data table: server-side pagination, multi-column sort, column filters, row selection, inline editing, and CSV export.',
+  stack: ['React', 'TypeScript', 'TanStack Table v8', 'React Query', 'Tailwind'],
+  time: '12–16 hrs', deps: ['43'],
+  guide: {
+    overview: 'TanStack Table is the industry-standard headless table library. Build a transactions table for your banking dashboard. Server-side pagination (pass page/sort params to API). Column filtering. Inline edit a cell. Bulk actions on selected rows. You will use this in every data-heavy app.',
+    steps: [
+      { n:'01', title:'TanStack Table setup', desc:'useReactTable({ data, columns, getCoreRowModel, getPaginationRowModel, getSortedRowModel }).', code:'' },
+      { n:'02', title:'Server-side pagination', desc:'manualPagination: true. onPaginationChange updates state, triggers React Query refetch with page params.', code:'' },
+      { n:'03', title:'Column filters + sorting', desc:'Column.getFilterValue(). facetedMinMaxValues for range filters. Debounce filter input.', code:'' },
+      { n:'04', title:'Row selection + bulk actions', desc:'enableRowSelection. table.getSelectedRowModel(). Bulk delete/export button appears on selection.', code:'' },
+      { n:'05', title:'CSV export', desc:'On export: get all selected row data, convert to CSV with Papa.unparse(), trigger download.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'TanStack Table v8', detail:'tanstack.com/table/latest/docs' },
+      { type:'docs', name:'React Query', detail:'tanstack.com/query/latest/docs' }
+    ],
+    difficulty: 3, hours: '12–16 hrs', lang: 'React + TypeScript'
+  }
+},
+
+{
+  id: 45, num: '45', cat: 'react', tier: 2,
+  title: 'Form Builder', sub: 'in React',
+  tagline: 'Drag-and-drop form builder: field palette, canvas, property editor, JSON schema output, and live preview. React DnD + complex state.',
+  stack: ['React', 'TypeScript', '@dnd-kit', 'Zustand', 'react-hook-form'],
+  time: '16–22 hrs', deps: ['41'],
+  guide: {
+    overview: 'Complex state management challenge. Drag fields from palette onto canvas. Reorder by dragging. Click to edit field properties (label, required, placeholder, validation). Output clean JSON schema. Preview rendered form with react-hook-form.',
+    steps: [
+      { n:'01', title:'@dnd-kit setup', desc:'DndContext, SortableContext for canvas. useDraggable for palette items. useDroppable for canvas.', code:'' },
+      { n:'02', title:'Form schema state', desc:'Zustand store: fields: FormField[]. addField, removeField, updateField, reorderFields actions.', code:'' },
+      { n:'03', title:'Field components', desc:'Text, Number, Select, Checkbox, Date, Textarea, FileUpload renderers. Each reads from schema.', code:'' },
+      { n:'04', title:'Property editor panel', desc:'Click field → show editor panel. react-hook-form for editing field properties. Updates Zustand on change.', code:'' },
+      { n:'05', title:'Preview + JSON output', desc:'Toggle preview mode: render form with react-hook-form, show validation. JSON tab: pretty-print schema.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'@dnd-kit', detail:'dndkit.com/docs/introduction' },
+      { type:'docs', name:'Zustand', detail:'docs.pmnd.rs/zustand' }
+    ],
+    difficulty: 3, hours: '16–22 hrs', lang: 'React + TypeScript'
+  }
+},
+
+{
+  id: 46, num: '46', cat: 'react', tier: 3,
+  title: 'Fintech Transaction Dashboard', sub: 'in React',
+  tagline: 'Production banking UI: account summary, transaction list with filters, spending analytics charts, and export. Connects to your Node.js ledger.',
+  stack: ['React', 'TypeScript', 'Recharts', 'TanStack Query', 'Tailwind', 'shadcn/ui'],
+  time: '18–24 hrs', deps: ['44','42','43'],
+  guide: {
+    overview: 'The frontend capstone that pairs with your Node.js Banking Ledger (project 39). Account balance cards, transaction table (project 44), spending breakdown pie chart, income vs expense bar chart. Optimistic UI updates. Export transactions as PDF.',
+    steps: [
+      { n:'01', title:'Account summary cards', desc:'useQuery to fetch accounts. Balance with currency formatting (Intl.NumberFormat). Loading skeleton.', code:'' },
+      { n:'02', title:'Transaction table', desc:'Integrate TanStack Table (project 44). Filter by date range, category, amount range. Color debit/credit.', code:'' },
+      { n:'03', title:'Spending analytics', desc:'Recharts PieChart by category. BarChart monthly income vs expense. Date range picker for period.', code:'' },
+      { n:'04', title:'Optimistic mutations', desc:'Transfer money: useMutation with optimisticUpdate. Balance updates immediately, rolls back on error.', code:'' },
+      { n:'05', title:'PDF export', desc:'react-pdf/renderer. Generate a PDF statement: header with account info, transaction table, footer.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'TanStack Query mutations', detail:'tanstack.com/query/latest/docs/framework/react/guides/mutations' },
+      { type:'docs', name:'react-pdf', detail:'react-pdf.org' }
+    ],
+    difficulty: 3, hours: '18–24 hrs', lang: 'React + TypeScript'
+  }
+},
+
+{
+  id: 47, num: '47', cat: 'react', tier: 3,
+  title: 'Kubernetes Dashboard Clone', sub: 'in React',
+  tagline: 'Visual K8s cluster browser: pods, deployments, services, live log streaming, and resource metrics. Pairs with your K8s automation work.',
+  stack: ['React', 'TypeScript', 'Kubernetes JS client', 'WebSocket', 'Recharts'],
+  time: '20–28 hrs', deps: ['42','44'],
+  guide: {
+    overview: 'You already automate Kubernetes deployments. Build a visual interface for it. A React frontend backed by a Node.js proxy that talks to the K8s API. Browse namespaces, view pod status, stream logs in real-time, and view resource usage charts. This combines your K8s expertise with React.',
+    steps: [
+      { n:'01', title:'K8s API proxy (Node.js)', desc:'@kubernetes/client-node. CoreV1Api for pods/services. AppsV1Api for deployments. Expose as REST endpoints.', code:'' },
+      { n:'02', title:'Namespace + resource browser', desc:'Sidebar with namespaces. Resource tabs: Pods, Deployments, Services. Table per resource type.', code:'' },
+      { n:'03', title:'Pod detail panel', desc:'Click pod → slide-over panel. Containers, resource requests/limits, events, conditions.', code:'' },
+      { n:'04', title:'Live log streaming', desc:'WebSocket endpoint proxies k8s exec log stream. Frontend: xterm.js terminal renders live logs.', code:'' },
+      { n:'05', title:'Resource metrics charts', desc:'Metrics server API for CPU/memory. Recharts line chart updating every 10s. Show request vs limit.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'@kubernetes/client-node', detail:'github.com/kubernetes-client/javascript' },
+      { type:'docs', name:'xterm.js', detail:'xtermjs.org' }
+    ],
+    difficulty: 4, hours: '20–28 hrs', lang: 'React + TypeScript'
+  }
+},
+
+{
+  id: 48, num: '48', cat: 'react', tier: 3,
+  title: 'Code Editor with Monaco', sub: 'in React',
+  tagline: 'Embedded code editor with Monaco (VS Code engine): multi-file tabs, language detection, run code via API, diff viewer, and theme switcher.',
+  stack: ['React', 'TypeScript', '@monaco-editor/react', 'Zustand', 'Tailwind'],
+  time: '16–22 hrs', deps: ['41'],
+  guide: {
+    overview: 'Monaco Editor is the engine behind VS Code. Build an online IDE: file tree, multi-tab editor, run code by POSTing to a sandboxed execution API, show output. Diff viewer for comparing versions. This is both technically impressive and directly usable for your internal tooling.',
+    steps: [
+      { n:'01', title:'Monaco Editor integration', desc:'@monaco-editor/react. language prop from file extension. onMount for editor instance access. Theme: vs-dark.', code:'' },
+      { n:'02', title:'File tree + multi-tab', desc:'Zustand: files: Map<path, content>, openTabs, activeTab. FileTree sidebar. Tab bar with close buttons.', code:'' },
+      { n:'03', title:'Language detection', desc:'Map file extension → Monaco language ID. Auto-detect on file create/open.', code:'' },
+      { n:'04', title:'Run code', desc:'POST selected file content to execution API (Judge0 or self-hosted). Poll for result. Show stdout/stderr in bottom panel.', code:'' },
+      { n:'05', title:'Diff viewer', desc:'Monaco DiffEditor for comparing two versions. File history stored in Zustand. Keyboard shortcut to open diff.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'@monaco-editor/react', detail:'github.com/suren-atoyan/monaco-react' },
+      { type:'docs', name:'Judge0 API', detail:'judge0.com' }
+    ],
+    difficulty: 3, hours: '16–22 hrs', lang: 'React + TypeScript'
+  }
+},
+
+{
+  id: 49, num: '49', cat: 'react', tier: 4,
+  title: 'LLM Chat Interface', sub: 'in React',
+  tagline: 'Production AI chat UI: streaming message rendering, conversation history, model selector, system prompt editor, cost tracker, and export.',
+  stack: ['React', 'TypeScript', 'Tailwind', 'Zustand', 'marked', 'SSE'],
+  time: '18–26 hrs', deps: ['43','42'],
+  guide: {
+    overview: 'Pairs with your Python LLM Streaming API (project 21). Build a full-featured chat interface: streaming markdown rendering, multi-conversation management, system prompt editor, token counter, and cost estimator. This is the frontend for your AI backend work.',
+    steps: [
+      { n:'01', title:'SSE streaming renderer', desc:'fetch() with ReadableStream. Decode each chunk, append to message content. React state drives re-render.', code:'const reader = resp.body?.getReader()\nwhile (true) {\n  const { done, value } = await reader.read()\n  if (done) break\n  setContent(c => c + decode(value))\n}' },
+      { n:'02', title:'Markdown renderer', desc:'marked.js parses streamed markdown incrementally. react-syntax-highlighter for code blocks. Copy button on code.', code:'' },
+      { n:'03', title:'Conversation manager', desc:'Zustand: conversations[], activeId. Sidebar shows conversation list. Rename, delete, search conversations.', code:'' },
+      { n:'04', title:'System prompt editor', desc:'Expandable panel above chat. Persist per conversation. Template library (presets).', code:'' },
+      { n:'05', title:'Token counter + cost', desc:'Estimate tokens from character count. Display running cost based on model pricing. Warn on long context.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'ReadableStream MDN', detail:'developer.mozilla.org/en-US/docs/Web/API/ReadableStream' },
+      { type:'docs', name:'marked.js', detail:'marked.js.org' }
+    ],
+    difficulty: 3, hours: '18–26 hrs', lang: 'React + TypeScript'
+  }
+},
+
+{
+  id: 50, num: '50', cat: 'react', tier: 4,
+  title: 'Full-Stack Deployment Tracker', sub: 'in React + Node.js',
+  tagline: 'The full-stack capstone: deployment pipeline visualizer connecting your API Gateway (Go), K8s automation, and observability — all in one React dashboard.',
+  stack: ['React', 'TypeScript', 'Node.js', 'WebSocket', 'Recharts', 'Tailwind'],
+  time: '28–40 hrs', deps: ['47','46','42'],
+  guide: {
+    overview: 'The ultimate portfolio project. A deployment tracker that shows the state of all your services: Go API Gateway, Python services, Node.js services. Triggered deploys, live log streaming, health checks, and a timeline of recent deployments with rollback button. This ties together everything you know.',
+    steps: [
+      { n:'01', title:'Service registry', desc:'YAML config defines all services: name, repo, k8s deployment name, health endpoint. Backend reads and serves.', code:'' },
+      { n:'02', title:'Deployment timeline', desc:'Fetch k8s events for each deployment. Recharts scatter chart: deployments on a timeline. Click for details.', code:'' },
+      { n:'03', title:'Live log aggregation', desc:'WebSocket endpoint streams logs from multiple k8s pods simultaneously. Merge with service labels. Filterable.', code:'' },
+      { n:'04', title:'Health status grid', desc:'Ping health endpoints every 10s. Color-coded status grid: green/yellow/red. Uptime percentage.', code:'' },
+      { n:'05', title:'Trigger deploy + rollback', desc:'POST /deploy/{service} triggers k8s rollout. Rollback button calls kubectl rollout undo. Progress tracked via WebSocket.', code:'' }
+    ],
+    resources: [
+      { type:'docs', name:'Kubernetes rollout docs', detail:'kubernetes.io/docs/concepts/workloads/controllers/deployment/#rolling-back-a-deployment' },
+      { type:'blog', name:'Building Internal Developer Platforms', detail:'platformengineering.org/blog/what-is-platform-engineering' }
+    ],
+    difficulty: 5, hours: '28–40 hrs', lang: 'React + Node.js'
+  }
+}
+
+];
+
+// ─── ENGINE ────────────────────────────────────────────────────────────────────
+
+let activeCat = 'all';
+let activeTiers = new Set();
+
+const localStorageMock = { data: {} };
+let doneSet;
+try {
+  doneSet = new Set(JSON.parse(localStorage.getItem('byo-be-done') || '[]'));
+} catch(e) {
+  window.localStorage = {
+    getItem: k => localStorageMock.data[k] || null,
+    setItem: (k, v) => { localStorageMock.data[k] = v; }
+  };
+  doneSet = new Set();
+}
+
+function renderCards() {
+  const grid = document.getElementById('grid');
+  grid.querySelectorAll('.project-card').forEach(c => c.remove());
+
+  PROJECTS.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'project-card' + (doneSet.has(p.id) ? ' done' : '');
+    card.dataset.id = p.id;
+    card.dataset.cat = p.cat;
+    card.dataset.tier = p.tier;
+    card.style.borderLeftColor = TIER_COLORS[p.tier];
+
+    card.innerHTML = `
+      <div class="card-meta">
+        <span class="card-num">#${p.num}</span>
+        <div class="card-badges">
+          <span class="badge tier-badge-${p.tier}">T${p.tier}</span>
+          <span class="badge cat-badge" style="background:${CAT_COLORS[p.cat]}22;color:${CAT_COLORS[p.cat]};border:1px solid ${CAT_COLORS[p.cat]}44">${p.cat.toUpperCase()}</span>
+        </div>
+      </div>
+      <div class="card-title">${p.title} <span style="font-weight:400;font-size:0.8rem;color:var(--muted)">${p.sub}</span></div>
+      <div class="card-tagline">${p.tagline}</div>
+      <div class="card-stack">${p.stack.map(s => `<span class="stack-tag">${s}</span>`).join('')}</div>
+      <div class="card-footer">
+        <span class="card-time">⏱ ${p.time}</span>
+        <span class="card-deps">${p.deps.length ? '← ' + p.deps.join(', ') : ''}</span>
+        <button class="done-btn" onclick="toggleDone(event, ${p.id})">${doneSet.has(p.id) ? '✓' : '○'}</button>
+      </div>
+    `;
+    card.addEventListener('click', (e) => {
+      if (!e.target.classList.contains('done-btn')) openModal(p.id);
+    });
+    grid.appendChild(card);
+  });
+  applyFilters();
+  updateProgress();
+}
+
+function applyFilters() {
+  const q = document.getElementById('searchBox').value.toLowerCase();
+  let visibleCount = 0;
+
+  document.querySelectorAll('.project-card').forEach(card => {
+    const p = PROJECTS.find(x => x.id == card.dataset.id);
+    const catMatch = activeCat === 'all' || card.dataset.cat === activeCat;
+    const tierMatch = activeTiers.size === 0 || activeTiers.has(parseInt(card.dataset.tier));
+    const searchMatch = !q || p.title.toLowerCase().includes(q) || p.tagline.toLowerCase().includes(q) || p.stack.some(s => s.toLowerCase().includes(q));
+
+    if (catMatch && tierMatch && searchMatch) {
+      card.classList.remove('hidden');
+      visibleCount++;
+    } else {
+      card.classList.add('hidden');
+    }
+  });
+
+  const empty = document.getElementById('emptyState');
+  empty.style.display = visibleCount === 0 ? 'block' : 'none';
+}
+
+function setCat(cat, btn) {
+  activeCat = cat;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters();
+}
+
+function toggleTier(tier, btn) {
+  if (activeTiers.has(tier)) { activeTiers.delete(tier); btn.classList.remove('active'); }
+  else { activeTiers.add(tier); btn.classList.add('active'); }
+  applyFilters();
+}
+
+function toggleDone(e, id) {
+  e.stopPropagation();
+  if (doneSet.has(id)) doneSet.delete(id);
+  else doneSet.add(id);
+  try { localStorage.setItem('byo-be-done', JSON.stringify([...doneSet])); } catch(e) { localStorageMock.data['byo-be-done'] = JSON.stringify([...doneSet]); }
+  const card = document.querySelector(`.project-card[data-id="${id}"]`);
+  card.classList.toggle('done');
+  card.querySelector('.done-btn').textContent = doneSet.has(id) ? '✓' : '○';
+  updateProgress();
+}
+
+function updateProgress() {
+  const pct = (doneSet.size / TOTAL) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('countLabel').textContent = `${doneSet.size} / ${TOTAL} DONE`;
+}
+
+function openModal(id) {
+  const p = PROJECTS.find(x => x.id === id);
+  const g = p.guide;
+
+  document.getElementById('modalTitle').textContent = p.title + ' — ' + p.sub;
+  document.getElementById('modalBadges').innerHTML = `
+    <span class="badge tier-badge-${p.tier}">TIER ${p.tier}</span>
+    <span class="badge cat-badge" style="background:${CAT_COLORS[p.cat]}22;color:${CAT_COLORS[p.cat]};border:1px solid ${CAT_COLORS[p.cat]}44">${p.cat.toUpperCase()}</span>
+    <span class="badge" style="background:rgba(255,255,255,0.05);color:var(--muted)">${g.lang}</span>
+    <span class="badge" style="background:rgba(255,255,255,0.05);color:var(--muted)">${g.hours}</span>
+  `;
+
+  const diffBars = Array.from({length: 5}, (_, i) =>
+    `<div class="diff-seg ${i < g.difficulty ? 'filled' : ''}"></div>`
+  ).join('');
+
+  document.getElementById('modalBody').innerHTML = `
+    <div>
+      <div class="modal-section-title">Overview</div>
+      <p style="font-size:0.82rem;color:var(--muted);line-height:1.7">${g.overview}</p>
+    </div>
+    <div class="info-grid">
+      <div class="info-box"><div class="info-label">Time Estimate</div><div class="info-val">${g.hours}</div></div>
+      <div class="info-box"><div class="info-label">Difficulty</div><div class="info-val" style="display:flex;align-items:center;gap:6px">${diffBars}<span style="font-size:0.7rem;color:var(--muted)">${g.difficulty}/5</span></div></div>
+      <div class="info-box"><div class="info-label">Language</div><div class="info-val">${g.lang}</div></div>
+      <div class="info-box"><div class="info-label">Prerequisites</div><div class="info-val" style="font-size:0.7rem;font-weight:400;line-height:1.4">${p.deps.length ? 'Project(s) #' + p.deps.join(', #') : 'None'}</div></div>
+    </div>
+    <div>
+      <div class="modal-section-title">Implementation Steps</div>
+      ${g.steps.map(s => `
+        <div class="guide-step">
+          <div class="step-num">${s.n}</div>
+          <div class="step-content">
+            <div class="step-title">${s.title}</div>
+            <div class="step-desc">${s.desc}</div>
+            ${s.code ? `<div class="step-code">${escapeHtml(s.code)}</div>` : ''}
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <div>
+      <div class="modal-section-title">Resources</div>
+      <div class="resource-list">
+        ${g.resources.map(r => `
+          <div class="resource-item">
+            <span class="resource-type rtype-${r.type}">${r.type}</span>
+            <div>
+              <div class="resource-name">${r.name}</div>
+              <div class="resource-detail">${r.detail}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div style="padding-top:8px;display:flex;gap:12px">
+      <button class="btn-primary" onclick="toggleDoneFromModal(${p.id})">
+        ${doneSet.has(p.id) ? '✓ Mark Incomplete' : '○ Mark Complete'}
+      </button>
+    </div>
+  `;
+
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function toggleDoneFromModal(id) {
+  if (doneSet.has(id)) doneSet.delete(id);
+  else doneSet.add(id);
+  try { localStorage.setItem('byo-be-done', JSON.stringify([...doneSet])); } catch(e) {}
+  const card = document.querySelector(`.project-card[data-id="${id}"]`);
+  if (card) {
+    card.classList.toggle('done');
+    card.querySelector('.done-btn').textContent = doneSet.has(id) ? '✓' : '○';
+  }
+  updateProgress();
+  openModal(id);
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function closeModalOnBg(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+function escapeHtml(text) {
+  return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+renderCards();
+</script>
+</body>
+</html>

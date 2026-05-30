@@ -1,0 +1,294 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap');
+
+:root {
+  --bg: #080c10;
+  --surface: #0d1117;
+  --surface2: #161b22;
+  --border: #21262d;
+  --text: #e6edf3;
+  --muted: #7d8590;
+  --dim: #3d444d;
+  --accent: #f0c040;
+  --green: #3fb950;
+  --blue: #79c0ff;
+  --purple: #d2a8ff;
+  --orange: #ff7b72;
+  --mono: 'Space Mono', monospace;
+  --display: 'Syne', sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--mono);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px);
+  pointer-events: none;
+  z-index: 9999;
+}
+
+header {
+  padding: 56px 40px 32px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+header::before {
+  content: 'RISE OF PHOENIX';
+  position: absolute;
+  top: -10px;
+  right: -20px;
+  font-family: var(--display);
+  font-size: 9rem;
+  font-weight: 800;
+  color: rgba(255,255,255,0.02);
+  letter-spacing: -0.05em;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+h1 {
+  font-family: var(--display);
+  font-size: clamp(2rem, 5vw, 4rem);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+h1 .accent { color: var(--accent); }
+h1 .dim    { color: var(--muted); font-weight: 400; }
+
+.header-meta {
+  font-size: 0.7rem;
+  color: var(--muted);
+  letter-spacing: 0.12em;
+  margin-top: 14px;
+  text-transform: uppercase;
+}
+
+.section-title {
+  font-family: var(--display);
+  font-size: 0.7rem;
+  color: var(--muted);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 28px 40px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.people {
+  padding: 24px 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 20px;
+}
+
+.person {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 22px;
+  border-radius: 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.person-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.person-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.person-name {
+  font-family: var(--display);
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+.person-handle {
+  font-size: 0.7rem;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+}
+.person-handle a { color: var(--blue); text-decoration: none; }
+.person-handle a:hover { text-decoration: underline; }
+
+.person-stats {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.stat {
+  flex: 1 1 0;
+  min-width: 120px;
+  padding: 10px 12px;
+  background: var(--surface2);
+  border-radius: 2px;
+}
+.stat .n {
+  font-family: var(--display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--accent);
+}
+.stat .l {
+  font-size: 0.55rem;
+  color: var(--muted);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+.person-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.link-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.link-label {
+  font-size: 0.55rem;
+  color: var(--dim);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+.link-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.tracker-link {
+  padding: 6px 10px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 0.7rem;
+  text-decoration: none;
+  border-radius: 2px;
+  font-family: var(--mono);
+  transition: all 0.15s;
+}
+.tracker-link:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.tracker-link[data-kind="ai"]:hover  { border-color: var(--green);  color: var(--green); }
+.tracker-link[data-kind="be"]:hover  { border-color: var(--orange); color: var(--orange); }
+.tracker-link[data-kind="fafo"]:hover{ border-color: var(--purple); color: var(--purple); }
+.tracker-link[data-kind="md"]:hover  { border-color: var(--blue);   color: var(--blue); }
+
+.activity {
+  padding: 8px 40px 80px;
+}
+
+.commit-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.commit {
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  gap: 14px;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.commit:last-child { border-bottom: none; }
+.commit:hover { background: var(--surface2); }
+
+.commit-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+}
+
+.commit-body { min-width: 0; }
+.commit-msg {
+  font-size: 0.78rem;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.commit-meta {
+  font-size: 0.62rem;
+  color: var(--muted);
+  margin-top: 3px;
+  letter-spacing: 0.05em;
+}
+.commit-meta a { color: var(--blue); text-decoration: none; }
+.commit-meta a:hover { text-decoration: underline; }
+
+.commit-sha {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  color: var(--dim);
+  background: var(--surface2);
+  padding: 3px 6px;
+  border-radius: 2px;
+}
+.commit-sha a { color: inherit; text-decoration: none; }
+
+.empty, .loading, .errored {
+  padding: 28px;
+  text-align: center;
+  color: var(--dim);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+}
+.errored { color: var(--orange); }
+
+footer {
+  padding: 20px 40px 28px;
+  border-top: 1px solid var(--border);
+  font-size: 0.6rem;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+footer a { color: var(--blue); text-decoration: none; }
+footer a:hover { text-decoration: underline; }
+
+@media (max-width: 640px) {
+  header, .people, .activity, .section-title, footer { padding-left: 18px; padding-right: 18px; }
+  .commit { grid-template-columns: 28px 1fr auto; gap: 10px; padding: 10px 12px; }
+  .commit-avatar { width: 26px; height: 26px; }
+}

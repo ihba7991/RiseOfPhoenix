@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rise of Phoenix — Shared Learning Tracker</title>
+<link rel="stylesheet" href="./assets/dashboard.css">
+</head>
+<body>
+
+<header>
+  <h1><span class="accent">RISE</span> <span class="dim">OF</span> <span class="accent">PHOENIX</span></h1>
+  <div class="header-meta">Shared learning tracker &nbsp;·&nbsp; <span id="lastUpdated">Loading…</span></div>
+</header>
+
+<div class="section-title">// People</div>
+<section class="people" id="peopleGrid"></section>
+
+<div class="section-title">// Recent activity</div>
+<section class="activity">
+  <div id="activityHost" class="loading">Loading commits…</div>
+</section>
+
+<footer>
+  <div>RiseOfPhoenix · <a id="repoLink" href="#" target="_blank" rel="noopener">github.com/ihba7991/RiseOfPhoenix</a></div>
+  <div>Trackers persist progress to your browser. Pushes update activity here.</div>
+</footer>
+
+<script>
+/* -----------------------------------------------------------
+ * Config — edit when you rename phoenix-a / phoenix-b.
+ * --------------------------------------------------------- */
+const REPO_OWNER = 'ihba7991';
+const REPO_NAME  = 'RiseOfPhoenix';
+
+const PEOPLE = [
+  {
+    folder: 'ihba7991',
+    name:   'Abhimanyu',
+    github: 'ihba7991'        // GitHub handle — used for avatar + commit grouping
+  },
+  {
+    folder: 'vikku',
+    name:   'Vikku',
+    github: 'vikku'           // update if their GitHub handle differs
+  }
+];
+
+const TRACKERS = [
+  { kind: 'ai',   path: 'ai/build-your-own-ai.html',                       label: 'Build Your Own AI' },
+  { kind: 'be',   path: 'languages/build-your-own-backend-frontend.html',  label: 'Backend & Frontend' },
+  { kind: 'fafo', path: 'languages/fafo-getting-your-hands-dirty.html',    label: 'FAFO — Hands Dirty' }
+];
+
+const TASK_LISTS = [
+  { kind: 'md', path: 'languages/go/100_go_tasks.md',                 label: 'Go · 100' },
+  { kind: 'md', path: 'languages/java/100_java_tasks.md',             label: 'Java · 100' },
+  { kind: 'md', path: 'languages/python/100_python_advanced_tasks.md', label: 'Python · 100' },
+  { kind: 'md', path: 'languages/javascript/100_react_tasks.md',      label: 'React · 100' },
+  { kind: 'md', path: 'languages/javascript/100_nodejs_tasks.md',     label: 'Node.js · 100' }
+];
+
+const API = 'https://api.github.com';
+
+/* -----------------------------------------------------------
+ * Helpers
+ * --------------------------------------------------------- */
+function repoUrl() { return `https://github.com/${REPO_OWNER}/${REPO_NAME}`; }
+
+function relativeTime(iso) {
+  const t = new Date(iso).getTime();
+  const diff = Date.now() - t;
+  const s = Math.floor(diff / 1000);
+  if (s < 60)        return `${s}s ago`;
+  const m = Math.floor(s / 60);
+  if (m < 60)        return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24)        return `${h}h ago`;
+  const d = Math.floor(h / 24);
+  if (d < 30)        return `${d}d ago`;
+  return new Date(iso).toLocaleDateString();
+}
+
+async function fetchJson(url) {
+  const res = await fetch(url, { headers: { 'Accept': 'application/vnd.github+json' } });
+  if (!res.ok) throw new Error(`${res.status} ${res.statusText} — ${url}`);
+  return res.json();
+}
+
+/* -----------------------------------------------------------
+ * Render
+ * --------------------------------------------------------- */
+function renderPeople(commits) {
+  const grid = document.getElementById('peopleGrid');
+  grid.innerHTML = '';
+
+  PEOPLE.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'person';
+
+    // count commits attributed to this person (match by author login or git author name)
+    const theirs = commits.filter(c =>
+      (c.author && c.author.login && c.author.login.toLowerCase() === p.github.toLowerCase())
+      || (c.commit && c.commit.author && c.commit.author.name &&
+          c.commit.author.name.toLowerCase().includes(p.name.toLowerCase()))
+    );
+    const last = theirs[0];
+
+    const trackerLinks = TRACKERS.map(t =>
+      `<a class="tracker-link" data-kind="${t.kind}" href="./${p.folder}/${t.path}">${t.label}</a>`
+    ).join('');
+    const mdLinks = TASK_LISTS.map(t =>
+      `<a class="tracker-link" data-kind="md" target="_blank" rel="noopener"
+          href="${repoUrl()}/blob/main/${p.folder}/${t.path}">${t.label}</a>`
+    ).join('');
+
+    card.innerHTML = `
+      <div class="person-head">
+        <img class="person-avatar" alt=""
+             src="https://github.com/${p.github}.png?size=120"
+             onerror="this.style.background='var(--surface2)';this.src=''"/>
+        <div>
+          <div class="person-name">${p.name}</div>
+          <div class="person-handle">
+            <a href="https://github.com/${p.github}" target="_blank" rel="noopener">@${p.github}</a>
+            · folder <code>${p.folder}/</code>
+          </div>
+        </div>
+      </div>
+
+      <div class="person-stats">
+        <div class="stat">
+          <div class="n">${theirs.length}</div>
+          <div class="l">commits (last 30 shown)</div>
+        </div>
+        <div class="stat">
+          <div class="n">${last ? relativeTime(last.commit.author.date) : '—'}</div>
+          <div class="l">last push</div>
+        </div>
+      </div>
+
+      <div class="person-links">
+        <div class="link-group">
+          <div class="link-label">Trackers</div>
+          <div class="link-row">${trackerLinks}</div>
+        </div>
+        <div class="link-group">
+          <div class="link-label">Task lists (GitHub)</div>
+          <div class="link-row">${mdLinks}</div>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function renderActivity(commits) {
+  const host = document.getElementById('activityHost');
+  if (!commits.length) {
+    host.outerHTML = `<div id="activityHost" class="empty">No commits yet — push something!</div>`;
+    return;
+  }
+  const list = document.createElement('div');
+  list.className = 'commit-list';
+  list.id = 'activityHost';
+
+  commits.forEach(c => {
+    const author = c.author ? c.author.login : (c.commit.author && c.commit.author.name) || 'unknown';
+    const avatar = c.author ? c.author.avatar_url : '';
+    const message = (c.commit.message || '').split('\n')[0];
+    const date = c.commit.author && c.commit.author.date;
+    const sha = c.sha ? c.sha.slice(0, 7) : '';
+    const profileUrl = c.author ? c.author.html_url : `${repoUrl()}/commits?author=${encodeURIComponent(author)}`;
+
+    const el = document.createElement('div');
+    el.className = 'commit';
+    el.innerHTML = `
+      <img class="commit-avatar" alt="" src="${avatar}"
+           onerror="this.style.background='var(--surface2)';this.src=''"/>
+      <div class="commit-body">
+        <div class="commit-msg">${escapeHtml(message)}</div>
+        <div class="commit-meta">
+          <a href="${profileUrl}" target="_blank" rel="noopener">@${escapeHtml(author)}</a>
+          · ${relativeTime(date)}
+        </div>
+      </div>
+      <div class="commit-sha">
+        <a href="${c.html_url}" target="_blank" rel="noopener">${sha}</a>
+      </div>
+    `;
+    list.appendChild(el);
+  });
+
+  host.replaceWith(list);
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, ch => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[ch]));
+}
+
+/* -----------------------------------------------------------
+ * Boot
+ * --------------------------------------------------------- */
+(async function init() {
+  document.getElementById('repoLink').href = repoUrl();
+  document.getElementById('repoLink').textContent = `github.com/${REPO_OWNER}/${REPO_NAME}`;
+  document.getElementById('lastUpdated').textContent = `Loaded ${new Date().toLocaleString()}`;
+
+  let commits = [];
+  // Prefer the build-time snapshot (works for private repos, no rate limits).
+  // Fall back to the live API if the snapshot isn't present (e.g. local dev).
+  try {
+    commits = await fetchJson('./commits.json');
+  } catch (_) {
+    try {
+      commits = await fetchJson(`${API}/repos/${REPO_OWNER}/${REPO_NAME}/commits?per_page=30`);
+    } catch (err) {
+      document.getElementById('activityHost').outerHTML =
+        `<div class="errored">Couldn't load commits: ${escapeHtml(err.message)}</div>`;
+    }
+  }
+
+  renderPeople(commits);
+  renderActivity(commits);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+# GitHub Pages build artifact (assembled by .github/workflows/pages.yml)
+_site/
+
+# Claude Code local config — already gitignored at parent level usually,
+# include here so the worktree stays clean
+.claude/
+
+# macOS junk
+.DS_Store
