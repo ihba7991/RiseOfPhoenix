@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LLD — Design Patterns</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap');
+:root{
+  --bg:#080c10;--surface:#0d1117;--surface2:#161b22;--border:#21262d;
+  --text:#e6edf3;--muted:#7d8590;--dim:#3d444d;
+  --accent:#f0c040;--green:#3fb950;--blue:#79c0ff;--purple:#d2a8ff;--orange:#ff7b72;
+  --mono:'Space Mono',monospace;--display:'Syne',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:100vh}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.08) 2px,rgba(0,0,0,.08) 4px);pointer-events:none;z-index:9999}
+header{padding:48px 40px 28px;border-bottom:1px solid var(--border);position:relative;overflow:hidden}
+header::before{content:'DESIGN PATTERNS';position:absolute;top:-10px;right:-20px;font-family:var(--display);font-size:9rem;font-weight:800;color:rgba(255,255,255,.02);letter-spacing:-.05em;white-space:nowrap;pointer-events:none}
+h1{font-family:var(--display);font-size:clamp(2rem,4vw,3rem);font-weight:800;line-height:1;letter-spacing:-.02em}
+h1 .accent{color:var(--accent)}
+h1 .dim{color:var(--muted);font-weight:400}
+.meta{font-size:.7rem;color:var(--muted);letter-spacing:.12em;margin-top:14px;text-transform:uppercase}
+.bar{height:3px;background:var(--border);margin-top:18px;border-radius:2px;overflow:hidden}
+.bar > div{height:100%;background:linear-gradient(90deg,var(--purple),var(--blue),var(--green),var(--accent));width:0;transition:width .3s}
+main{padding:24px 40px 80px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px}
+.section{background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:20px}
+.section h2{font-family:var(--display);font-size:1rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.section h2 .dot{width:8px;height:8px;border-radius:1px}
+.section[data-kind="creational"] h2 .dot{background:var(--accent)}
+.section[data-kind="structural"] h2 .dot{background:var(--blue)}
+.section[data-kind="behavioral"] h2 .dot{background:var(--purple)}
+.item{display:flex;align-items:flex-start;gap:10px;padding:9px 8px;border-radius:2px;cursor:pointer;border-top:1px solid var(--border)}
+.item:first-of-type{border-top:none}
+.item:hover{background:var(--surface2)}
+.item .cb{width:16px;height:16px;border:1px solid var(--dim);border-radius:2px;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:.55rem;color:var(--green)}
+.item.done .cb{background:rgba(63,185,80,.15);border-color:var(--green)}
+.item.done .name{text-decoration:line-through;color:var(--muted)}
+.name{font-size:.78rem;font-weight:700;color:var(--text);font-family:var(--display)}
+.intent{font-size:.68rem;color:var(--muted);margin-top:3px;line-height:1.55}
+footer{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-top:1px solid var(--border);padding:8px 24px;display:flex;justify-content:space-between;align-items:center;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);z-index:500}
+footer a{color:var(--blue);text-decoration:none}
+@media (max-width:600px){header,main{padding-left:18px;padding-right:18px}}
+</style>
+</head>
+<body>
+<header>
+  <h1><span class="accent">DESIGN</span> <span class="dim">PATTERNS</span></h1>
+  <div class="meta">GoF · 23 patterns · Creational · Structural · Behavioral</div>
+  <div class="bar"><div id="progressBar"></div></div>
+</header>
+
+<main id="grid"></main>
+
+<footer>
+  <div><span id="doneCount">0</span> / <span id="totalCount">0</span> done</div>
+  <div><a href="../../index.html">← Dashboard</a></div>
+</footer>
+
+<script>
+const STORAGE_KEY = 'dp-done';
+const PATTERNS = {
+  creational: [
+    ['Abstract Factory',  'Provide an interface for creating families of related objects without specifying their concrete classes.'],
+    ['Builder',           'Separate the construction of a complex object from its representation so the same process can create different representations.'],
+    ['Factory Method',    'Define an interface for creating an object, but let subclasses decide which class to instantiate.'],
+    ['Prototype',         'Specify the kinds of objects to create using a prototypical instance, then create new objects by copying it.'],
+    ['Singleton',         'Ensure a class has only one instance, and provide a global point of access to it.']
+  ],
+  structural: [
+    ['Adapter',   'Convert the interface of a class into another interface clients expect.'],
+    ['Bridge',    'Decouple an abstraction from its implementation so the two can vary independently.'],
+    ['Composite', 'Compose objects into tree structures to represent part-whole hierarchies; clients treat individual objects and compositions uniformly.'],
+    ['Decorator', 'Attach additional responsibilities to an object dynamically; a flexible alternative to subclassing.'],
+    ['Facade',    'Provide a unified interface to a set of interfaces in a subsystem.'],
+    ['Flyweight', 'Use sharing to support large numbers of fine-grained objects efficiently.'],
+    ['Proxy',     'Provide a surrogate or placeholder for another object to control access to it.']
+  ],
+  behavioral: [
+    ['Chain of Responsibility', 'Avoid coupling the sender of a request to its receiver by giving more than one object a chance to handle it.'],
+    ['Command',                 'Encapsulate a request as an object, letting you parameterize clients with different requests and support undo.'],
+    ['Interpreter',             'Given a language, define a representation for its grammar along with an interpreter that uses the representation.'],
+    ['Iterator',                'Provide a way to access elements of an aggregate object sequentially without exposing its underlying representation.'],
+    ['Mediator',                'Define an object that encapsulates how a set of objects interact, promoting loose coupling.'],
+    ['Memento',                 'Without violating encapsulation, capture and externalize an object’s internal state so it can be restored later.'],
+    ['Observer',                'Define a one-to-many dependency so that when one object changes state, all dependents are notified and updated.'],
+    ['State',                   'Allow an object to alter its behavior when its internal state changes; it appears to change its class.'],
+    ['Strategy',                'Define a family of algorithms, encapsulate each one, and make them interchangeable.'],
+    ['Template Method',         'Define the skeleton of an algorithm in an operation, deferring some steps to subclasses.'],
+    ['Visitor',                 'Represent an operation to be performed on the elements of an object structure without changing the classes of the elements.']
+  ]
+};
+
+function loadDone(){
+  try{ return new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')); }
+  catch(_){ return new Set(); }
+}
+function saveDone(set){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify([...set])); }catch(_){}
+}
+
+const done = loadDone();
+const grid = document.getElementById('grid');
+
+function id(kind, name){ return kind+':'+name; }
+function total(){ return Object.values(PATTERNS).flat().length; }
+function render(){
+  grid.innerHTML = '';
+  for (const [kind, items] of Object.entries(PATTERNS)) {
+    const sec = document.createElement('section');
+    sec.className = 'section'; sec.dataset.kind = kind;
+    const title = kind[0].toUpperCase() + kind.slice(1);
+    sec.innerHTML = `<h2><span class="dot"></span>${title} · ${items.length}</h2>`;
+    items.forEach(([name, intent]) => {
+      const key = id(kind, name);
+      const row = document.createElement('div');
+      row.className = 'item' + (done.has(key) ? ' done' : '');
+      row.innerHTML = `<div class="cb">${done.has(key) ? '✓' : ''}</div>
+        <div><div class="name">${name}</div><div class="intent">${intent}</div></div>`;
+      row.addEventListener('click', () => {
+        if (done.has(key)) done.delete(key); else done.add(key);
+        saveDone(done); render();
+      });
+      sec.appendChild(row);
+    });
+    grid.appendChild(sec);
+  }
+  const t = total();
+  document.getElementById('totalCount').textContent = t;
+  document.getElementById('doneCount').textContent = done.size;
+  document.getElementById('progressBar').style.width = (100 * done.size / t) + '%';
+}
+render();
+</script>
+</body>
+</html>

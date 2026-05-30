@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LLD — Machine Coding Problems</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap');
+:root{
+  --bg:#080c10;--surface:#0d1117;--surface2:#161b22;--border:#21262d;
+  --text:#e6edf3;--muted:#7d8590;--dim:#3d444d;
+  --accent:#f0c040;--green:#3fb950;--blue:#79c0ff;--purple:#d2a8ff;--orange:#ff7b72;
+  --tier1:#f0c040;--tier2:#e07020;--tier3:#c03050;
+  --mono:'Space Mono',monospace;--display:'Syne',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:100vh}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.08) 2px,rgba(0,0,0,.08) 4px);pointer-events:none;z-index:9999}
+header{padding:48px 40px 28px;border-bottom:1px solid var(--border);position:relative;overflow:hidden}
+header::before{content:'MACHINE CODING';position:absolute;top:-10px;right:-20px;font-family:var(--display);font-size:9rem;font-weight:800;color:rgba(255,255,255,.02);letter-spacing:-.05em;white-space:nowrap;pointer-events:none}
+h1{font-family:var(--display);font-size:clamp(2rem,4vw,3rem);font-weight:800;line-height:1;letter-spacing:-.02em}
+h1 .accent{color:var(--accent)}
+h1 .dim{color:var(--muted);font-weight:400}
+.meta{font-size:.7rem;color:var(--muted);letter-spacing:.12em;margin-top:14px;text-transform:uppercase}
+.bar{height:3px;background:var(--border);margin-top:18px;border-radius:2px;overflow:hidden}
+.bar > div{height:100%;background:linear-gradient(90deg,var(--tier3),var(--tier2),var(--tier1));width:0;transition:width .3s}
+.controls{padding:16px 40px;border-bottom:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;background:rgba(13,17,23,.8);position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}
+.filter-btn{padding:5px 12px;background:transparent;border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border-radius:2px}
+.filter-btn:hover{color:var(--text);border-color:var(--dim)}
+.filter-btn.active[data-tier="all"]{background:var(--text);color:var(--bg);border-color:transparent}
+.filter-btn.active[data-tier="1"]{background:var(--tier1);color:#000;border-color:transparent}
+.filter-btn.active[data-tier="2"]{background:var(--tier2);color:#fff;border-color:transparent}
+.filter-btn.active[data-tier="3"]{background:var(--tier3);color:#fff;border-color:transparent}
+main{padding:24px 40px 80px;display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--border);padding:18px;border-radius:3px;display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:background .15s}
+.card:hover{background:var(--surface2)}
+.card.done{opacity:.55}
+.card.done .name{text-decoration:line-through}
+.card.hidden{display:none}
+.card-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.num{font-size:.55rem;color:var(--dim);letter-spacing:.1em}
+.tier{padding:2px 7px;font-size:.55rem;letter-spacing:.08em;text-transform:uppercase;border-radius:1px;border:1px solid}
+.tier-1{background:rgba(240,192,64,.12);color:var(--tier1);border-color:rgba(240,192,64,.3)}
+.tier-2{background:rgba(224,112,32,.12);color:var(--tier2);border-color:rgba(224,112,32,.3)}
+.tier-3{background:rgba(192,48,80,.12);color:var(--tier3);border-color:rgba(192,48,80,.3)}
+.name{font-family:var(--display);font-size:1rem;font-weight:700;color:var(--text)}
+.tag{font-size:.68rem;color:var(--muted);line-height:1.5}
+.foot{margin-top:auto;padding-top:8px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.time{font-size:.55rem;color:var(--dim);letter-spacing:.08em}
+.cb{width:18px;height:18px;border:1px solid var(--border);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:.55rem;color:var(--dim)}
+.card.done .cb{background:rgba(63,185,80,.15);border-color:var(--green);color:var(--green)}
+footer{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-top:1px solid var(--border);padding:8px 24px;display:flex;justify-content:space-between;align-items:center;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);z-index:500}
+footer a{color:var(--blue);text-decoration:none}
+@media (max-width:600px){header,.controls,main{padding-left:18px;padding-right:18px}}
+</style>
+</head>
+<body>
+<header>
+  <h1><span class="accent">MACHINE</span> <span class="dim">CODING</span></h1>
+  <div class="meta">Standard LLD problems · 90-min builds · interview-grade</div>
+  <div class="bar"><div id="progressBar"></div></div>
+</header>
+
+<div class="controls">
+  <button class="filter-btn active" data-tier="all">All</button>
+  <button class="filter-btn"        data-tier="1">T1 · Warm-up</button>
+  <button class="filter-btn"        data-tier="2">T2 · Standard</button>
+  <button class="filter-btn"        data-tier="3">T3 · Heavy</button>
+</div>
+
+<main id="grid"></main>
+
+<footer>
+  <div><span id="doneCount">0</span> / <span id="totalCount">0</span> done</div>
+  <div><a href="../../index.html">← Dashboard</a></div>
+</footer>
+
+<script>
+const STORAGE_KEY = 'mc-done';
+const PROBLEMS = [
+  {n:'01',tier:1,name:'Tic-Tac-Toe',          tag:'Classic 2-player board. Win/draw detection.',                    time:'45 min'},
+  {n:'02',tier:1,name:'Snake & Ladder',       tag:'Dice + board + multiple players. Pure state machine.',           time:'60 min'},
+  {n:'03',tier:1,name:'Vending Machine',      tag:'State pattern (Idle → HasCoin → Dispensing).',                   time:'60 min'},
+  {n:'04',tier:1,name:'Logger',               tag:'Async logger, log levels, appenders (file, console).',           time:'45 min'},
+  {n:'05',tier:1,name:'Stack Overflow Lite',  tag:'Questions, answers, votes, tags. In-memory.',                    time:'75 min'},
+  {n:'06',tier:2,name:'Parking Lot',          tag:'Multi-level, slot types, ticketing. Bedrock LLD problem.',       time:'90 min'},
+  {n:'07',tier:2,name:'Splitwise',            tag:'Expense splitting, simplify debts (graph reduction).',           time:'90 min'},
+  {n:'08',tier:2,name:'LRU Cache',            tag:'Map + doubly-linked list. O(1) get/put.',                        time:'45 min'},
+  {n:'09',tier:2,name:'LFU Cache',            tag:'Frequency buckets + DLL per bucket.',                            time:'75 min'},
+  {n:'10',tier:2,name:'Rate Limiter',         tag:'Token bucket, leaky bucket, sliding window — pick one each.',    time:'75 min'},
+  {n:'11',tier:2,name:'ATM',                  tag:'Card → PIN → transaction. State machine + cash inventory.',      time:'75 min'},
+  {n:'12',tier:2,name:'Chess',                tag:'Piece hierarchy, move validation, check/checkmate.',             time:'120 min'},
+  {n:'13',tier:2,name:'Library Mgmt',         tag:'Books, members, reservations, fines. Pure CRUD + state.',        time:'75 min'},
+  {n:'14',tier:2,name:'Elevator System',      tag:'SCAN algorithm, multi-car coordination, request queue.',         time:'90 min'},
+  {n:'15',tier:2,name:'Notification System',  tag:'Strategy pattern across SMS/Email/Push. Retry + dedupe.',        time:'75 min'},
+  {n:'16',tier:2,name:'In-memory DB',         tag:'Transactions: begin/commit/rollback, nested savepoints.',        time:'90 min'},
+  {n:'17',tier:2,name:'Inventory System',     tag:'Stock, reservations, multiple warehouses, low-stock alerts.',    time:'90 min'},
+  {n:'18',tier:3,name:'BookMyShow',           tag:'Cinemas, shows, seat locking with TTL. Concurrency-heavy.',      time:'2 hrs'},
+  {n:'19',tier:3,name:'Food Ordering',        tag:'Zomato/Swiggy clone. Restaurant catalog → cart → order lifecycle.',time:'2 hrs'},
+  {n:'20',tier:3,name:'Ride Sharing',         tag:'Uber clone. Matching, surge pricing, trip lifecycle, payments.', time:'2 hrs'},
+  {n:'21',tier:3,name:'Hotel Booking',        tag:'Rooms, rate plans, availability calendar, overbooking guard.',   time:'2 hrs'},
+  {n:'22',tier:3,name:'File System',          tag:'Path resolution, inodes, hard/symbolic links, mkdir/ls/touch.',  time:'90 min'},
+  {n:'23',tier:3,name:'Stock Exchange',       tag:'Order book, matching engine, price-time priority.',              time:'2 hrs'},
+  {n:'24',tier:3,name:'Cab Aggregator Pricing',tag:'Surge model, demand zones, cohort discounting.',                time:'90 min'},
+  {n:'25',tier:3,name:'Distributed Task Queue',tag:'Producer/worker/queue, retries, DLQ, scheduling.',              time:'2 hrs'}
+];
+
+function loadDone(){
+  try{ return new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')); }
+  catch(_){ return new Set(); }
+}
+function saveDone(s){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify([...s])); }catch(_){ } }
+
+const done = loadDone();
+const grid = document.getElementById('grid');
+let activeTier = 'all';
+
+function render(){
+  grid.innerHTML = '';
+  PROBLEMS.forEach(p => {
+    const isDone = done.has(p.n);
+    const visible = activeTier === 'all' || String(p.tier) === activeTier;
+    const card = document.createElement('div');
+    card.className = 'card' + (isDone ? ' done' : '') + (visible ? '' : ' hidden');
+    card.innerHTML = `
+      <div class="card-head">
+        <div class="num">${p.n}</div>
+        <span class="tier tier-${p.tier}">Tier ${p.tier}</span>
+      </div>
+      <div class="name">${p.name}</div>
+      <div class="tag">${p.tag}</div>
+      <div class="foot">
+        <div class="time">${p.time}</div>
+        <div class="cb">${isDone ? '✓' : ''}</div>
+      </div>`;
+    card.addEventListener('click', () => {
+      if (done.has(p.n)) done.delete(p.n); else done.add(p.n);
+      saveDone(done); render();
+    });
+    grid.appendChild(card);
+  });
+  document.getElementById('totalCount').textContent = PROBLEMS.length;
+  document.getElementById('doneCount').textContent = done.size;
+  document.getElementById('progressBar').style.width = (100 * done.size / PROBLEMS.length) + '%';
+}
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeTier = btn.dataset.tier;
+    render();
+  });
+});
+
+render();
+</script>
+</body>
+</html>
