@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LLD — Concurrency</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap');
+:root{
+  --bg:#080c10;--surface:#0d1117;--surface2:#161b22;--border:#21262d;
+  --text:#e6edf3;--muted:#7d8590;--dim:#3d444d;
+  --accent:#f0c040;--green:#3fb950;--blue:#79c0ff;--purple:#d2a8ff;--orange:#ff7b72;
+  --cat-primitive:#79c0ff;--cat-pattern:#d2a8ff;--cat-classic:#ff7b72;--cat-memory:#f0c040;
+  --mono:'Space Mono',monospace;--display:'Syne',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:100vh}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.08) 2px,rgba(0,0,0,.08) 4px);pointer-events:none;z-index:9999}
+header{padding:48px 40px 28px;border-bottom:1px solid var(--border);position:relative;overflow:hidden}
+header::before{content:'CONCURRENCY';position:absolute;top:-10px;right:-20px;font-family:var(--display);font-size:9rem;font-weight:800;color:rgba(255,255,255,.02);letter-spacing:-.05em;white-space:nowrap;pointer-events:none}
+h1{font-family:var(--display);font-size:clamp(2rem,4vw,3rem);font-weight:800;line-height:1;letter-spacing:-.02em}
+h1 .accent{color:var(--accent)}
+h1 .dim{color:var(--muted);font-weight:400}
+.meta{font-size:.7rem;color:var(--muted);letter-spacing:.12em;margin-top:14px;text-transform:uppercase}
+.bar{height:3px;background:var(--border);margin-top:18px;border-radius:2px;overflow:hidden}
+.bar > div{height:100%;background:linear-gradient(90deg,var(--cat-primitive),var(--cat-pattern),var(--cat-classic),var(--cat-memory));width:0;transition:width .3s}
+main{padding:24px 40px 80px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px}
+.section{background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:20px}
+.section h2{font-family:var(--display);font-size:1rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.section h2 .dot{width:8px;height:8px;border-radius:1px}
+.section[data-cat="primitive"] h2 .dot{background:var(--cat-primitive)}
+.section[data-cat="pattern"]   h2 .dot{background:var(--cat-pattern)}
+.section[data-cat="classic"]   h2 .dot{background:var(--cat-classic)}
+.section[data-cat="memory"]    h2 .dot{background:var(--cat-memory)}
+.item{display:flex;align-items:flex-start;gap:10px;padding:9px 8px;border-radius:2px;cursor:pointer;border-top:1px solid var(--border)}
+.item:first-of-type{border-top:none}
+.item:hover{background:var(--surface2)}
+.item .cb{width:16px;height:16px;border:1px solid var(--dim);border-radius:2px;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:.55rem;color:var(--green)}
+.item.done .cb{background:rgba(63,185,80,.15);border-color:var(--green)}
+.item.done .name{text-decoration:line-through;color:var(--muted)}
+.name{font-size:.78rem;font-weight:700;color:var(--text);font-family:var(--display)}
+.intent{font-size:.68rem;color:var(--muted);margin-top:3px;line-height:1.55}
+footer{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-top:1px solid var(--border);padding:8px 24px;display:flex;justify-content:space-between;align-items:center;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);z-index:500}
+footer a{color:var(--blue);text-decoration:none}
+@media (max-width:600px){header,main{padding-left:18px;padding-right:18px}}
+</style>
+</head>
+<body>
+<header>
+  <h1><span class="accent">CONCURRENCY</span></h1>
+  <div class="meta">Primitives · Patterns · Classics · Memory model</div>
+  <div class="bar"><div id="progressBar"></div></div>
+</header>
+
+<main id="grid"></main>
+
+<footer>
+  <div><span id="doneCount">0</span> / <span id="totalCount">0</span> done</div>
+  <div><a href="../../index.html">← Dashboard</a></div>
+</footer>
+
+<script>
+const STORAGE_KEY = 'cc-done';
+const TOPICS = {
+  primitive: [
+    ['Threads & Runnable',          'Spin up a thread, join it, understand daemon vs user threads.'],
+    ['synchronized + monitors',     'Intrinsic locks, reentrancy, monitor enter/exit semantics.'],
+    ['volatile',                    'Visibility guarantees and the difference vs atomicity.'],
+    ['ReentrantLock',               'Explicit lock with tryLock, lockInterruptibly, fair locks.'],
+    ['Semaphore',                   'Permits, fair semantics, used for throttling.'],
+    ['CountDownLatch / CyclicBarrier','One-shot vs reusable rendezvous points.'],
+    ['Atomic classes',              'AtomicInteger, compareAndSet, ABA problem.'],
+    ['ThreadLocal',                 'Per-thread storage, leaks via thread pools, InheritableThreadLocal.']
+  ],
+  pattern: [
+    ['Producer–Consumer',          'BlockingQueue based; bounded buffer with wait/notify variant.'],
+    ['Thread Pool',                'Implement a fixed pool with a BlockingQueue + worker threads.'],
+    ['Reader–Writer Lock',         'Many readers OR one writer. Fairness and starvation.'],
+    ['Future / Promise',           'Submit work, get a handle; chain with thenApply.'],
+    ['CompletableFuture pipeline', 'Compose async stages with thenCompose, allOf, exceptionally.'],
+    ['Fork–Join',                  'Recursive work-stealing pool, RecursiveTask example.'],
+    ['Async pipeline / Pub-Sub',   'Decouple producers and consumers across stages.'],
+    ['Double-checked Singleton',   'Why volatile is required; lazy holder idiom alternative.']
+  ],
+  classic: [
+    ['Dining Philosophers',     'Avoid deadlock via ordering / waiter / asymmetric pickup.'],
+    ['Sleeping Barber',         'Coordinate barber, customers, and waiting room.'],
+    ['Cigarette Smokers',       'Three smokers, an agent, mutexes per ingredient.'],
+    ['H2O Synchronization',     'Build water molecules from H and O threads.'],
+    ['Print FooBar alternately','Strict ordering between two threads using locks/semaphores.'],
+    ['ZeroEvenOdd',             'Three threads cooperate to print 0,1,0,2,0,3…'],
+    ['Building H2O / molecules','Generalize H2O to arbitrary molecule formulas.']
+  ],
+  memory: [
+    ['Java Memory Model basics', 'happens-before, partial order, reordering.'],
+    ['Visibility vs atomicity',  'Two distinct guarantees often conflated.'],
+    ['Synchronization actions',  'Locks, volatile writes, final field publication.'],
+    ['Safe publication',         'Final fields, volatile, immutable objects.'],
+    ['Cache coherence basics',   'MESI, false sharing, padding strategies.'],
+    ['CAS & lock-free queues',   'Treiber stack, Michael-Scott queue.'],
+    ['Memory leaks via locks',   'Forgotten ThreadLocals, unbounded queues, deadlocks.']
+  ]
+};
+
+function loadDone(){
+  try{ return new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')); }
+  catch(_){ return new Set(); }
+}
+function saveDone(s){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify([...s])); }catch(_){ } }
+
+const done = loadDone();
+const grid = document.getElementById('grid');
+
+function id(cat, name){ return cat+':'+name; }
+function total(){ return Object.values(TOPICS).flat().length; }
+function render(){
+  grid.innerHTML = '';
+  for (const [cat, items] of Object.entries(TOPICS)) {
+    const sec = document.createElement('section');
+    sec.className = 'section'; sec.dataset.cat = cat;
+    const title = cat[0].toUpperCase() + cat.slice(1) + 's';
+    sec.innerHTML = `<h2><span class="dot"></span>${title} · ${items.length}</h2>`;
+    items.forEach(([name, intent]) => {
+      const key = id(cat, name);
+      const row = document.createElement('div');
+      row.className = 'item' + (done.has(key) ? ' done' : '');
+      row.innerHTML = `<div class="cb">${done.has(key) ? '✓' : ''}</div>
+        <div><div class="name">${name}</div><div class="intent">${intent}</div></div>`;
+      row.addEventListener('click', () => {
+        if (done.has(key)) done.delete(key); else done.add(key);
+        saveDone(done); render();
+      });
+      sec.appendChild(row);
+    });
+    grid.appendChild(sec);
+  }
+  const t = total();
+  document.getElementById('totalCount').textContent = t;
+  document.getElementById('doneCount').textContent = done.size;
+  document.getElementById('progressBar').style.width = (100 * done.size / t) + '%';
+}
+render();
+</script>
+</body>
+</html>
