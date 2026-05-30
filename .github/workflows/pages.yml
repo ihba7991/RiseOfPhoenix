@@ -33,7 +33,7 @@ jobs:
           cp -R docs/. _site/
 
           # Mirror each person's folder so the dashboard's relative links resolve
-          for p in phoenix-a phoenix-b; do
+          for p in ihba7991 vikku; do
             if [ -d "$p" ]; then
               mkdir -p "_site/$p"
               cp -R "$p/." "_site/$p/"

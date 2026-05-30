@@ -1,6 +1,4 @@
-# phoenix-b
-
-Personal learning space. Rename this folder to your handle when ready (`git mv phoenix-b <handle>` and update `PEOPLE` in `docs/index.html`).
+# vikku — Vikku's learning space
 
 Layout mirrors the repo root:
 

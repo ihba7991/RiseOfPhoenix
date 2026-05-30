@@ -1,6 +1,4 @@
-# phoenix-a
-
-Personal learning space. Rename this folder to your handle when ready (`git mv phoenix-a <handle>` and update `PEOPLE` in `docs/index.html`).
+# ihba7991 — Abhimanyu's learning space
 
 Layout mirrors the repo root:
 
