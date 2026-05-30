@@ -1,0 +1,2151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BUILD YOUR OWN — AI/ML From Scratch</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&family=Syne+Mono&display=swap');
+
+:root {
+  --bg: #080c10;
+  --surface: #0d1117;
+  --surface2: #161b22;
+  --border: #21262d;
+  --text: #e6edf3;
+  --muted: #7d8590;
+  --dim: #3d444d;
+
+  --tier1: #f0c040;
+  --tier2: #e07020;
+  --tier3: #c03050;
+  --tier4: #7040e0;
+
+  --cat-inference: #3fb950;
+  --cat-training: #ff7b72;
+  --cat-arch: #79c0ff;
+  --cat-systems: #ffa657;
+  --cat-rag: #d2a8ff;
+  --cat-multimodal: #56d364;
+  --cat-optim: #f0883e;
+  --cat-data: #58a6ff;
+
+  --mono: 'Space Mono', monospace;
+  --display: 'Syne', sans-serif;
+  --code: 'Syne Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--mono);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* SCANLINE TEXTURE */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.08) 2px,
+    rgba(0,0,0,0.08) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* HEADER */
+header {
+  padding: 48px 40px 32px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+header::before {
+  content: 'BUILD YOUR OWN';
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  font-family: var(--display);
+  font-size: 10rem;
+  font-weight: 800;
+  color: rgba(255,255,255,0.02);
+  letter-spacing: -0.05em;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.header-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+h1 {
+  font-family: var(--display);
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+h1 .accent { color: var(--tier1); }
+h1 .dim { color: var(--muted); font-weight: 400; }
+
+.header-meta {
+  font-size: 0.7rem;
+  color: var(--muted);
+  letter-spacing: 0.12em;
+  margin-top: 12px;
+  text-transform: uppercase;
+}
+
+.stats-row {
+  display: flex;
+  gap: 24px;
+  margin-top: 32px;
+  flex-wrap: wrap;
+}
+
+.stat-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.stat-pill .n {
+  font-family: var(--display);
+  font-size: 1.2rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+/* TIER LEGEND */
+.tier-legend {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.tier-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.tier-dot {
+  width: 8px; height: 8px;
+  border-radius: 1px;
+}
+
+/* CONTROLS */
+.controls {
+  padding: 20px 40px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  background: rgba(13,17,23,0.8);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+}
+
+.filter-group {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 5px 12px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.filter-btn:hover { border-color: var(--dim); color: var(--text); }
+.filter-btn.active { color: var(--bg); border-color: transparent; }
+
+.filter-btn[data-cat="all"].active { background: var(--text); }
+.filter-btn[data-cat="inference"].active { background: var(--cat-inference); }
+.filter-btn[data-cat="training"].active { background: var(--cat-training); }
+.filter-btn[data-cat="arch"].active { background: var(--cat-arch); }
+.filter-btn[data-cat="systems"].active { background: var(--cat-systems); }
+.filter-btn[data-cat="rag"].active { background: var(--cat-rag); color: #000; }
+.filter-btn[data-cat="multimodal"].active { background: var(--cat-multimodal); }
+.filter-btn[data-cat="optim"].active { background: var(--cat-optim); }
+.filter-btn[data-cat="data"].active { background: var(--cat-data); }
+
+.tier-filter-group {
+  display: flex;
+  gap: 6px;
+}
+
+.tier-btn {
+  padding: 5px 12px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.15s;
+}
+.tier-btn:hover { color: var(--text); }
+.tier-btn.active[data-tier="1"] { background: var(--tier1); color: #000; border-color: transparent; }
+.tier-btn.active[data-tier="2"] { background: var(--tier2); color: #fff; border-color: transparent; }
+.tier-btn.active[data-tier="3"] { background: var(--tier3); color: #fff; border-color: transparent; }
+.tier-btn.active[data-tier="4"] { background: var(--tier4); color: #fff; border-color: transparent; }
+
+.sep { width: 1px; height: 24px; background: var(--border); flex-shrink: 0; }
+
+.search-box {
+  padding: 5px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  outline: none;
+  border-radius: 2px;
+  width: 200px;
+  transition: border-color 0.15s;
+}
+.search-box:focus { border-color: var(--dim); }
+.search-box::placeholder { color: var(--dim); }
+
+/* GRID */
+.grid-container {
+  padding: 32px 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 2px;
+  background: var(--border);
+}
+
+.project-card {
+  background: var(--surface);
+  padding: 24px;
+  cursor: pointer;
+  transition: background 0.15s;
+  position: relative;
+  border-left: 3px solid transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.project-card:hover { background: var(--surface2); }
+.project-card.hidden { display: none; }
+.project-card.done { opacity: 0.5; }
+.project-card.done .card-title { text-decoration: line-through; }
+
+.card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.card-num {
+  font-size: 0.6rem;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+}
+
+.card-badges {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.badge {
+  padding: 2px 7px;
+  font-size: 0.55rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 1px;
+}
+
+.tier-badge-1 { background: rgba(240,192,64,0.15); color: var(--tier1); border: 1px solid rgba(240,192,64,0.3); }
+.tier-badge-2 { background: rgba(224,112,32,0.15); color: var(--tier2); border: 1px solid rgba(224,112,32,0.3); }
+.tier-badge-3 { background: rgba(192,48,80,0.15); color: var(--tier3); border: 1px solid rgba(192,48,80,0.3); }
+.tier-badge-4 { background: rgba(112,64,224,0.15); color: var(--tier4); border: 1px solid rgba(112,64,224,0.3); }
+
+.cat-badge { font-size: 0.55rem; padding: 2px 7px; border-radius: 1px; }
+
+.card-title {
+  font-family: var(--display);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+.card-tagline {
+  font-size: 0.72rem;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.card-stack {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.stack-tag {
+  padding: 2px 6px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  font-size: 0.55rem;
+  color: var(--dim);
+  border-radius: 1px;
+  font-family: var(--code);
+  letter-spacing: 0.05em;
+}
+
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.card-time {
+  font-size: 0.6rem;
+  color: var(--dim);
+  letter-spacing: 0.06em;
+}
+
+.card-deps {
+  font-size: 0.55rem;
+  color: var(--dim);
+}
+
+.done-btn {
+  width: 18px; height: 18px;
+  border: 1px solid var(--border);
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.55rem;
+  color: var(--dim);
+  border-radius: 2px;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.done-btn:hover { border-color: #3fb950; color: #3fb950; }
+.project-card.done .done-btn { background: rgba(63,185,80,0.15); border-color: #3fb950; color: #3fb950; }
+
+/* MODAL */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(8,12,16,0.92);
+  z-index: 1000;
+  display: none;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.open { display: flex; }
+
+.modal {
+  width: min(680px, 95vw);
+  max-height: calc(100vh - 40px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  overflow-y: auto;
+  animation: slideIn 0.2s ease;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.modal-header {
+  padding: 24px 28px 20px;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.modal-close {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  padding: 4px 10px;
+  cursor: pointer;
+  border-radius: 2px;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.modal-close:hover { border-color: var(--tier3); color: var(--tier3); }
+
+.modal-body { padding: 28px; display: flex; flex-direction: column; gap: 24px; }
+
+.modal-title {
+  font-family: var(--display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.modal-section-title {
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 6px;
+}
+
+.guide-step {
+  display: flex;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.guide-step:last-child { border-bottom: none; }
+
+.step-num {
+  font-family: var(--display);
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--dim);
+  min-width: 32px;
+  line-height: 1;
+  padding-top: 3px;
+}
+
+.step-content {}
+.step-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+  font-family: var(--display);
+}
+.step-desc {
+  font-size: 0.72rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.step-code {
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  font-family: var(--code);
+  font-size: 0.68rem;
+  color: var(--tier1);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+
+.resource-list { display: flex; flex-direction: column; gap: 6px; }
+.resource-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 8px 10px;
+  background: var(--surface2);
+  border-radius: 2px;
+}
+.resource-type {
+  font-size: 0.58rem;
+  padding: 2px 6px;
+  border-radius: 1px;
+  font-family: var(--code);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.rtype-paper { background: rgba(121,192,255,0.12); color: var(--cat-arch); }
+.rtype-repo { background: rgba(63,185,80,0.12); color: var(--cat-inference); }
+.rtype-video { background: rgba(255,123,114,0.12); color: var(--cat-training); }
+.rtype-blog { background: rgba(210,168,255,0.12); color: var(--cat-rag); }
+.rtype-docs { background: rgba(88,166,255,0.12); color: var(--cat-data); }
+
+.resource-text {}
+.resource-name { font-size: 0.75rem; color: var(--text); margin-bottom: 2px; }
+.resource-detail { font-size: 0.6rem; color: var(--muted); }
+
+.difficulty-bar {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+.diff-seg {
+  height: 6px;
+  width: 28px;
+  border-radius: 1px;
+  background: var(--border);
+}
+.diff-seg.filled { background: var(--tier1); }
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.info-box {
+  background: var(--surface2);
+  padding: 12px 14px;
+  border-radius: 2px;
+}
+.info-label {
+  font-size: 0.58rem;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.info-val {
+  font-size: 0.8rem;
+  color: var(--text);
+  font-family: var(--display);
+  font-weight: 700;
+}
+
+/* PROGRESS BAR at bottom */
+.progress-bar-container {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--border);
+  z-index: 500;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--tier4), var(--tier3), var(--tier2), var(--tier1));
+  transition: width 0.4s ease;
+}
+
+.count-label {
+  position: fixed;
+  bottom: 10px;
+  right: 20px;
+  font-size: 0.58rem;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  z-index: 501;
+  background: var(--bg);
+  padding: 3px 8px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+}
+
+/* EMPTY STATE */
+.empty-state {
+  grid-column: 1/-1;
+  padding: 80px;
+  text-align: center;
+  color: var(--dim);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  display: none;
+}
+
+@media (max-width: 600px) {
+  header, .controls, .grid-container { padding-left: 16px; padding-right: 16px; }
+  .grid-container { grid-template-columns: 1fr; }
+  .modal { width: 100%; max-height: 85vh; position: fixed; bottom: 0; border-radius: 8px 8px 0 0; }
+  .modal-overlay { align-items: flex-end; padding: 0; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div>
+      <h1><span class="accent">BUILD</span><br><span class="dim">YOUR OWN</span></h1>
+      <div class="header-meta">51 projects · AI/ML from scratch · Full implementation guides</div>
+    </div>
+    <div class="tier-legend">
+      <div class="tier-item"><div class="tier-dot" style="background:var(--tier1)"></div>Tier 1 — Foundations</div>
+      <div class="tier-item"><div class="tier-dot" style="background:var(--tier2)"></div>Tier 2 — Core Systems</div>
+      <div class="tier-item"><div class="tier-dot" style="background:var(--tier3)"></div>Tier 3 — Advanced</div>
+      <div class="tier-item"><div class="tier-dot" style="background:var(--tier4)"></div>Tier 4 — Research-Grade</div>
+    </div>
+  </div>
+  <div class="stats-row">
+    <div class="stat-pill"><span class="n" style="color:var(--tier1)">15</span> Foundations</div>
+    <div class="stat-pill"><span class="n" style="color:var(--tier2)">18</span> Core Systems</div>
+    <div class="stat-pill"><span class="n" style="color:var(--tier3)">12</span> Advanced</div>
+    <div class="stat-pill"><span class="n" style="color:var(--tier4)">6</span> Research</div>
+    <div class="stat-pill"><span class="n" id="doneCount" style="color:var(--cat-inference)">0</span> Completed</div>
+  </div>
+</header>
+
+<div class="controls">
+  <input class="search-box" type="text" placeholder="search projects..." id="searchBox" oninput="applyFilters()">
+  <div class="sep"></div>
+  <div class="filter-group">
+    <button class="filter-btn active" data-cat="all" onclick="setCat('all',this)">All</button>
+    <button class="filter-btn" data-cat="foundations" onclick="setCat('foundations',this)">Foundations</button>
+    <button class="filter-btn" data-cat="inference" onclick="setCat('inference',this)">Inference</button>
+    <button class="filter-btn" data-cat="training" onclick="setCat('training',this)">Training</button>
+    <button class="filter-btn" data-cat="arch" onclick="setCat('arch',this)">Architecture</button>
+    <button class="filter-btn" data-cat="systems" onclick="setCat('systems',this)">Systems</button>
+    <button class="filter-btn" data-cat="rag" onclick="setCat('rag',this)">RAG/Agents</button>
+    <button class="filter-btn" data-cat="multimodal" onclick="setCat('multimodal',this)">Multimodal</button>
+    <button class="filter-btn" data-cat="optim" onclick="setCat('optim',this)">Optimization</button>
+    <button class="filter-btn" data-cat="data" onclick="setCat('data',this)">Data</button>
+  </div>
+  <div class="sep"></div>
+  <div class="tier-filter-group">
+    <button class="tier-btn" data-tier="1" onclick="toggleTier(1,this)">T1</button>
+    <button class="tier-btn" data-tier="2" onclick="toggleTier(2,this)">T2</button>
+    <button class="tier-btn" data-tier="3" onclick="toggleTier(3,this)">T3</button>
+    <button class="tier-btn" data-tier="4" onclick="toggleTier(4,this)">T4</button>
+  </div>
+</div>
+
+<div class="grid-container" id="grid">
+  <div class="empty-state" id="emptyState">NO PROJECTS MATCH YOUR FILTERS</div>
+</div>
+
+<div class="progress-bar-container">
+  <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+</div>
+<div class="count-label" id="countLabel">0 / 51 DONE</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOnBg(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div>
+        <div id="modalBadges" style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;"></div>
+        <div class="modal-title" id="modalTitle"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕ CLOSE</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+const PROJECTS = [
+  {
+    id: 1, num: "01", tier: 1, cat: "foundations",
+    title: "Autograd Engine",
+    sub: "like Micrograd",
+    tagline: "Build scalar-valued backpropagation from scratch. Understand how gradients flow through a computational graph. The fundamental primitive everything else is built on.",
+    stack: ["Python", "NumPy"],
+    time: "1–2 days",
+    deps: [],
+    guide: {
+      overview: "Karpathy's Micrograd is the gold standard introduction. You build a Value class that wraps scalars, overloads arithmetic operators, and implements backward() via the chain rule. No external autodiff library.",
+      steps: [
+        { n: "01", title: "Value class & forward pass", desc: "Create a Value class holding data, grad, and _backward. Implement __add__, __mul__, __pow__, relu. Each operation stores references to parent Values.", code: "class Value:\n  def __init__(self, data, _children=()):\n    self.data = data\n    self.grad = 0\n    self._backward = lambda: None\n    self._prev = set(_children)\n\n  def __mul__(self, other):\n    out = Value(self.data * other.data, (self, other))\n    def _backward():\n      self.grad += other.data * out.grad\n      other.grad += self.data * out.grad\n    out._backward = _backward\n    return out" },
+        { n: "02", title: "Topological sort + backward()", desc: "Walk the computation graph in reverse topological order, calling each node's _backward to accumulate gradients.", code: "def backward(self):\n  topo = []\n  visited = set()\n  def build(v):\n    if v not in visited:\n      visited.add(v)\n      for child in v._prev: build(child)\n      topo.append(v)\n  build(self)\n  self.grad = 1.0\n  for node in reversed(topo):\n    node._backward()" },
+        { n: "03", title: "Build MLP on top", desc: "Create Neuron, Layer, MLP classes using your Value engine. Train on XOR or a toy dataset. Verify gradients match numerical estimates.", code: "# Verify: f(x+h) - f(x-h) / 2h ≈ analytical grad\ndef numerical_grad(f, x, h=1e-5):\n  return (f(x+h) - f(x-h)) / (2*h)" },
+        { n: "04", title: "Extend to tensors", desc: "Generalize from scalars to NumPy arrays. This is your path to a minimal PyTorch-like system. Handle broadcasting in backward passes.", code: "" }
+      ],
+      resources: [
+        { type: "video", name: "Andrej Karpathy — micrograd walkthrough", detail: "youtube.com/watch?v=VMj-3S1tku0 · 2.5 hrs · The definitive tutorial" },
+        { type: "repo", name: "karpathy/micrograd", detail: "github.com · ~100 lines, study every line" },
+        { type: "blog", name: "Backpropagation calculus — 3Blue1Brown", detail: "Read before watching Karpathy" }
+      ],
+      difficulty: 2, hours: "12–18 hrs", lang: "Python"
+    }
+  },
+  {
+    id: 2, num: "02", tier: 1, cat: "foundations",
+    title: "Tokenizer",
+    sub: "BPE implementation",
+    tagline: "Byte Pair Encoding from scratch. Merge vocabulary, encode/decode text, handle special tokens. This is what GPT-2/4 uses internally.",
+    stack: ["Python", "regex"],
+    time: "1–2 days",
+    deps: [],
+    guide: {
+      overview: "BPE starts with characters (or bytes), counts adjacent pair frequencies, merges the most frequent pair, and repeats. Building this gives you intuition for why tokenization matters for model efficiency and multilingual support.",
+      steps: [
+        { n: "01", title: "Byte-level encoding", desc: "Encode text as UTF-8 bytes → list of integers 0-255. This is the GPT-2 trick to handle any Unicode text without UNK tokens.", code: "def get_stats(ids):\n  counts = {}\n  for pair in zip(ids, ids[1:]):\n    counts[pair] = counts.get(pair, 0) + 1\n  return counts" },
+        { n: "02", title: "Merge loop", desc: "Repeatedly find the most frequent pair, assign it a new token id, replace all occurrences. Store merges dict for encode/decode.", code: "def merge(ids, pair, idx):\n  newids = []\n  i = 0\n  while i < len(ids):\n    if i < len(ids)-1 and (ids[i],ids[i+1]) == pair:\n      newids.append(idx)\n      i += 2\n    else:\n      newids.append(ids[i])\n      i += 1\n  return newids" },
+        { n: "03", title: "Encode & Decode", desc: "Encode: apply merges in order. Decode: reverse the vocab mapping. Handle special tokens (<|endoftext|>) separately.", code: "" },
+        { n: "04", title: "Train on real corpus", desc: "Run your tokenizer on a Wikipedia dump. Compare vocab size vs compression ratio. Compare to tiktoken output.", code: "" }
+      ],
+      resources: [
+        { type: "video", name: "Karpathy — Let's build the GPT Tokenizer", detail: "youtube.com · 2 hrs · builds minbpe" },
+        { type: "repo", name: "karpathy/minbpe", detail: "github.com · clean reference implementation" },
+        { type: "paper", name: "Neural Machine Translation of Rare Words with Subword Units", detail: "Sennrich et al. 2016 · Original BPE paper" }
+      ],
+      difficulty: 2, hours: "10–16 hrs", lang: "Python"
+    }
+  },
+  {
+    id: 3, num: "03", tier: 1, cat: "arch",
+    title: "Transformer from Scratch",
+    sub: "Attention is All You Need",
+    tagline: "Implement the full encoder-decoder transformer: multi-head attention, positional encodings, FFN layers, layer norm. Train on translation or language modeling.",
+    stack: ["Python", "PyTorch"],
+    time: "3–5 days",
+    deps: ["Autograd Engine", "Tokenizer"],
+    guide: {
+      overview: "The Transformer (Vaswani et al., 2017) replaced RNNs entirely. The key insight: attention over all positions simultaneously. Build it module by module following the paper architecture.",
+      steps: [
+        { n: "01", title: "Scaled Dot-Product Attention", desc: "Attention(Q,K,V) = softmax(QK^T / sqrt(d_k))V. The scaling prevents vanishing gradients in softmax for large d_k.", code: "def attention(Q, K, V, mask=None):\n  d_k = Q.size(-1)\n  scores = torch.matmul(Q, K.transpose(-2,-1)) / math.sqrt(d_k)\n  if mask is not None:\n    scores = scores.masked_fill(mask==0, -1e9)\n  return torch.matmul(F.softmax(scores, dim=-1), V)" },
+        { n: "02", title: "Multi-Head Attention", desc: "Project Q,K,V into h heads, run attention in parallel, concatenate and project. This lets each head attend to different positions.", code: "class MultiHeadAttention(nn.Module):\n  def __init__(self, d_model, h):\n    # d_k = d_model // h\n    # Wq, Wk, Wv: (d_model, d_k) each\n    # Wo: (h*d_k, d_model)" },
+        { n: "03", title: "Positional Encoding + FFN", desc: "Sinusoidal PE: PE(pos,2i)=sin(pos/10000^(2i/d_model)). FFN: two linear layers with ReLU, d_ff=4*d_model.", code: "" },
+        { n: "04", title: "Encoder/Decoder stacks", desc: "Stack N=6 layers. Decoder has cross-attention over encoder output. Use causal mask in decoder self-attention.", code: "" },
+        { n: "05", title: "Train on Shakespeare/WMT14", desc: "Use Adam with warmup schedule: lr = d_model^(-0.5) * min(step^(-0.5), step*warmup^(-1.5))", code: "" }
+      ],
+      resources: [
+        { type: "paper", name: "Attention Is All You Need — Vaswani et al. 2017", detail: "arxiv.org/abs/1706.03762 · Read this first" },
+        { type: "blog", name: "The Annotated Transformer — Harvard NLP", detail: "nlp.seas.harvard.edu · line-by-line with code" },
+        { type: "video", name: "Karpathy — Let's build GPT from scratch", detail: "youtube.com · 2 hrs · Best code walkthrough" },
+        { type: "repo", name: "karpathy/nanoGPT", detail: "github.com · clean, minimal reference" }
+      ],
+      difficulty: 3, hours: "25–40 hrs", lang: "Python/PyTorch"
+    }
+  },
+  {
+    id: 4, num: "04", tier: 1, cat: "foundations",
+    title: "Chain of Thought Reasoner",
+    sub: "Structured reasoning with LLMs",
+    tagline: "Implement CoT prompting, scratchpad reasoning, self-consistency voting, and tree-of-thought search. Build a reasoning wrapper around any LLM API.",
+    stack: ["Python", "LLM API"],
+    time: "2–3 days",
+    deps: [],
+    guide: {
+      overview: "Chain of Thought (Wei et al., 2022) showed that prompting LLMs to 'think step by step' dramatically improves reasoning. You'll implement zero-shot CoT, few-shot CoT, self-consistency, and the Tree-of-Thoughts extension.",
+      steps: [
+        { n: "01", title: "Zero-shot & Few-shot CoT", desc: "Append 'Let's think step by step' or provide worked examples. Parse final answer from the scratchpad.", code: 'def cot_prompt(question, examples=None):\n  prompt = ""\n  if examples:\n    for q, reasoning, a in examples:\n      prompt += f"Q: {q}\\nA: {reasoning}\\nAnswer: {a}\\n\\n"\n  prompt += f"Q: {question}\\nA: Let\'s think step by step."\n  return prompt' },
+        { n: "02", title: "Self-consistency voting", desc: "Sample N reasoning paths (temperature > 0), extract final answers, return the majority vote. Dramatically improves accuracy on math benchmarks.", code: "def self_consistent_answer(question, n=10, temp=0.7):\n  answers = []\n  for _ in range(n):\n    resp = llm(cot_prompt(question), temperature=temp)\n    answers.append(extract_answer(resp))\n  return Counter(answers).most_common(1)[0][0]" },
+        { n: "03", title: "Tree-of-Thoughts", desc: "Generate multiple reasoning branches, score each with the LLM itself, use BFS/DFS to explore and prune the solution tree.", code: "" },
+        { n: "04", title: "Eval on benchmarks", desc: "Test on GSM8K (math), StrategyQA (commonsense), ARC (science). Measure accuracy vs vanilla prompting.", code: "" }
+      ],
+      resources: [
+        { type: "paper", name: "Chain-of-Thought Prompting Elicits Reasoning — Wei et al. 2022", detail: "arxiv.org/abs/2201.11903" },
+        { type: "paper", name: "Self-Consistency Improves CoT — Wang et al. 2022", detail: "arxiv.org/abs/2203.11171" },
+        { type: "paper", name: "Tree of Thoughts — Yao et al. 2023", detail: "arxiv.org/abs/2305.10601" },
+        { type: "repo", name: "princeton-nlp/tree-of-thought-llm", detail: "github.com · official ToT implementation" }
+      ],
+      difficulty: 1, hours: "8–14 hrs", lang: "Python"
+    }
+  },
+  {
+    id: 5, num: "05", tier: 1, cat: "rag",
+    title: "ReAct Agent Loop",
+    sub: "Reasoning + Acting pattern",
+    tagline: "Build an agent that interleaves reasoning traces with tool calls. Implement the ReAct loop: Thought → Action → Observation → repeat until done.",
+    stack: ["Python", "LLM API", "Tools"],
+    time: "2–4 days",
+    deps: ["Chain of Thought Reasoner"],
+    guide: {
+      overview: "ReAct (Yao et al., 2023) combines chain-of-thought reasoning with action execution. The LLM generates a Thought, then an Action (tool call), receives an Observation, and loops. You'll build the orchestration loop, tool registry, and error recovery.",
+      steps: [
+        { n: "01", title: "Tool registry", desc: "Define a clean tool interface: name, description, parameters schema, execute function. The agent sees only the name and description.", code: "class Tool:\n  def __init__(self, name, desc, func, schema):\n    self.name = name\n    self.description = desc\n    self.func = func\n    self.schema = schema\n\n  def run(self, **kwargs):\n    return str(self.func(**kwargs))" },
+        { n: "02", title: "ReAct prompt template", desc: "System prompt includes: available tools, output format (Thought/Action/Observation), stop conditions, max steps.", code: 'SYSTEM = """\nYou have access to:\n{tools}\n\nFormat:\nThought: your reasoning\nAction: tool_name\nAction Input: {{\"param\": \"value\"}}\n\nWhen done:\nFinal Answer: your answer\n"""' },
+        { n: "03", title: "Agent loop", desc: "Parse Action from LLM output, execute tool, inject Observation back into context. Loop until Final Answer or max_steps.", code: "def run(query, max_steps=10):\n  messages = [system_msg, user_msg(query)]\n  for _ in range(max_steps):\n    resp = llm(messages)\n    if 'Final Answer:' in resp:\n      return parse_final(resp)\n    action, args = parse_action(resp)\n    obs = tools[action].run(**args)\n    messages += [assistant(resp), user(f'Observation: {obs}')]" },
+        { n: "04", title: "Add memory + error recovery", desc: "Scratchpad memory for multi-turn. Handle tool failures gracefully: inject error as observation, let agent retry or choose alternate approach.", code: "" }
+      ],
+      resources: [
+        { type: "paper", name: "ReAct: Synergizing Reasoning and Acting — Yao et al. 2023", detail: "arxiv.org/abs/2210.03629 · Original paper" },
+        { type: "blog", name: "Building an Agent from Scratch — Lilian Weng", detail: "lilianweng.github.io/posts/2023-06-23-agent" },
+        { type: "repo", name: "hwchase17/langchain agents source", detail: "Read the AgentExecutor loop implementation" }
+      ],
+      difficulty: 2, hours: "15–24 hrs", lang: "Python"
+    }
+  },
+  {
+    id: 6, num: "06", tier: 2, cat: "systems",
+    title: "Inference Server",
+    sub: "C++ or Rust HTTP server",
+    tagline: "Build a production inference server with batching, KV cache, tokenization, and an HTTP API. Handle concurrent requests, backpressure, and health checks.",
+    stack: ["C++/Rust", "GGML/llama.cpp"],
+    time: "1–2 weeks",
+    deps: ["Transformer from Scratch"],
+    guide: {
+      overview: "Study llama.cpp's architecture. Build a Rust Actix-web server that accepts completion requests, queues them for batching, runs forward passes, and streams tokens back via SSE. Focus on the request lifecycle, not model training.",
+      steps: [
+        { n: "01", title: "HTTP API layer (Rust/Actix)", desc: "POST /v1/completions accepting OpenAI-compatible JSON. Response streaming via Server-Sent Events. Health check endpoint.", code: '#[post("/v1/completions")]\nasync fn completions(\n  req: web::Json<CompletionRequest>,\n  state: web::Data<AppState>\n) -> impl Responder {\n  let (tx, rx) = tokio::sync::mpsc::channel(100);\n  state.queue.send(InferenceJob { req, tx }).await;\n  StreamingResponse::new(ReceiverStream::new(rx))\n}' },
+        { n: "02", title: "Continuous batching queue", desc: "In-flight request scheduler: group requests by sequence length, fill KV cache slots, evict finished sequences. This is the key to vLLM-style throughput.", code: "" },
+        { n: "03", title: "Tokenization in C++/Rust", desc: "Port your BPE tokenizer. Avoid Python for the hot path. Use sentencepiece C++ bindings or port tiktoken.", code: "" },
+        { n: "04", title: "Metrics + graceful shutdown", desc: "Prometheus /metrics: requests/s, queue depth, latency p50/p95/p99, tokens/s. SIGTERM handling with drain.", code: "" }
+      ],
+      resources: [
+        { type: "repo", name: "ggerganov/llama.cpp", detail: "github.com · Production-quality C++ inference, study server.cpp" },
+        { type: "repo", name: "Actix-web docs", detail: "actix.rs/docs · Rust async web framework" },
+        { type: "paper", name: "Orca: Progressive Job Scheduling for Efficient LLM Inference", detail: "OSDI 2022 · Continuous batching foundation" }
+      ],
+      difficulty: 4, hours: "40–80 hrs", lang: "Rust or C++"
+    }
+  },
+  {
+    id: 7, num: "07", tier: 2, cat: "rag",
+    title: "Vector Database",
+    sub: "HNSW index from scratch",
+    tagline: "Implement Hierarchical Navigable Small World graphs for approximate nearest neighbor search. Handle insertions, deletions, and multi-threaded queries.",
+    stack: ["Python/C++", "NumPy"],
+    time: "1 week",
+    deps: [],
+    guide: {
+      overview: "HNSW (Malkov & Yashunin, 2018) is the backbone of every production vector DB (Qdrant, Weaviate, Pinecone). Build the multi-layer graph, greedy search, and understand the ef/M parameters that control recall vs speed tradeoffs.",
+      steps: [
+        { n: "01", title: "Layer structure", desc: "Each node exists in layers 0..L where L is sampled from an exponential distribution. Higher layers are sparser, used for fast long-range navigation.", code: "def get_max_layer(ml):\n  # ml = 1/ln(M), M = max connections\n  return int(-math.log(random.uniform(0,1)) * ml)" },
+        { n: "02", title: "Greedy search", desc: "Start from entry point, greedily move to the neighbor that minimizes distance. Do this top-down through layers, narrowing ef candidates.", code: "def search_layer(query, ep, ef, layer):\n  visited = {ep}\n  candidates = [(dist(query, ep), ep)]  # min-heap\n  dynamic_list = [(dist(query, ep), ep)]  # max-heap\n  while candidates:\n    _, curr = heapq.heappop(candidates)\n    worst = dynamic_list[0][0]\n    if dist(query, curr) > worst: break\n    for neighbor in graph[layer][curr]:\n      if neighbor not in visited:\n        visited.add(neighbor)\n        d = dist(query, neighbor)\n        if d < worst or len(dynamic_list) < ef:\n          heapq.heappush(candidates, (d, neighbor))\n          heapq.heappush(dynamic_list, (-d, neighbor))\n  return [node for _,node in dynamic_list]" },
+        { n: "03", title: "Insert + prune connections", desc: "On insert: find M nearest neighbors per layer, add bidirectional edges, prune over-connected nodes using heuristic neighbor selection.", code: "" },
+        { n: "04", title: "Persistence + metadata", desc: "Serialize graph as adjacency list + vectors. Add metadata filtering: store payload per vector, apply filters during search.", code: "" }
+      ],
+      resources: [
+        { type: "paper", name: "Efficient and Robust ANN Search Using HNSW — Malkov & Yashunin 2018", detail: "arxiv.org/abs/1603.09320 · Read this carefully" },
+        { type: "repo", name: "nmslib/hnswlib", detail: "github.com · C++ header-only reference implementation" },
+        { type: "blog", name: "HNSW explained visually — Pinecone blog", detail: "pinecone.io/learn/hnsw · Best visual walkthrough" }
+      ],
+      difficulty: 3, hours: "20–35 hrs", lang: "Python or C++"
+    }
+  },
+  {
+    id: 8, num: "08", tier: 1, cat: "rag",
+    title: "RAG Pipeline",
+    sub: "Full retrieval-augmented generation",
+    tagline: "Ingest documents → chunk → embed → index → retrieve → rerank → generate. Implement query rewriting, HyDE, and citation grounding.",
+    stack: ["Python", "Qdrant", "LLM API"],
+    time: "3–5 days",
+    deps: ["Vector Database", "ReAct Agent Loop"],
+    guide: {
+      overview: "RAG is the most impactful pattern in production AI. Build each stage from scratch, understand where quality degrades, and implement advanced retrieval: hybrid search (dense + sparse), cross-encoder reranking, and HyDE.",
+      steps: [
+        { n: "01", title: "Document ingestion + chunking", desc: "Recursive character splitting with overlap. Semantic chunking (split on embedding similarity drops). Handle PDFs, HTML, code. Preserve metadata.", code: "def chunk_text(text, chunk_size=512, overlap=64):\n  chunks = []\n  i = 0\n  while i < len(text):\n    chunk = text[i:i+chunk_size]\n    chunks.append({'text': chunk, 'start': i})\n    i += chunk_size - overlap\n  return chunks" },
+        { n: "02", title: "Embedding + indexing", desc: "Embed chunks with text-embedding-3-large or BGE. Batch for efficiency. Upsert to Qdrant with payload. Handle updates/deletes.", code: "" },
+        { n: "03", title: "Hybrid retrieval + reranking", desc: "Dense vector search + BM25 sparse retrieval. Merge with RRF (Reciprocal Rank Fusion). Cross-encoder reranker (cohere or bge-reranker) for final top-k.", code: "def rrf(dense_results, sparse_results, k=60):\n  scores = {}\n  for rank, doc in enumerate(dense_results):\n    scores[doc.id] = scores.get(doc.id,0) + 1/(k+rank+1)\n  for rank, doc in enumerate(sparse_results):\n    scores[doc.id] = scores.get(doc.id,0) + 1/(k+rank+1)\n  return sorted(scores, key=scores.get, reverse=True)" },
+        { n: "04", title: "HyDE + query rewriting", desc: "Hypothetical Document Embedding: generate a fake answer, embed it, retrieve on that. Query rewriting: expand abbreviations, add synonyms, decompose multi-hop.", code: "" },
+        { n: "05", title: "Citation grounding", desc: "Map generated text spans back to source chunks. Use LLM to verify each claim against its cited source. Flag low-confidence citations.", code: "" }
+      ],
+      resources: [
+        { type: "paper", name: "Retrieval-Augmented Generation — Lewis et al. 2020", detail: "arxiv.org/abs/2005.11401 · Original RAG paper" },
+        { type: "paper", name: "HyDE — Gao et al. 2022", detail: "arxiv.org/abs/2212.10496" },
+        { type: "blog", name: "Advanced RAG Techniques — Lilian Weng", detail: "lilianweng.github.io · Comprehensive survey" },
+        { type: "repo", name: "RAGAS evaluation framework", detail: "github.com/explodinggradients/ragas" }
+      ],
+      difficulty: 2, hours: "20–30 hrs", lang: "Python"
+    }
+  },
+  {
+    id: 9, num: "09", tier: 3, cat: "optim",
+    title: "Flash Attention Kernel",
+    sub: "CUDA implementation",
+    tagline: "Implement the IO-aware attention algorithm in CUDA. Tile the computation to stay in SRAM, fuse operations, achieve 2-4x speedup over naive attention.",
+    stack: ["CUDA", "C++", "PyTorch"],
+    time: "2–3 weeks",
+    deps: ["Transformer from Scratch"],
+    guide: {
+      overview: "FlashAttention (Dao et al., 2022) is the most impactful systems paper in LLMs. The key insight: standard attention is memory-bandwidth bound, not compute-bound. Tiling the K,V matrices to fit in SRAM and fusing softmax+matmul reduces HBM reads by O(N).",
+      steps: [
+        { n: "01", title: "Profile naive attention", desc: "Measure HBM bandwidth usage of standard attention. Use nvprof/nsight to confirm it's bandwidth-bound, not compute-bound.", code: "# Roofline: measure arithmetic intensity\n# naive attention: O(N^2) memory, O(N^2*d) compute\n# FlashAttn: O(N*d) memory passes" },
+        { n: "02", title: "Online softmax in CUDA", desc: "Compute softmax incrementally without materializing the full N×N matrix. Maintain running max and sum across tiles.", code: "__global__ void flash_attn_fwd(\n    float* Q, float* K, float* V, float* O,\n    int N, int d, int Bc, int Br) {\n  // Load Q tile to SRAM\n  // Loop over K,V tiles in HBM\n  // Online softmax: maintain m_i, l_i\n  // Accumulate output O_i\n}" },
+        { n: "03", title: "Backward pass", desc: "Recompute attention weights from Q,K (not stored) in backward. This is the memory-saving trick that makes FlashAttention practical.", code: "" },
+        { n: "04", title: "CUDA extensions for PyTorch", desc: "Write setup.py for torch.utils.cpp_extension. Expose forward/backward as a torch.autograd.Function.", code: "" }
+      ],
+      resources: [
+        { type: "paper", name: "FlashAttention — Dao et al. 2022", detail: "arxiv.org/abs/2205.14135 · Read the CUDA pseudocode" },
+        { type: "paper", name: "FlashAttention-2 — Dao 2023", detail: "arxiv.org/abs/2307.08691" },
+        { type: "repo", name: "tinygrad flash attention", detail: "github.com/tinygrad/tinygrad · Clean reference" },
+        { type: "video", name: "GPU Programming — CUDA tutorial", detail: "NVIDIA developer docs + Horace He's FA blog post" }
+      ],
+      difficulty: 5, hours: "60–100 hrs", lang: "CUDA/C++"
+    }
+  },
+  {
+    id: 10, num: "10", tier: 2, cat: "optim",
+    title: "Quantization Library",
+    sub: "Int8 / FP4 implementation",
+    tagline: "Implement post-training quantization: absmax, zero-point, per-channel. Build Int8 matmul, W4A16, and understand the accuracy/speed tradeoffs.",
+    stack: ["Python", "NumPy", "CUDA"],
+    time: "1 week",
+    deps: ["Transformer from Scratch"],
+    guide: {
+      overview: "Quantization reduces model memory 2-8x with minimal accuracy loss. Implement absmax quantization for weights, zero-point for activations, and the key insight: outlier features require per-channel or LLM.int8()-style mixed precision.",
+      steps: [
+        { n: "01", title: "Absmax Int8 quantization", desc: "Scale weights to [-127, 127] by dividing by max(|W|). Dequantize during matmul. Measure perplexity degradation.", code: "def quantize_absmax(W):\n  scale = W.abs().max() / 127\n  W_q = (W / scale).round().clamp(-127, 127).to(torch.int8)\n  return W_q, scale\n\ndef dequantize(W_q, scale):\n  return W_q.float() * scale" },
+        { n: "02", title: "Per-channel quantization", desc: "Compute scale per output channel. Critical for weight matrices with different magnitude distributions across channels.", code: "def quantize_per_channel(W):\n  scale = W.abs().max(dim=-1, keepdim=True).values / 127\n  return (W / scale).round().to(torch.int8), scale" },
+        { n: "03", title: "LLM.int8() — mixed precision", desc: "Decompose matmul: identify outlier feature dimensions (>6 std), compute those in fp16, rest in int8. This is how bitsandbytes works.", code: "" },
+        { n: "04", title: "GPTQ — weight-only quantization", desc: "Layer-wise quantization minimizing ||WX - W_q X||. Use Hessian information. Achieves W4A16 with near-fp16 accuracy.", code: "" }
+      ],
+      resources: [
+        { type: "paper", name: "LLM.int8() — Dettmers et al. 2022", detail: "arxiv.org/abs/2208.07339 · Must read" },
+        { type: "paper", name: "GPTQ — Frantar et al. 2022", detail: "arxiv.org/abs/2210.17323" },
+        { type: "blog", name: "Tim Dettmers blog — bitsandbytes", detail: "timdettmers.com · Definitive quantization resource" },
+        { type: "repo", name: "TimDettmers/bitsandbytes", detail: "github.com · Read the source" }
+      ],
+      difficulty: 3, hours: "25–40 hrs", lang: "Python/CUDA"
+    }
+  },
+  {
+    id: 11, num: "11", tier: 3, cat: "arch",
+    title: "Mixture of Experts",
+    sub: "MoE routing layer",
+    tagline: "Implement sparse MoE with top-k routing, load balancing loss, and expert capacity. Understand how Mixtral and GPT-4 (allegedly) use this architecture.",
+    stack: ["Python", "PyTorch"],
+    time: "1–2 weeks",
+    deps: ["Transformer from Scratch"],
+    guide: {
+      overview: "MoE replaces the FFN layer with N expert FFNs and a router that selects top-k experts per token. This scales parameters without proportionally scaling compute. The key challenge: load balancing — preventing expert collapse.",
+      steps: [
+        { n: "01", title: "Router network", desc: "Linear layer + softmax over N experts. Top-k selection. The router must learn to route meaningfully — not just always pick the same experts.", code: "class MoERouter(nn.Module):\n  def __init__(self, d_model, n_experts, top_k):\n    self.gate = nn.Linear(d_model, n_experts, bias=False)\n    self.top_k = top_k\n\n  def forward(self, x):\n    logits = self.gate(x)  # (B,T,n_experts)\n    probs = F.softmax(logits, dim=-1)\n    topk_probs, topk_idx = probs.topk(self.top_k, dim=-1)\n    return topk_probs, topk_idx" },
+        { n: "02", title: "Expert dispatch + combine", desc: "Route each token to its assigned experts, gather results, weighted combine by router probability. Handle variable tokens per expert.", code: "" },
+        { n: "03", title: "Load balancing loss", desc: "Auxiliary loss: encourage uniform expert utilization. Minimize f_i * p_i where f_i = fraction of tokens to expert i, p_i = mean router probability.", code: "def load_balance_loss(router_probs, expert_indices, n_experts):\n  # f_i: fraction of tokens dispatched to expert i\n  # P_i: mean routing probability for expert i\n  # loss = n_experts * sum(f_i * P_i)\n  pass" },
+        { n: "04", title: "Expert parallelism", desc: "In distributed setting, partition experts across GPUs. All-to-all communication for token routing. This is the hardest part of MoE at scale.", code: "" }
+      ],
+      resources: [
+        { type: "paper", name: "Mixtral of Experts — Mistral AI 2024", detail: "arxiv.org/abs/2401.04088" },
+        { type: "paper", name: "Switch Transformers — Fedus et al. 2021", detail: "arxiv.org/abs/2101.03961 · Cleaner formulation" },
+        { type: "paper", name: "Outrageously Large Neural Networks (Sparsely-Gated MoE) — Shazeer 2017", detail: "arxiv.org/abs/1701.06538 · Original" }
+      ],
+      difficulty: 4, hours: "35–55 hrs", lang: "Python/PyTorch"
+    }
+  },
+  {
+    id: 12, num: "12", tier: 4, cat: "training",
+    title: "Distributed Training",
+    sub: "FSDP / Tensor Parallelism",
+    tagline: "Shard model parameters across GPUs. Implement FSDP-style all-gather/reduce-scatter, pipeline parallelism, and tensor parallelism for large model training.",
+    stack: ["Python", "PyTorch", "NCCL"],
+    time: "2–4 weeks",
+    deps: ["Transformer from Scratch"],
+    guide: {
+      overview: "Training models that don't fit on one GPU requires distributed strategies. DDP replicates the model — fine for most cases. FSDP shards parameters + gradients + optimizer states. Tensor parallelism splits individual matrix multiplications across GPUs (Megatron-LM style).",
+      steps: [
+        { n: "01", title: "DDP baseline", desc: "Wrap model in DistributedDataParallel. Understand how gradients are all-reduced synchronously after backward. This is the easy case.", code: "# Baseline: DDP\ndist.init_process_group('nccl')\nmodel = DDP(model, device_ids=[local_rank])\n# Grads all-reduced automatically in backward" },
+        { n: "02", title: "FSDP — parameter sharding", desc: "Shard model params across ranks. Forward: all-gather params just-in-time. Backward: reduce-scatter gradients. Optimizer: update local shard only.", code: "from torch.distributed.fsdp import FullyShardedDataParallel as FSDP\nmodel = FSDP(\n  model,\n  sharding_strategy=ShardingStrategy.FULL_SHARD,\n  cpu_offload=CPUOffload(offload_params=True)\n)" },
+        { n: "03", title: "Tensor parallelism (Megatron-style)", desc: "Split attention heads across GPUs. Split FFN intermediate dimension. Require specific communication patterns (all-reduce in forward, no extra comm in backward).", code: "" },
+        { n: "04", title: "Gradient checkpointing + mixed precision", desc: "Recompute activations in backward to save memory. FP16 forward with FP32 gradient accumulation. GradScaler for loss scaling.", code: "" }
+      ],
+      resources: [
+        { type: "paper", name: "Megatron-LM: Training Multi-Billion Parameter Language Models", detail: "arxiv.org/abs/1909.08053" },
+        { type: "paper", name: "PyTorch FSDP Paper — Zhao et al. 2023", detail: "arxiv.org/abs/2304.11277" },
+        { type: "blog", name: "Lilian Weng — Large-scale LLM Training", detail: "lilianweng.github.io · Survey of parallelism strategies" },
+        { type: "repo", name: "pytorch/examples/distributed", detail: "github.com/pytorch/examples · FSDP tutorials" }
+      ],
+      difficulty: 5, hours: "60–120 hrs", lang: "Python/PyTorch/NCCL"
+    }
+  },
+  {
+    id: 13, num: "13", tier: 3, cat: "systems",
+    title: "KV Cache Paging",
+    sub: "like vLLM's PagedAttention",
+    tagline: "Implement virtual memory-style paging for KV caches. Block manager, cache eviction, prefix sharing. Eliminate KV cache fragmentation for 2-3x throughput gains.",
+    stack: ["Python", "C++", "CUDA"],
+    time: "1–2 weeks",
+    deps: ["Inference Server", "Transformer from Scratch"],
+    guide: {
+      overview: "vLLM's PagedAttention stores KV caches in non-contiguous memory blocks (like OS virtual memory pages). This allows sharing prefixes between requests and eliminates fragmentation. Critical for serving many concurrent users efficiently.",
+      steps: [
+        { n: "01", title: "Block manager design", desc: "Define block size (e.g., 16 tokens). Physical blocks are fixed-size GPU memory slabs. Logical blocks form a sequence's KV cache. Map logical→physical via block table.", code: "class BlockManager:\n  def __init__(self, num_blocks, block_size):\n    self.free_blocks = list(range(num_blocks))\n    self.block_size = block_size\n    # block_table[seq_id] = [phys_block_id, ...]\n    self.block_table = {}" },
+        { n: "02", title: "Sequence lifecycle", desc: "Allocate blocks on sequence start. Extend on new token. Free all blocks on sequence completion. Handle OOM with preemption (swap to CPU).", code: "" },
+        { n: "03", title: "Prefix sharing (copy-on-write)", desc: "Multiple sequences sharing a system prompt share physical blocks for prefix tokens. On divergence, copy-on-write allocates new block.", code: "" },
+        { n: "04", title: "Paged attention CUDA kernel", desc: "Attention kernel that reads from non-contiguous memory via block table indirection. The core contribution of vLLM.", code: "" }
+      ],
+      resources: [
+        { type: "paper", name: "Efficient Memory Management for LLM Serving with PagedAttention (vLLM)", detail: "arxiv.org/abs/2309.06180 · Read every section" },
+        { type: "repo", name: "vllm-project/vllm", detail: "github.com · Study _scheduler.py and block_manager.py" },
+        { type: "blog", name: "vLLM blog post — PagedAttention explained", detail: "vllm.ai/blog/2023/06/20/vllm.html" }
+      ],
+      difficulty: 4, hours: "40–70 hrs", lang: "Python/C++/CUDA"
+    }
+  },
+  {
+    id: 14, num: "14", tier: 3, cat: "inference",
+    title: "Speculative Decoding",
+    sub: "Draft-then-verify system",
+    tagline: "Use a small draft model to generate k tokens, verify in parallel with the large model. Achieve 2-3x decoding speedup with zero quality loss.",
+    stack: ["Python", "PyTorch"],
+    time: "1 week",
+    deps: ["Inference Server", "KV Cache Paging"],
+    guide: {
+      overview: "Autoregressive decoding is sequential and slow. Speculative decoding (Leviathan et al., 2023) uses a fast draft model to propose k tokens, then verifies all k in a single large-model forward pass using rejection sampling. If accepted, k tokens generated at cost of ~1 forward pass.",
+      steps: [
+        { n: "01", title: "Draft model integration", desc: "Run small model (e.g., GPT-2 small as draft for GPT-2 large). Generate k=4 tokens with draft model, recording logits p_draft(t).", code: "def draft(prompt, k=4):\n  input_ids = prompt\n  draft_tokens = []\n  draft_probs = []\n  for _ in range(k):\n    logits = draft_model(input_ids).logits[:,-1,:]\n    probs = F.softmax(logits, dim=-1)\n    token = torch.multinomial(probs, 1)\n    draft_tokens.append(token)\n    draft_probs.append(probs[0, token])\n    input_ids = torch.cat([input_ids, token], dim=-1)\n  return draft_tokens, draft_probs" },
+        { n: "02", title: "Parallel verification", desc: "Run large model on prompt + all k draft tokens in one forward pass. Get target logits for each position.", code: "def verify(prompt, draft_tokens, target_model):\n  input_ids = torch.cat([prompt] + draft_tokens, dim=-1)\n  logits = target_model(input_ids).logits\n  # logits[i] = target distribution for token at position i\n  return logits" },
+        { n: "03", title: "Rejection sampling", desc: "For each draft token t_i: accept with probability min(1, p_target(t_i)/p_draft(t_i)). On rejection, sample from adjusted target distribution.", code: "def rejection_sample(draft_tokens, draft_probs, target_logits):\n  accepted = []\n  for i, (t, p_d) in enumerate(zip(draft_tokens, draft_probs)):\n    p_t = F.softmax(target_logits[-(len(draft_tokens)-i+1)], dim=-1)[t]\n    if random.random() < min(1.0, (p_t / p_d).item()):\n      accepted.append(t)\n    else:\n      # Sample from max(0, p_target - p_draft)\n      break\n  return accepted" },
+        { n: "04", title: "Measure speedup", desc: "Benchmark wall-clock time vs standard autoregressive. Track acceptance rate by domain. Speculative decoding shines on predictable text.", code: "" }
+      ],
+      resources: [
+        { type: "paper", name: "Fast Inference from Transformers via Speculative Decoding — Leviathan et al. 2023", detail: "arxiv.org/abs/2211.17192" },
+        { type: "paper", name: "Speculative Decoding with Big Little Decoder", detail: "arxiv.org/abs/2302.07863" },
+        { type: "blog", name: "How Speculative Decoding Works — Kipp Jones", detail: "Detailed math walkthrough of acceptance sampling" }
+      ],
+      difficulty: 3, hours: "20–35 hrs", lang: "Python/PyTorch"
+    }
+  },
+  {
+    id: 15, num: "15", tier: 4, cat: "arch",
+    title: "State Space Model",
+    sub: "Mamba implementation",
+    tagline: "Implement Mamba's selective state space model with the S6 operator, hardware-aware parallel scan, and demonstrate linear-time sequence processing.",
+    stack: ["Python", "PyTorch", "CUDA"],
+    time: "2–3 weeks",
+    deps: ["Transformer from Scratch"],
+    guide: {
+      overview: "Mamba (Gu & Dao, 2023) is the strongest alternative to Transformers for long sequences. Unlike fixed SSMs, Mamba's parameters are input-dependent (selective). The parallel scan replaces attention's O(N²) complexity with O(N log N), enabling long context at scale.",
+      steps: [
+        { n: "01", title: "Linear recurrence (SSM basics)", desc: "h_t = A*h_{t-1} + B*x_t, y_t = C*h_t. Continuous-time SSM discretized via Zero-order hold. Understand A, B, C, D matrices.", code: "# Discretize continuous SSM\n# A_bar = exp(delta * A)\n# B_bar = (A_bar - I) * inv(A) * B\ndef discretize(A, B, delta):\n  A_bar = torch.matrix_exp(delta * A)\n  B_bar = torch.linalg.solve(A, (A_bar - torch.eye(A.shape[-1])) @ B)\n  return A_bar, B_bar" },
+        { n: "02", title: "Selective scan (S6)", desc: "Make B, C, delta input-dependent. This is the selectivity mechanism: the model learns to selectively remember or forget based on content.", code: "class S6(nn.Module):\n  def forward(self, x):\n    B = self.W_B(x)   # input-dependent\n    C = self.W_C(x)   # input-dependent\n    delta = F.softplus(self.W_delta(x))  # input-dependent\n    A = -torch.exp(self.log_A)  # fixed, diagonal\n    return selective_scan(x, delta, A, B, C)" },
+        { n: "03", title: "Parallel scan algorithm", desc: "The recurrence h_t = A_t*h_{t-1} + B_t*x_t can be computed in O(N log N) with parallel prefix scan. Critical for GPU efficiency.", code: "" },
+        { n: "04", title: "Mamba block", desc: "SSM inside a residual block with 1D convolution, SiLU activation, gating. Replace Transformer FFN to build a full Mamba model.", code: "" }
+      ],
+      resources: [
+        { type: "paper", name: "Mamba: Linear-Time Sequence Modeling with Selective State Spaces", detail: "arxiv.org/abs/2312.00752 · Gu & Dao 2023" },
+        { type: "repo", name: "state-spaces/mamba", detail: "github.com · Official implementation" },
+        { type: "blog", name: "Mamba explained — The AI Summer", detail: "theaisummer.com · Best visual explanation of SSMs" }
+      ],
+      difficulty: 5, hours: "50–80 hrs", lang: "Python/CUDA"
+    }
+  },
+  {
+    id: 16, num: "16", tier: 3, cat: "training",
+    title: "RLHF Pipeline",
+    sub: "PPO implementation",
+    tagline: "Build reward model training, PPO with KL penalty, and reference policy. This is how ChatGPT was trained. Implement actor, critic, reward, and reference models.",
+    stack: ["Python", "PyTorch", "trl"],
+    time: "2–3 weeks",
+    deps: ["Transformer from Scratch", "Distributed Training"],
+    guide: {
+      overview: "RLHF has three stages: SFT (supervised fine-tuning), RM (reward model training from human preference pairs), and RL (PPO to maximize reward while staying close to SFT policy via KL penalty).",
+      steps: [
+        { n: "01", title: "Reward model training", desc: "Take preference pairs (chosen, rejected). Train RM to output scalar reward: loss = -log(sigmoid(r_chosen - r_rejected)). Use Bradley-Terry model.", code: "def reward_loss(r_chosen, r_rejected):\n  return -F.logsigmoid(r_chosen - r_rejected).mean()" },
+        { n: "02", title: "PPO setup — 4 model copies", desc: "Actor (policy being trained), Critic (value function), Reference (frozen SFT policy), Reward (frozen RM). Actor and Critic share base weights.", code: "" },
+        { n: "03", title: "PPO objective with KL", desc: "r = reward - beta * KL(actor || reference). PPO clip: L = min(ratio*A, clip(ratio,1-eps,1+eps)*A) where ratio=pi_new/pi_old, A=advantage.", code: "def ppo_loss(logprobs, old_logprobs, advantages, clip_eps=0.2):\n  ratio = torch.exp(logprobs - old_logprobs)\n  clipped = torch.clamp(ratio, 1-clip_eps, 1+clip_eps)\n  return -torch.min(ratio * advantages, clipped * advantages).mean()" },
+        { n: "04", title: "GAE + value function", desc: "Generalized Advantage Estimation reduces variance. Train critic to minimize MSE against TD targets. This stabilizes PPO.", code: "" }
+      ],
+      resources: [
+        { type: "paper", name: "Training Language Models to Follow Instructions with RLHF — InstructGPT", detail: "arxiv.org/abs/2203.02155" },
+        { type: "paper", name: "Proximal Policy Optimization — Schulman et al. 2017", detail: "arxiv.org/abs/1707.06347" },
+        { type: "repo", name: "huggingface/trl", detail: "github.com · PPOTrainer source is the reference" }
+      ],
+      difficulty: 4, hours: "50–80 hrs", lang: "Python/PyTorch"
+    }
+  },
+  {
+    id: 17, num: "17", tier: 2, cat: "arch",
+    title: "Small Language Model",
+    sub: "Train a real SLM end-to-end",
+    tagline: "Train a ~125M parameter GPT from data collection through pre-training to evaluation. This is the full lifecycle in miniature.",
+    stack: ["Python", "PyTorch", "A100/H100"],
+    time: "2–4 weeks",
+    deps: ["Transformer from Scratch", "Tokenizer"],
+    guide: {
+      overview: "Following nanoGPT and llm.c, train GPT-2 124M on FineWeb/OpenWebText. This gives you hands-on experience with every production concern: data pipeline, distributed training, eval, and iteration.",
+      steps: [
+        { n: "01", title: "Data pipeline", desc: "Download FineWeb-Edu (10B tokens). Tokenize with tiktoken. Shard into .bin files. DataLoader with shuffled shards, no full-dataset load.", code: "# Process in parallel shards\n# python fineweb.py --nprocs 8\n# Outputs: train_000000.bin ... train_000099.bin" },
+        { n: "02", title: "GPT-2 architecture", desc: "124M params: 12 layers, 12 heads, 768 d_model, 4096 d_ff. Pre-norm (GPT-2 uses post-norm; pre-norm is more stable). RoPE or learned PE.", code: "" },
+        { n: "03", title: "Training loop", desc: "AdamW with weight decay=0.1. Cosine LR decay with warmup. Gradient clipping at 1.0. FP16 + GradScaler. Log to W&B.", code: "optimizer = torch.optim.AdamW(\n  model.parameters(),\n  lr=6e-4, betas=(0.9, 0.95),\n  weight_decay=0.1\n)" },
+        { n: "04", title: "Eval: HellaSwag + validation loss", desc: "Run HellaSwag 0-shot every 500 steps. Track val loss. Compare to GPT-2 paper numbers.", code: "" }
+      ],
+      resources: [
+        { type: "repo", name: "karpathy/llm.c", detail: "github.com · Train GPT-2 in 1hr for ~$20" },
+        { type: "repo", name: "karpathy/nanoGPT", detail: "github.com · Python version, easier to modify" },
+        { type: "video", name: "Karpathy — Let's reproduce GPT-2", detail: "youtube.com · 4 hrs · End to end SLM training" }
+      ],
+      difficulty: 3, hours: "40–70 hrs", lang: "Python/PyTorch"
+    }
+  },
+  {
+    id: 18, num: "18", tier: 2, cat: "foundations",
+    title: "Matrix Multiplication Kernel",
+    sub: "Tiled GEMM optimization",
+    tagline: "Write CUDA SGEMM from scratch, progressively optimize with shared memory tiling, register blocking, and vectorized loads. Hit >80% of cuBLAS performance.",
+    stack: ["CUDA", "C++"],
+    time: "1–2 weeks",
+    deps: [],
+    guide: {
+      overview: "Everything in deep learning reduces to matrix multiplication. Understanding how to write an efficient GEMM teaches you GPU architecture: shared memory, warps, memory coalescing, and the roofline model.",
+      steps: [
+        { n: "01", title: "Naive CUDA GEMM", desc: "One thread per output element. Measure FLOPS. This is bandwidth-bound due to repeated HBM reads.", code: "__global__ void matmul_naive(\n    float* A, float* B, float* C,\n    int M, int N, int K) {\n  int row = blockIdx.y * blockDim.y + threadIdx.y;\n  int col = blockIdx.x * blockDim.x + threadIdx.x;\n  float sum = 0;\n  for (int k = 0; k < K; k++)\n    sum += A[row*K + k] * B[k*N + col];\n  C[row*N + col] = sum;\n}" },
+        { n: "02", title: "Shared memory tiling", desc: "Load 32×32 tiles of A and B into __shared__ memory. Threads in a block cooperate to load, then each computes its partial sum. 10-20x speedup.", code: "__shared__ float As[TILE][TILE];\n__shared__ float Bs[TILE][TILE];\n// Load tile, __syncthreads(), compute, repeat" },
+        { n: "03", title: "Register blocking + vectorized loads", desc: "Each thread computes a 4x4 output tile using registers. Use float4 loads for 128-bit memory transactions. Avoid bank conflicts.", code: "" },
+        { n: "04", title: "Benchmark vs cuBLAS", desc: "Use NVIDIA Nsight to profile. Target >80% of cuBLAS performance. Understand why the remaining gap exists.", code: "" }
+      ],
+      resources: [
+        { type: "blog", name: "CUDA Matrix Multiplication — Simon Boehm", detail: "siboehm.com/articles/22/CUDA-MMM · Best progressive tutorial" },
+        { type: "blog", name: "How to Optimize a CUDA Matmul Kernel — Lei Mao", detail: "leimao.github.io · Step-by-step" },
+        { type: "docs", name: "CUDA C++ Programming Guide", detail: "docs.nvidia.com · Memory model chapter essential" }
+      ],
+      difficulty: 4, hours: "30–50 hrs", lang: "CUDA/C++"
+    }
+  },
+  {
+    id: 19, num: "19", tier: 2, cat: "training",
+    title: "LoRA Trainer",
+    sub: "Low-Rank Adaptation",
+    tagline: "Implement LoRA: inject trainable low-rank matrices into attention layers, freeze base model. Add QLoRA (NF4 quantization + double quantization). Fine-tune on custom dataset.",
+    stack: ["Python", "PyTorch"],
+    time: "1 week",
+    deps: ["Transformer from Scratch"],
+    guide: {
+      overview: "LoRA (Hu et al., 2021) adds low-rank matrices ΔW = BA (where B ∈ R^{d×r}, A ∈ R^{r×k}, r << d,k) to frozen pre-trained weight matrices. Only B and A are trained, reducing trainable params by 10,000x.",
+      steps: [
+        { n: "01", title: "LoRA layer", desc: "Inject LoRA into W_q and W_v of attention. Forward: y = xW + x(BA) * (alpha/r). Init: A ~ N(0,σ), B = 0 (so ΔW=0 at init).", code: "class LoRALinear(nn.Module):\n  def __init__(self, linear, r=8, alpha=16):\n    self.linear = linear  # frozen\n    self.lora_A = nn.Parameter(torch.randn(linear.in_features, r) * 0.01)\n    self.lora_B = nn.Parameter(torch.zeros(r, linear.out_features))\n    self.scaling = alpha / r\n\n  def forward(self, x):\n    base = self.linear(x)  # frozen\n    lora = (x @ self.lora_A @ self.lora_B) * self.scaling\n    return base + lora" },
+        { n: "02", title: "Model injection + freezing", desc: "Walk model modules, replace target Linear layers with LoRALinear. Freeze all base parameters. Only LoRA params require grad.", code: "for name, module in model.named_modules():\n  if isinstance(module, nn.Linear) and 'q_proj' in name:\n    parent = get_parent(model, name)\n    setattr(parent, name.split('.')[-1], LoRALinear(module))" },
+        { n: "03", title: "QLoRA — quantized base", desc: "Load base model in NF4 4-bit precision (bitsandbytes). Adds double quantization (quantize the quantization constants). LoRA adapters stay in BF16.", code: "" },
+        { n: "04", title: "Merge + export", desc: "After training: W_merged = W + BA * scaling. Export as standard model. This is how merged HuggingFace models are produced.", code: "def merge_lora(model):\n  for module in model.modules():\n    if isinstance(module, LoRALinear):\n      module.linear.weight.data += (\n        module.lora_B @ module.lora_A\n      ).T * module.scaling" }
+      ],
+      resources: [
+        { type: "paper", name: "LoRA: Low-Rank Adaptation of Large Language Models — Hu et al. 2021", detail: "arxiv.org/abs/2106.09685 · Short and clear" },
+        { type: "paper", name: "QLoRA — Dettmers et al. 2023", detail: "arxiv.org/abs/2305.14314" },
+        { type: "repo", name: "microsoft/LoRA", detail: "github.com · Original implementation" }
+      ],
+      difficulty: 2, hours: "15–25 hrs", lang: "Python/PyTorch"
+    }
+  },
+  {
+    id: 20, num: "20", tier: 2, cat: "systems",
+    title: "Code Interpreter Sandbox",
+    sub: "Secure execution environment",
+    tagline: "Build an isolated code execution sandbox with resource limits, timeout enforcement, network isolation, and structured output capture. The engine behind Code Interpreter.",
+    stack: ["Python", "Docker", "seccomp"],
+    time: "1 week",
+    deps: ["ReAct Agent Loop"],
+    guide: {
+      overview: "Code interpreter agents need safe execution. Build a Docker-based sandbox with seccomp syscall filtering, memory/CPU limits, timeout via SIGKILL, stdout/stderr capture, and structured result extraction.",
+      steps: [
+        { n: "01", title: "Docker sandbox container", desc: "Minimal Python image. No network. Read-only filesystem except /tmp. Non-root user. Resource limits via Docker API.", code: "client.containers.run(\n  'python:3.11-slim',\n  command=f'python -c \"{code}\"',\n  network_disabled=True,\n  mem_limit='256m',\n  cpu_period=100000,\n  cpu_quota=50000,  # 50% of one CPU\n  user='nobody',\n  read_only=True,\n  tmpfs={'/tmp': 'size=64m'},\n  timeout=10\n)" },
+        { n: "02", title: "Timeout + resource enforcement", desc: "Enforce wall-clock timeout with threading.Timer. Catch memory OOM from Docker daemon. Parse exit codes.", code: "" },
+        { n: "03", title: "Structured output extraction", desc: "Parse stdout for serialized results. Support pandas DataFrames (to JSON), matplotlib figures (to base64 PNG), plain text.", code: "" },
+        { n: "04", title: "State persistence between turns", desc: "Serialize interpreter state between calls. Pickle namespace, or use a persistent container per session with exec().", code: "" }
+      ],
+      resources: [
+        { type: "docs", name: "Docker SDK for Python", detail: "docker-py.readthedocs.io" },
+        { type: "blog", name: "Building a Secure Code Execution Engine", detail: "How Anthropic/OpenAI approach sandbox security" },
+        { type: "docs", name: "seccomp — Docker security profiles", detail: "docs.docker.com/engine/security/seccomp" }
+      ],
+      difficulty: 3, hours: "20–35 hrs", lang: "Python/Docker"
+    }
+  },
+  {
+    id: 21, num: "21", tier: 3, cat: "training",
+    title: "DPO Loss Function",
+    sub: "Direct Preference Optimization",
+    tagline: "Implement DPO: skip the reward model entirely. Directly optimize policy to prefer chosen over rejected responses. Implement the closed-form loss and training loop.",
+    stack: ["Python", "PyTorch"],
+    time: "3–5 days",
+    deps: ["RLHF Pipeline"],
+    guide: {
+      overview: "DPO (Rafailov et al., 2023) shows that RLHF's RL stage can be skipped. The optimal policy can be expressed directly in terms of preference pairs. The loss trains the policy to relatively upweight chosen and downweight rejected vs the reference model.",
+      steps: [
+        { n: "01", title: "DPO derivation intuition", desc: "Start from RLHF objective: max E[r(x,y)] - β*KL(π||π_ref). DPO shows r*(x,y) = β*log(π*(y|x)/π_ref(y|x)) + Z(x). Substitute into Bradley-Terry.", code: "" },
+        { n: "02", title: "DPO loss implementation", desc: "L_DPO = -E[log σ(β*(log π(y_w|x) - log π_ref(y_w|x)) - (log π(y_l|x) - log π_ref(y_l|x)))]", code: "def dpo_loss(policy_chosen_logps, policy_rejected_logps,\n             ref_chosen_logps, ref_rejected_logps, beta=0.1):\n  chosen_rewards = beta * (policy_chosen_logps - ref_chosen_logps)\n  rejected_rewards = beta * (policy_rejected_logps - ref_rejected_logps)\n  losses = -F.logsigmoid(chosen_rewards - rejected_rewards)\n  return losses.mean(), chosen_rewards.mean(), rejected_rewards.mean()" },
+        { n: "03", title: "Log probability computation", desc: "Get per-token log probs from policy and reference. Sum over response tokens (not prompt). Handle padding correctly.", code: "def get_logprobs(model, input_ids, labels):\n  logits = model(input_ids).logits\n  logps = F.log_softmax(logits, dim=-1)\n  # Gather logps for actual tokens\n  return logps.gather(-1, labels.unsqueeze(-1)).squeeze(-1).sum(-1)" },
+        { n: "04", title: "Compare to PPO", desc: "Train on same dataset with DPO vs PPO. Compare reward model scores, human eval, and training stability. DPO is simpler but may underperform on complex tasks.", code: "" }
+      ],
+      resources: [
+        { type: "paper", name: "Direct Preference Optimization — Rafailov et al. 2023", detail: "arxiv.org/abs/2305.18290 · Very readable" },
+        { type: "repo", name: "eric-mitchell/direct-preference-optimization", detail: "github.com · Reference implementation" },
+        { type: "blog", name: "DPO vs RLHF — Sebastian Raschka", detail: "magazine.sebastianraschka.com · Clear comparison" }
+      ],
+      difficulty: 3, hours: "20–30 hrs", lang: "Python/PyTorch"
+    }
+  },
+  {
+    id: 22, num: "22", tier: 3, cat: "rag",
+    title: "Graph RAG System",
+    sub: "Knowledge graph + vector retrieval",
+    tagline: "Extract entities and relations into a knowledge graph. Combine graph traversal with vector similarity for multi-hop reasoning. Implement community detection for summarization.",
+    stack: ["Python", "Neo4j", "spaCy", "NetworkX"],
+    time: "1–2 weeks",
+    deps: ["RAG Pipeline", "Knowledge Graph Builder"],
+    guide: {
+      overview: "Microsoft's GraphRAG (2024) showed that adding graph structure to RAG dramatically improves global question answering. Build the entity extraction pipeline, knowledge graph, community detection, and hybrid graph+vector retrieval.",
+      steps: [
+        { n: "01", title: "Entity + relation extraction", desc: "Use LLM or spaCy to extract (entity, relation, entity) triples from text chunks. Deduplicate and normalize entities.", code: "EXTRACT_PROMPT = \"\"\"\nExtract all entities and relationships.\nOutput JSON: {\"entities\": [...], \"relations\": [{\"from\": , \"rel\": , \"to\": }]}\nText: {text}\n\"\"\"" },
+        { n: "02", title: "Knowledge graph construction", desc: "Store in Neo4j or NetworkX. Entity nodes with embeddings. Relation edges with type and weight. Connect to source chunk IDs.", code: "" },
+        { n: "03", title: "Community detection (Leiden/Louvain)", desc: "Find clusters of tightly related entities. Generate LLM summaries for each community. Store as high-level nodes.", code: "import networkx as nx\ncommunities = nx.community.louvain_communities(G)\nfor community in communities:\n  nodes = list(community)\n  summary = llm_summarize(get_subgraph(G, nodes))" },
+        { n: "04", title: "Hybrid graph + vector retrieval", desc: "Local search: vector similarity for entities + graph neighborhood expansion. Global search: community summaries for broad questions.", code: "" }
+      ],
+      resources: [
+        { type: "paper", name: "From Local to Global: A GraphRAG Approach to Query-Focused Summarization", detail: "arxiv.org/abs/2404.16130 · Microsoft 2024" },
+        { type: "repo", name: "microsoft/graphrag", detail: "github.com · Official GraphRAG implementation" },
+        { type: "blog", name: "Neo4j GraphRAG Python package", detail: "neo4j.com/docs/neo4j-graphrag-python" }
+      ],
+      difficulty: 3, hours: "30–50 hrs", lang: "Python"
+    }
+  },
+  {
+    id: 23, num: "23", tier: 3, cat: "optim",
+    title: "Model Merger",
+    sub: "SLERP / Model Soups",
+    tagline: "Merge multiple fine-tuned models into one. Implement linear interpolation (Model Soups), spherical linear interpolation (SLERP), and TIES merging with task vectors.",
+    stack: ["Python", "PyTorch"],
+    time: "3–5 days",
+    deps: ["LoRA Trainer"],
+    guide: {
+      overview: "Model merging combines multiple specialized models without retraining. Model Soups (Wortsman et al.) average weights. SLERP interpolates on the unit sphere. TIES (Yadav et al.) handles conflicting signs. These techniques power the open-source model community.",
+      steps: [
+        { n: "01", title: "Model Soups — linear averaging", desc: "Average weights of models fine-tuned from the same base. Works best when models are similar (same architecture, close task distribution).", code: "def model_soup(models, weights=None):\n  if weights is None:\n    weights = [1/len(models)] * len(models)\n  merged = {}\n  for key in models[0].state_dict():\n    merged[key] = sum(w * m.state_dict()[key]\n                      for w, m in zip(weights, models))\n  return merged" },
+        { n: "02", title: "Task vectors + TIES", desc: "Task vector = fine_tuned_weights - base_weights. TIES: trim low-magnitude values, resolve sign conflicts by majority vote, merge remaining.", code: "def task_vector(base, finetuned):\n  return {k: finetuned[k] - base[k] for k in base}\n\ndef ties_merge(base, task_vecs, density=0.2):\n  # 1. Trim: keep top-density fraction by magnitude\n  # 2. Elect: majority sign per parameter\n  # 3. Disjoint merge: apply elected signs\n  pass" },
+        { n: "03", title: "SLERP — spherical interpolation", desc: "Interpolate along the great circle on the hypersphere. Preserves relative magnitudes better than linear. Used for smooth model blending.", code: "def slerp(v0, v1, t):\n  v0_n = v0 / v0.norm()\n  v1_n = v1 / v1.norm()\n  omega = torch.acos(torch.clamp((v0_n * v1_n).sum(), -1, 1))\n  if omega.abs() < 1e-6: return (1-t)*v0 + t*v1\n  return (torch.sin((1-t)*omega)/torch.sin(omega))*v0 + \\\n         (torch.sin(t*omega)/torch.sin(omega))*v1" },
+        { n: "04", title: "Eval merged model", desc: "Evaluate on tasks from all source models. Plot Pareto frontier of task performance vs interpolation coefficient.", code: "" }
+      ],
+      resources: [
+        { type: "paper", name: "Model Soups — Wortsman et al. 2022", detail: "arxiv.org/abs/2203.05482" },
+        { type: "paper", name: "TIES-Merging — Yadav et al. 2023", detail: "arxiv.org/abs/2306.01708" },
+        { type: "repo", name: "arcee-ai/mergekit", detail: "github.com · Production merging library" }
+      ],
+      difficulty: 2, hours: "15–25 hrs", lang: "Python/PyTorch"
+    }
+  },
+  {
+    id: 24, num: "24", tier: 4, cat: "arch",
+    title: "Sparse Autoencoder",
+    sub: "Interpretability tool (SAE)",
+    tagline: "Train sparse autoencoders on LLM activations to find interpretable features. Implement the overcomplete dictionary learning with L1 sparsity penalty.",
+    stack: ["Python", "PyTorch"],
+    time: "2 weeks",
+    deps: ["Transformer from Scratch", "Autograd Engine"],
+    guide: {
+      overview: "SAEs (Cunningham et al., 2023; Anthropic, 2024) decompose LLM residual stream activations into interpretable features. Train an overcomplete autoencoder (dict size >> activation dim) with L1 penalty. Each latent corresponds to an interpretable concept.",
+      steps: [
+        { n: "01", title: "Collect activations", desc: "Hook into LLM residual stream at specific layers. Collect large dataset of activation vectors (millions of tokens). Normalize by running mean/std.", code: "activations = []\ndef hook(module, input, output):\n  activations.append(output.detach().cpu())\nmodel.transformer.h[8].register_forward_hook(hook)" },
+        { n: "02", title: "SAE architecture", desc: "Encoder: W_enc ∈ R^{d_act × d_dict}, bias, ReLU. Decoder: W_dec (unit-normed columns). L_SAE = ||x - x_hat||² + λ||f||₁", code: "class SAE(nn.Module):\n  def __init__(self, d_act, d_dict, l1_coef=1e-3):\n    self.W_enc = nn.Linear(d_act, d_dict)\n    self.W_dec = nn.Linear(d_dict, d_act, bias=False)\n    self.l1_coef = l1_coef\n\n  def forward(self, x):\n    f = F.relu(self.W_enc(x))  # sparse features\n    x_hat = self.W_dec(f)\n    loss = (x - x_hat).pow(2).mean() + self.l1_coef * f.abs().mean()\n    return f, x_hat, loss" },
+        { n: "03", title: "Dead feature handling", desc: "Many features die (never activate). Use auxiliary loss to revive them. Track feature activation frequency; reset dead features to data points.", code: "" },
+        { n: "04", title: "Feature interpretation", desc: "Find max-activating examples per feature. Use LLM to label features. Look for monosemantic features (one concept) vs polysemantic.", code: "" }
+      ],
+      resources: [
+        { type: "paper", name: "Towards Monosemanticity — Anthropic 2023", detail: "transformer-circuits.pub/2023/monosemantic-features" },
+        { type: "paper", name: "Scaling and Evaluating Sparse Autoencoders — Gao et al. Anthropic 2024", detail: "arxiv.org/abs/2406.04093" },
+        { type: "repo", name: "EleutherAI/sae — SAE training codebase", detail: "github.com/EleutherAI/sae" }
+      ],
+      difficulty: 4, hours: "40–60 hrs", lang: "Python/PyTorch"
+    }
+  },
+  {
+    id: 25, num: "25", tier: 2, cat: "data",
+    title: "Synthetic Data Generator",
+    sub: "LLM-based dataset creation",
+    tagline: "Build a pipeline that generates high-quality training data: seed prompts, self-instruct, evol-instruct, quality filtering, deduplication, and format conversion.",
+    stack: ["Python", "LLM API"],
+    time: "1 week",
+    deps: ["ReAct Agent Loop"],
+    guide: {
+      overview: "Synthetic data is how Alpaca, Vicuna, and Phi-2 were trained. Implement Self-Instruct (generate diverse instruction-following pairs from seeds), Evol-Instruct (iteratively make instructions harder), and quality filtering with LLM judges.",
+      steps: [
+        { n: "01", title: "Self-Instruct pipeline", desc: "Start with 175 seed tasks. Sample 6 examples from pool, ask LLM to generate a new task. Filter similar to existing (ROUGE-L threshold). Repeat until target count.", code: "def self_instruct_prompt(seed_tasks, n_demos=6):\n  demos = random.sample(seed_tasks, n_demos)\n  prompt = \"Here are diverse task instructions:\\n\"\n  for i, task in enumerate(demos, 1):\n    prompt += f\"{i}. Instruction: {task['instruction']}\\n\"\n  prompt += f\"{n_demos+1}. Instruction:\"\n  return prompt" },
+        { n: "02", title: "Evol-Instruct", desc: "Take existing instruction, prompt LLM to make it harder (add constraints, increase steps, require domain knowledge). Repeat 2-3 generations.", code: "" },
+        { n: "03", title: "Quality filtering", desc: "LLM judge: 1-5 score on instruction clarity, response quality, factual accuracy. Filter below 3.5. Dedup with MinHash or ROUGE-L.", code: "" },
+        { n: "04", title: "Output format pipeline", desc: "Convert to ShareGPT / Alpaca / ChatML format. Split train/eval. Validate schema. Compute statistics.", code: "" }
+      ],
+      resources: [
+        { type: "paper", name: "Self-Instruct — Wang et al. 2022", detail: "arxiv.org/abs/2212.10560" },
+        { type: "paper", name: "WizardLM: Evol-Instruct", detail: "arxiv.org/abs/2304.12244" },
+        { type: "repo", name: "argilla-io/distilabel", detail: "github.com · Production synthetic data pipelines" }
+      ],
+      difficulty: 2, hours: "15–25 hrs", lang: "Python"
+    }
+  },
+  {
+    id: 26, num: "26", tier: 2, cat: "rag",
+    title: "Function Calling Router",
+    sub: "Structured tool dispatch",
+    tagline: "Build a router that parses LLM tool calls, validates against JSON schemas, dispatches to registered functions, handles errors, and supports parallel tool calls.",
+    stack: ["Python", "Pydantic"],
+    time: "3–5 days",
+    deps: ["ReAct Agent Loop"],
+    guide: {
+      overview: "Function calling (OpenAI's tool use spec) requires: defining tools as JSON schemas, parsing LLM tool_call messages, validating parameters with Pydantic, dispatching to Python functions, and returning structured ToolMessage results.",
+      steps: [
+        { n: "01", title: "Tool definition DSL", desc: "Decorator-based tool registration. Introspect Python type hints and docstrings to auto-generate JSON schema.", code: "@tool\ndef search_papers(query: str, max_results: int = 5) -> list[dict]:\n  \"\"\"Search academic papers by semantic query.\"\"\"\n  return vector_search(query, k=max_results)\n\n# Auto-generates:\n# {\"name\": \"search_papers\",\n#  \"description\": \"Search academic papers...\",\n#  \"parameters\": {\"query\": {\"type\": \"string\"}, ...}}" },
+        { n: "02", title: "Tool call parsing", desc: "Parse OpenAI-format tool_calls from assistant message. Extract function name and JSON arguments. Handle streaming (partial JSON).", code: "" },
+        { n: "03", title: "Pydantic validation", desc: "Validate extracted arguments against Pydantic model derived from function signature. Return structured validation errors as ToolMessage for self-correction.", code: "" },
+        { n: "04", title: "Parallel execution", desc: "Multiple tool calls in one turn: dispatch with asyncio.gather. Preserve tool_call_id for result mapping.", code: "async def execute_parallel(tool_calls, registry):\n  tasks = [registry.run(tc.function.name, tc.function.arguments)\n           for tc in tool_calls]\n  results = await asyncio.gather(*tasks, return_exceptions=True)\n  return [ToolMessage(content=r, tool_call_id=tc.id)\n          for tc, r in zip(tool_calls, results)]" }
+      ],
+      resources: [
+        { type: "docs", name: "OpenAI Function Calling Guide", detail: "platform.openai.com/docs/guides/function-calling" },
+        { type: "repo", name: "langchain-ai/langchain — Tool source", detail: "github.com · @tool decorator implementation" },
+        { type: "docs", name: "Pydantic v2 docs", detail: "docs.pydantic.dev · Validation patterns" }
+      ],
+      difficulty: 2, hours: "12–20 hrs", lang: "Python"
+    }
+  },
+  {
+    id: 27, num: "27", tier: 3, cat: "arch",
+    title: "Structured Output Parser",
+    sub: "Context Free Grammars + constrained sampling",
+    tagline: "Constrain LLM token sampling to valid JSON/SQL/code using CFGs. Implement the grammar-guided logit masking at each generation step.",
+    stack: ["Python", "LARK", "vLLM"],
+    time: "1 week",
+    deps: ["Inference Server", "Logit Processor"],
+    guide: {
+      overview: "Structured generation (outlines, instructor) ensures LLMs always produce valid JSON/SQL by masking invalid tokens at each step. Requires parsing the partial output as a CFG prefix and determining which tokens can legally follow.",
+      steps: [
+        { n: "01", title: "JSON schema → FSM", desc: "Convert JSON schema to finite state machine. States represent valid parse positions. Transitions labeled by valid tokens.", code: "from outlines.fsm.guide import RegexGuide\n# Or build your own:\n# Schema {\"type\": \"object\", \"properties\": {\"name\": {\"type\": \"string\"}}}\n# → regex: \\{\\s*\"name\"\\s*:\\s*\"[^\"]*\"\\s*\\}" },
+        { n: "02", title: "Incremental parsing", desc: "At each generation step, advance FSM state with the sampled token. Compute valid next tokens from current FSM state.", code: "" },
+        { n: "03", title: "Logit masking", desc: "Set logits of invalid tokens to -inf before sampling. This guarantees valid output without any post-processing.", code: "def mask_logits(logits, valid_token_ids):\n  mask = torch.full_like(logits, float('-inf'))\n  mask[..., valid_token_ids] = 0\n  return logits + mask" },
+        { n: "04", title: "SQL + code grammars", desc: "Define SQL grammar in LARK. Use Earley parser for incremental CFG parsing. Apply same logit masking approach.", code: "" }
+      ],
+      resources: [
+        { type: "paper", name: "Efficient Guided Generation for LLMs — Willard & Louf 2023", detail: "arxiv.org/abs/2307.09702 · outlines paper" },
+        { type: "repo", name: "outlines-dev/outlines", detail: "github.com · Production CFG-guided generation" },
+        { type: "repo", name: "jxnl/instructor", detail: "github.com · Pydantic-based structured outputs" }
+      ],
+      difficulty: 3, hours: "25–40 hrs", lang: "Python"
+    }
+  },
+  {
+    id: 28, num: "28", tier: 3, cat: "multimodal",
+    title: "Multi-modal Projector",
+    sub: "CLIP implementation",
+    tagline: "Implement CLIP's contrastive image-text pretraining. Build the vision encoder (ViT), text encoder, and the InfoNCE contrastive loss that aligns them.",
+    stack: ["Python", "PyTorch"],
+    time: "2 weeks",
+    deps: ["Transformer from Scratch", "Vision Transformer"],
+    guide: {
+      overview: "CLIP (Radford et al., 2021) trains a vision encoder and text encoder jointly using contrastive loss on 400M image-text pairs. The resulting embeddings enable zero-shot classification and underpin GPT-4V, LLaVA, and Stable Diffusion.",
+      steps: [
+        { n: "01", title: "Vision encoder (ViT-B/32)", desc: "Patch images into 14×14 patches → linear embedding → transformer. Add [CLS] token. Project to 512-dim CLIP space.", code: "class VisionEncoder(nn.Module):\n  def __init__(self, img_size=224, patch_size=32, d_model=768):\n    self.patch_embed = nn.Conv2d(3, d_model, patch_size, patch_size)\n    self.cls_token = nn.Parameter(torch.randn(1,1,d_model))\n    self.transformer = TransformerEncoder(d_model, 12, 12)\n    self.proj = nn.Linear(d_model, 512)" },
+        { n: "02", title: "Text encoder", desc: "Byte-pair tokenizer (same as GPT-2). Causal transformer (not bidirectional). [EOS] token's embedding projected to 512-dim.", code: "" },
+        { n: "03", title: "InfoNCE contrastive loss", desc: "N image-text pairs. Similarity matrix: S = I_emb @ T_emb^T. Loss: cross-entropy over diagonal (each image matches its text and vice versa).", code: "def clip_loss(image_emb, text_emb, temp=0.07):\n  # Normalize embeddings\n  I = F.normalize(image_emb, dim=-1)\n  T = F.normalize(text_emb, dim=-1)\n  # Similarity matrix scaled by temperature\n  logits = (I @ T.T) / temp\n  N = logits.size(0)\n  labels = torch.arange(N, device=logits.device)\n  loss_i = F.cross_entropy(logits, labels)\n  loss_t = F.cross_entropy(logits.T, labels)\n  return (loss_i + loss_t) / 2" },
+        { n: "04", title: "Zero-shot classification", desc: "Embed class names as text ('a photo of a {class}'). Compute cosine similarity to image embeddings. Argmax = prediction.", code: "" }
+      ],
+      resources: [
+        { type: "paper", name: "Learning Transferable Visual Models from Natural Language Supervision (CLIP) — Radford et al. 2021", detail: "arxiv.org/abs/2103.00020" },
+        { type: "repo", name: "openai/CLIP", detail: "github.com · Official implementation" },
+        { type: "blog", name: "CLIP explained visually — Lilian Weng", detail: "lilianweng.github.io/posts/2021-05-31-contrastive" }
+      ],
+      difficulty: 3, hours: "30–50 hrs", lang: "Python/PyTorch"
+    }
+  },
+  {
+    id: 29, num: "29", tier: 2, cat: "systems",
+    title: "LLM Eval Harness",
+    sub: "Benchmarking framework",
+    tagline: "Build an evaluation framework: multiple choice (MMLU), generation (GSM8K), classification (BBH). Implement LLM-as-judge for open-ended tasks.",
+    stack: ["Python", "LLM API"],
+    time: "1 week",
+    deps: ["Chain of Thought Reasoner"],
+    guide: {
+      overview: "EleutherAI's lm-evaluation-harness is the standard. Build your own to understand: how benchmarks work, prompt formatting variations, answer extraction, metric computation, and LLM-as-judge for subjective tasks.",
+      steps: [
+        { n: "01", title: "Task abstraction", desc: "Task = dataset + prompt template + output parser + metric. Multiple choice: log-prob scoring. Generation: string match / regex. Code: execution-based.", code: "@dataclass\nclass Task:\n  name: str\n  dataset: str\n  prompt_fn: Callable  # row -> str\n  parse_fn: Callable   # response -> str\n  metric_fn: Callable  # (prediction, gold) -> float" },
+        { n: "02", title: "Log-prob scoring (MMLU-style)", desc: "For each choice, compute log P(choice | context). Select argmax. More reliable than generation for multiple choice.", code: "def score_choice(model, context, choice):\n  input_ids = tokenizer(context + choice)\n  with torch.no_grad():\n    logits = model(input_ids).logits\n  # Sum log probs over choice tokens\n  return log_prob_sum(logits, input_ids, len(context))" },
+        { n: "03", title: "LLM-as-judge", desc: "For open-ended tasks: prompt judge LLM with question + candidate answer + reference. Score 1-10. Account for position bias by swapping order.", code: "JUDGE_PROMPT = \"\"\"\n[Question] {question}\n[Reference] {reference}\n[Response] {response}\nRate the response 1-10 for accuracy and completeness. Output only JSON: {{\"score\": N}}\n\"\"\"" },
+        { n: "04", title: "Parallel eval + results aggregation", desc: "Run tasks in parallel with asyncio. Bootstrap confidence intervals. Export to JSON/CSV. Compare across model checkpoints.", code: "" }
+      ],
+      resources: [
+        { type: "repo", name: "EleutherAI/lm-evaluation-harness", detail: "github.com · The reference implementation" },
+        { type: "paper", name: "Judging LLM-as-a-Judge with MT-Bench — Zheng et al. 2023", detail: "arxiv.org/abs/2306.05685" },
+        { type: "blog", name: "MMLU — Measuring Massive Multitask Language Understanding", detail: "arxiv.org/abs/2009.03300" }
+      ],
+      difficulty: 2, hours: "20–30 hrs", lang: "Python"
+    }
+  },
+  {
+    id: 30, num: "30", tier: 2, cat: "systems",
+    title: "Guardrails System",
+    sub: "Input / Output filtering",
+    tagline: "Build multi-layer safety: intent classification, prompt injection detection, PII redaction, output toxicity scoring, and automated red-teaming.",
+    stack: ["Python", "transformers"],
+    time: "1 week",
+    deps: ["LLM Eval Harness"],
+    guide: {
+      overview: "Production AI systems need defense in depth. Build: input layer (intent classification, injection detection, PII), output layer (toxicity, hallucination detection, citation grounding), and an automated red-team loop.",
+      steps: [
+        { n: "01", title: "Intent classifier", desc: "Fine-tune a small classifier (or use LLM) on harm taxonomy: safe, jailbreak, PII request, off-topic, competitor mention. Latency-sensitive: < 50ms.", code: "CATEGORIES = ['safe', 'jailbreak_attempt', 'pii_request',\n              'harmful_content', 'off_topic']\n# Use zero-shot: prompt GPT-4 or fine-tune DeBERTa" },
+        { n: "02", title: "Prompt injection detection", desc: "Detect attempts to override system prompt. Instruction hierarchy: system > user. Heuristics: 'ignore previous', 'new instructions', base64 encoded payloads.", code: "" },
+        { n: "03", title: "PII detection + redaction", desc: "Named entity recognition for PII: SSN, credit cards, emails, phone numbers. Regex + NER ensemble. Redact before logging, optional redact in response.", code: "import spacy\nfrom presidio_analyzer import AnalyzerEngine\nanalyzer = AnalyzerEngine()\nresults = analyzer.analyze(text=text, language='en')" },
+        { n: "04", title: "Output toxicity + hallucination", desc: "Toxicity: fine-tuned DeBERTa classifier. Hallucination: check claims against retrieved context, flag ungrounded statements.", code: "" }
+      ],
+      resources: [
+        { type: "repo", name: "guardrails-ai/guardrails", detail: "github.com · Production guardrails framework" },
+        { type: "repo", name: "microsoft/presidio", detail: "github.com · PII detection" },
+        { type: "paper", name: "LlamaGuard — Inan et al. 2023", detail: "arxiv.org/abs/2312.06674" }
+      ],
+      difficulty: 2, hours: "20–30 hrs", lang: "Python"
+    }
+  },
+  {
+    id: 31, num: "31", tier: 2, cat: "optim",
+    title: "Prompt Cache",
+    sub: "KV cache reuse mechanism",
+    tagline: "Cache KV states for repeated prompt prefixes. Implement exact prefix matching and semantic prefix caching with vector similarity. Measure cache hit rates and latency reduction.",
+    stack: ["Python", "Redis"],
+    time: "3–5 days",
+    deps: ["KV Cache Paging"],
+    guide: {
+      overview: "Repeated system prompts, RAG contexts, or few-shot examples can be precomputed and cached. Anthropic's Prompt Caching reduces cost by 90% for repeated prefixes. Build exact-match and semantic-match caching layers.",
+      steps: [
+        { n: "01", title: "Exact prefix cache", desc: "Hash prefix tokens. Store (prefix_hash → KV_state). On hit, initialize generation from cached KV state. LRU eviction.", code: "class PrefixCache:\n  def __init__(self, max_entries=1000):\n    self.cache = OrderedDict()  # LRU\n  \n  def get(self, prefix_tokens):\n    key = hash(tuple(prefix_tokens))\n    if key in self.cache:\n      self.cache.move_to_end(key)\n      return self.cache[key]\n    return None" },
+        { n: "02", title: "Semantic prefix matching", desc: "Embed the prompt prefix. On new request, find nearest cached prefix with cosine similarity > threshold. Use that KV state if semantically close enough.", code: "" },
+        { n: "03", title: "Distributed cache with Redis", desc: "Serialize KV states as compressed tensors. Store in Redis with TTL. Multi-server inference can share the cache.", code: "" },
+        { n: "04", title: "Cache warming", desc: "Pre-populate cache with common system prompts, RAG templates, few-shot examples. Measure hit rate and TTFT improvement.", code: "" }
+      ],
+      resources: [
+        { type: "docs", name: "Anthropic Prompt Caching docs", detail: "docs.anthropic.com/en/docs/build-with-claude/prompt-caching" },
+        { type: "blog", name: "Prefix caching in vLLM", detail: "docs.vllm.ai/en/latest/automatic_prefix_caching" }
+      ],
+      difficulty: 2, hours: "15–25 hrs", lang: "Python"
+    }
+  },
+  {
+    id: 32, num: "32", tier: 3, cat: "multimodal",
+    title: "Diffusion Model",
+    sub: "UNet + DDPM scheduler",
+    tagline: "Implement DDPM from scratch: forward noising process, UNet denoiser with attention, and denoising score matching loss. Generate MNIST or CIFAR images.",
+    stack: ["Python", "PyTorch"],
+    time: "2 weeks",
+    deps: ["Transformer from Scratch"],
+    guide: {
+      overview: "Diffusion models (Ho et al., 2020) define a forward process that gradually adds Gaussian noise, then train a neural network to denoise. At inference, start from pure noise and denoise step by step. The UNet architecture with skip connections is the standard denoiser.",
+      steps: [
+        { n: "01", title: "Forward noising process", desc: "Define variance schedule β_1,...,β_T. Sample noisy image: x_t = sqrt(ᾱ_t)*x_0 + sqrt(1-ᾱ_t)*ε, where ε~N(0,I). This allows sampling any t in one step.", code: "def q_sample(x0, t, noise):\n  sqrt_alpha_bar = alphas_bar_sqrt[t].view(-1,1,1,1)\n  sqrt_one_minus = alphas_bar_sqrt_m1[t].view(-1,1,1,1)\n  return sqrt_alpha_bar * x0 + sqrt_one_minus * noise" },
+        { n: "02", title: "UNet denoiser", desc: "Encoder: ResNet blocks with downsampling. Bottleneck: self-attention. Decoder: ResNet blocks with upsampling + skip connections. Time embedding: sinusoidal → MLP → scale+shift.", code: "" },
+        { n: "03", title: "Training objective", desc: "Simple noise prediction loss: L = E[||ε - ε_θ(x_t, t)||²]. Predict the noise that was added, not the denoised image directly.", code: "def training_step(x0):\n  t = torch.randint(0, T, (B,))\n  eps = torch.randn_like(x0)\n  xt = q_sample(x0, t, eps)\n  eps_pred = model(xt, t)\n  return F.mse_loss(eps, eps_pred)" },
+        { n: "04", title: "DDIM sampler", desc: "DDIM (Song et al.) achieves same quality in 20-50 steps vs DDPM's 1000. Implement deterministic sampling for faster inference.", code: "" }
+      ],
+      resources: [
+        { type: "paper", name: "Denoising Diffusion Probabilistic Models — Ho et al. 2020", detail: "arxiv.org/abs/2006.11239" },
+        { type: "paper", name: "DDIM — Song et al. 2020", detail: "arxiv.org/abs/2010.02502" },
+        { type: "blog", name: "The Illustrated Diffusion — Jay Alammar", detail: "jalammar.github.io · Best visual explanation" }
+      ],
+      difficulty: 3, hours: "35–55 hrs", lang: "Python/PyTorch"
+    }
+  },
+  {
+    id: 33, num: "33", tier: 2, cat: "multimodal",
+    title: "Vision Transformer",
+    sub: "ViT from scratch",
+    tagline: "Split images into patches, linearly embed each patch, feed into a standard Transformer encoder. Add [CLS] token for classification. Train on CIFAR-10.",
+    stack: ["Python", "PyTorch"],
+    time: "1 week",
+    deps: ["Transformer from Scratch"],
+    guide: {
+      overview: "ViT (Dosovitskiy et al., 2020) applies the Transformer directly to image patches with minimal modifications. It outperforms CNNs when trained on large datasets and is the foundation of all modern vision models.",
+      steps: [
+        { n: "01", title: "Patch embedding", desc: "Divide image into P×P patches. Linear projection: each patch → d_model vector. Add learnable [CLS] token and positional embeddings.", code: "class PatchEmbed(nn.Module):\n  def __init__(self, img_size=224, patch_size=16, d_model=768):\n    n_patches = (img_size // patch_size) ** 2\n    self.proj = nn.Conv2d(3, d_model, patch_size, patch_size)\n    self.cls = nn.Parameter(torch.zeros(1, 1, d_model))\n    self.pos_embed = nn.Parameter(torch.zeros(1, n_patches+1, d_model))\n\n  def forward(self, x):\n    x = self.proj(x).flatten(2).transpose(1,2)  # (B,N,d)\n    cls = self.cls.expand(x.shape[0], -1, -1)\n    return torch.cat([cls, x], dim=1) + self.pos_embed" },
+        { n: "02", title: "Standard Transformer encoder", desc: "Reuse your Transformer encoder from scratch. The only ViT-specific change is the patch embedding and no masking.", code: "" },
+        { n: "03", title: "Classification head", desc: "Take [CLS] token output → LayerNorm → Linear → logits. Alternatively use global average pooling of all patch tokens.", code: "" },
+        { n: "04", title: "Data augmentation + training", desc: "Mixup, CutMix, RandAugment. Warmup + cosine decay. ViT needs more data than CNNs — use ImageNet21k pre-training if available.", code: "" }
+      ],
+      resources: [
+        { type: "paper", name: "An Image is Worth 16x16 Words — Dosovitskiy et al. 2020", detail: "arxiv.org/abs/2010.11929" },
+        { type: "repo", name: "lucidrains/vit-pytorch", detail: "github.com · Clean ViT implementation" },
+        { type: "blog", name: "Visual Guide to ViT — Pinecone", detail: "pinecone.io/learn/series/image-search/vision-transformers" }
+      ],
+      difficulty: 2, hours: "20–30 hrs", lang: "Python/PyTorch"
+    }
+  },
+  {
+    id: 34, num: "34", tier: 3, cat: "multimodal",
+    title: "Whisper-style ASR",
+    sub: "Speech recognition model",
+    tagline: "Implement log-mel spectrogram extraction, convolutional encoder, transformer decoder, and sequence-to-sequence training on LibriSpeech or Common Voice.",
+    stack: ["Python", "PyTorch", "torchaudio"],
+    time: "2–3 weeks",
+    deps: ["Transformer from Scratch", "Vision Transformer"],
+    guide: {
+      overview: "Whisper (Radford et al., 2022) is a seq2seq Transformer trained on 680k hours of diverse audio. The encoder processes log-mel spectrograms via Conv layers + Transformer. The decoder generates transcriptions autoregressively.",
+      steps: [
+        { n: "01", title: "Log-mel spectrogram", desc: "25ms windows, 10ms hop. 80 mel filterbanks. Log compression. Normalize to zero mean unit variance. Pad/trim to 30s.", code: "def log_mel_spectrogram(audio, n_mels=80, n_fft=400):\n  stft = torch.stft(audio, n_fft, hop_length=160, win_length=400)\n  magnitudes = stft[..., :-1].pow(2).sum(-1)\n  mel_filters = torchaudio.functional.melscale_fbanks(201, 0, 8000, n_mels, 16000)\n  mel_spec = mel_filters @ magnitudes\n  return torch.log10(torch.clamp(mel_spec, min=1e-10))" },
+        { n: "02", title: "Audio encoder", desc: "Two Conv1d layers (stride 1 and 2) → GELU → Transformer encoder. Output: sequence of audio features.", code: "" },
+        { n: "03", title: "Text decoder + cross-attention", desc: "Standard causal Transformer decoder with cross-attention over encoder outputs. Predict tokens autoregressively. Special tokens: <|startoftranscript|>, <|en|>, <|transcribe|>.", code: "" },
+        { n: "04", title: "Training + WER evaluation", desc: "Cross-entropy loss on text tokens. Evaluate with Word Error Rate (WER). Beam search decoding for best accuracy.", code: "" }
+      ],
+      resources: [
+        { type: "paper", name: "Robust Speech Recognition via Large-Scale Weak Supervision (Whisper) — Radford et al. 2022", detail: "arxiv.org/abs/2212.04356" },
+        { type: "repo", name: "openai/whisper", detail: "github.com · Official implementation" },
+        { type: "repo", name: "karpathy/whisper.cpp port", detail: "Study the architecture simplifications" }
+      ],
+      difficulty: 3, hours: "35–55 hrs", lang: "Python/PyTorch"
+    }
+  },
+  {
+    id: 35, num: "35", tier: 2, cat: "multimodal",
+    title: "Text-to-Speech Pipeline",
+    sub: "Neural TTS system",
+    tagline: "Build a TTS pipeline: text normalization, phoneme conversion, acoustic model (FastSpeech2-style), and vocoder (HiFi-GAN). Synthesize clean speech from arbitrary text.",
+    stack: ["Python", "PyTorch"],
+    time: "2–3 weeks",
+    deps: ["Vision Transformer"],
+    guide: {
+      overview: "Modern TTS has three stages: frontend (text → phonemes), acoustic model (phonemes → mel spectrogram), vocoder (mel → waveform). Build each stage, connecting them into a production pipeline.",
+      steps: [
+        { n: "01", title: "Frontend: text normalization", desc: "Expand abbreviations, numbers (TTS: text-to-speech → tee tee ess). G2P (grapheme-to-phoneme) using CMU dict or neural G2P. Produce phoneme sequence.", code: "" },
+        { n: "02", title: "Acoustic model (FastSpeech2)", desc: "Non-autoregressive transformer. Duration predictor (align phonemes to frames). Pitch + energy predictors. Outputs mel spectrogram in one forward pass.", code: "" },
+        { n: "03", title: "HiFi-GAN vocoder", desc: "GAN-based: generator (upsampling conv) + multi-scale discriminator. Converts mel spectrogram to 22kHz waveform. Near real-time on CPU.", code: "" },
+        { n: "04", title: "VITS — end-to-end alternative", desc: "VAE + normalizing flows + GAN: train text→waveform end-to-end. Better prosody than two-stage systems.", code: "" }
+      ],
+      resources: [
+        { type: "paper", name: "FastSpeech 2 — Ren et al. 2020", detail: "arxiv.org/abs/2006.04558" },
+        { type: "paper", name: "HiFi-GAN — Kong et al. 2020", detail: "arxiv.org/abs/2010.05646" },
+        { type: "repo", name: "coqui-ai/TTS", detail: "github.com · Production TTS with all architectures" }
+      ],
+      difficulty: 3, hours: "40–60 hrs", lang: "Python/PyTorch"
+    }
+  },
+  {
+    id: 36, num: "36", tier: 2, cat: "rag",
+    title: "Semantic Router",
+    sub: "Intent-based request routing",
+    tagline: "Build a semantic router that classifies queries by intent and routes to specialized handlers, models, or pipelines without a round-trip to an LLM.",
+    stack: ["Python", "embeddings"],
+    time: "3–5 days",
+    deps: ["Vector Database"],
+    guide: {
+      overview: "Semantic routing (as in aurelio-ai/semantic-router) uses embedding cosine similarity to classify user intent and route to the right handler. Much faster than LLM classification (~5ms vs ~500ms).",
+      steps: [
+        { n: "01", title: "Route definition", desc: "Each route = intent name + sample utterances + handler. Embed all sample utterances, store as route prototype (mean embedding).", code: "@route('code_question')\ndef handle_code(query):\n  return code_specialist_llm(query)\n\n# Samples:\n# 'how do I sort a list in python'\n# 'write me a function that...'\n# 'debug this code'" },
+        { n: "02", title: "Similarity-based routing", desc: "Embed query, compute cosine similarity to all route prototypes, route to highest-scoring if above threshold. Fall back to LLM classifier if ambiguous.", code: "def route(query):\n  q_emb = embed(query)\n  scores = {route: cosine(q_emb, route.embedding)\n            for route in routes}\n  best_route = max(scores, key=scores.get)\n  if scores[best_route] > THRESHOLD:\n    return best_route.handler(query)\n  return fallback_handler(query)" },
+        { n: "03", title: "Dynamic route learning", desc: "Add routes at runtime. Update route embeddings incrementally as new examples are added.", code: "" },
+        { n: "04", title: "Multi-level routing", desc: "Hierarchical routing: first route to domain (medical, legal, code), then to sub-intent within domain.", code: "" }
+      ],
+      resources: [
+        { type: "repo", name: "aurelio-ai/semantic-router", detail: "github.com · Production semantic router" },
+        { type: "blog", name: "Semantic Router — James Briggs", detail: "Medium post explaining the architecture" }
+      ],
+      difficulty: 1, hours: "10–16 hrs", lang: "Python"
+    }
+  },
+  {
+    id: 37, num: "37", tier: 2, cat: "rag",
+    title: "Knowledge Graph Builder",
+    sub: "Entity extraction + graph construction",
+    tagline: "Extract structured knowledge from unstructured text: NER, relation extraction, entity linking, coreference resolution. Store in Neo4j and query with Cypher.",
+    stack: ["Python", "spaCy", "Neo4j"],
+    time: "1 week",
+    deps: ["RAG Pipeline"],
+    guide: {
+      overview: "Knowledge graphs enable structured reasoning over text. Build the full pipeline: NER → relation extraction → coreference resolution → entity linking to Wikidata → graph storage → Cypher query interface.",
+      steps: [
+        { n: "01", title: "NER + relation extraction", desc: "Use spaCy for NER (PERSON, ORG, GPE). LLM-based relation extraction for custom relations. Output: (head, relation, tail) triples.", code: "" },
+        { n: "02", title: "Coreference resolution", desc: "Link 'he', 'the company', 'it' to their antecedents. Use neuralcoref or coreferee. Critical for accurate relation extraction across sentences.", code: "" },
+        { n: "03", title: "Entity linking to Wikidata", desc: "Normalize entities: 'Apple Inc', 'Apple', 'AAPL' → Q312. Use entity embeddings for disambiguation.", code: "" },
+        { n: "04", title: "Neo4j storage + Cypher", desc: "Merge entities as nodes (upsert by Wikidata ID). Relations as edges. Query: find all companies founded by Stanford graduates in AI.", code: "# Cypher query\nMATCH (p:Person)-[:FOUNDED]->(c:Company)\nWHERE p.education CONTAINS 'Stanford'\nAND c.industry = 'AI'\nRETURN p.name, c.name" }
+      ],
+      resources: [
+        { type: "docs", name: "spaCy NLP docs", detail: "spacy.io/usage · NER and relation extraction" },
+        { type: "docs", name: "Neo4j Python driver", detail: "neo4j.com/docs/python-manual" },
+        { type: "repo", name: "microsoft/REBEL", detail: "github.com · End-to-end relation extraction" }
+      ],
+      difficulty: 2, hours: "20–30 hrs", lang: "Python"
+    }
+  },
+  {
+    id: 38, num: "38", tier: 2, cat: "data",
+    title: "Data Curation Pipeline",
+    sub: "MinHash deduplication",
+    tagline: "Build a production data cleaning pipeline: MinHash LSH deduplication, language detection, quality filtering, toxic content removal, and PII scrubbing at billion-document scale.",
+    stack: ["Python", "Spark", "Spark"],
+    time: "1 week",
+    deps: ["Synthetic Data Generator"],
+    guide: {
+      overview: "FineWeb, Dolma, and RedPajama all deduplicate aggressively. MinHash LSH finds near-duplicate documents in O(N) vs O(N²). Build the full pipeline: URL dedup → MinHash near-dedup → quality filters → domain classification.",
+      steps: [
+        { n: "01", title: "MinHash implementation", desc: "Represent document as n-gram shingles set. Apply k hash functions to get k-dimensional MinHash signature. Two docs with high Jaccard similarity have high MinHash signature match probability.", code: "def minhash(doc, num_perm=128, n=5):\n  shingles = set(doc[i:i+n] for i in range(len(doc)-n+1))\n  hashvalues = np.full(num_perm, np.inf)\n  for shingle in shingles:\n    for i in range(num_perm):\n      h = mmh3.hash(shingle, i)\n      if h < hashvalues[i]:\n        hashvalues[i] = h\n  return hashvalues" },
+        { n: "02", title: "LSH banding", desc: "Divide k MinHash values into b bands of r rows each. Documents that match in any band are candidate duplicates. Tune b,r for precision/recall.", code: "" },
+        { n: "03", title: "Quality filters", desc: "Perplexity filter (low-quality text has high LM perplexity). Ratio filters: alpha chars, punctuation, symbols. Length filters. C4-style heuristics.", code: "" },
+        { n: "04", title: "Scale with Ray/Spark", desc: "Process billion documents with Ray Data or Spark. Distribute MinHash computation. Use bloom filters for URL dedup.", code: "" }
+      ],
+      resources: [
+        { type: "paper", name: "Deduplicating Training Data Makes LLMs Better — Lee et al. 2022", detail: "arxiv.org/abs/2107.06499" },
+        { type: "repo", name: "bigcode-project/bigcode-dataset", detail: "github.com · Production deduplication pipeline" },
+        { type: "blog", name: "FineWeb data curation — HuggingFace", detail: "huggingface.co/spaces/HuggingFaceFW/blogpost-fineweb-v1" }
+      ],
+      difficulty: 3, hours: "25–40 hrs", lang: "Python/Spark"
+    }
+  },
+  {
+    id: 39, num: "39", tier: 3, cat: "systems",
+    title: "AI Gateway",
+    sub: "Load balancing + failover",
+    tagline: "Build a production AI gateway: provider routing, load balancing, circuit breakers, rate limiting, semantic caching, cost tracking, and observability.",
+    stack: ["Python/Rust", "Redis", "Prometheus"],
+    time: "1–2 weeks",
+    deps: ["Inference Server", "Guardrails System"],
+    guide: {
+      overview: "An AI gateway sits between your app and LLM providers. It handles: routing (cheapest/fastest provider for each request), circuit breakers (fail to backup on errors), semantic caching (similar requests share responses), and unified observability.",
+      steps: [
+        { n: "01", title: "Provider abstraction", desc: "Unified API over OpenAI, Anthropic, Gemini. Translate between API formats. Handle provider-specific features (system prompts, tool calling).", code: "class Provider:\n  async def complete(self, messages, model, **kwargs):\n    pass\n\nclass OpenAIProvider(Provider):\n  async def complete(self, messages, model, **kwargs):\n    return await client.chat.completions.create(...)\n\nclass AnthropicProvider(Provider): ..." },
+        { n: "02", title: "Circuit breaker", desc: "Track error rates per provider. Open circuit (failover to backup) when error rate > threshold for last N requests. Probe with small traffic before closing.", code: "" },
+        { n: "03", title: "Semantic cache", desc: "Embed requests. Cache responses with embedding key. Serve cached response for cosine similarity > 0.95. Dramatic cost savings for similar queries.", code: "" },
+        { n: "04", title: "Rate limiting + cost tracking", desc: "Token bucket per user/org. Hard limits on tokens/minute. Track $ cost per request. Alert on budget overage.", code: "" }
+      ],
+      resources: [
+        { type: "repo", name: "BerriAI/litellm", detail: "github.com · Production AI gateway" },
+        { type: "repo", name: "Portkey-AI/gateway", detail: "github.com · Open source AI gateway" },
+        { type: "blog", name: "Building a Reliable AI Gateway", detail: "Circuit breaker pattern for LLMs" }
+      ],
+      difficulty: 3, hours: "30–50 hrs", lang: "Python or Rust"
+    }
+  },
+  {
+    id: 40, num: "40", tier: 3, cat: "training",
+    title: "PEFT Library",
+    sub: "Parameter Efficient Fine-Tuning",
+    tagline: "Build a PEFT library supporting LoRA, Prefix Tuning, Prompt Tuning, and (IA)³. Provide a unified interface for injecting adapters into any HuggingFace model.",
+    stack: ["Python", "PyTorch"],
+    time: "1–2 weeks",
+    deps: ["LoRA Trainer"],
+    guide: {
+      overview: "HuggingFace PEFT unifies LoRA, prefix tuning, prompt tuning under one interface. Build a similar library: adapter injection, config system, save/load, and merge. This teaches you how meta-libraries abstract model internals.",
+      steps: [
+        { n: "01", title: "Adapter config system", desc: "Dataclass configs for each PEFT type. Specify target modules by name pattern, rank, alpha, dropout.", code: "@dataclass\nclass LoRAConfig:\n  r: int = 8\n  alpha: float = 16\n  target_modules: list = ('q_proj', 'v_proj')\n  dropout: float = 0.0\n  bias: str = 'none'  # 'none', 'all', 'lora_only'" },
+        { n: "02", title: "Prefix Tuning", desc: "Add trainable prefix tokens to K and V at each layer. Only prefix parameters are trained. Less parameter-efficient than LoRA but sometimes better on NLG tasks.", code: "" },
+        { n: "03", title: "Prompt Tuning", desc: "Add trainable soft prompt tokens to input embeddings. Simplest PEFT method. Only works well at large scale.", code: "" },
+        { n: "04", title: "Unified get_peft_model()", desc: "Function that takes model + config, injects appropriate adapters, freezes base model, returns wrapped model. Save/load adapter weights separately.", code: "def get_peft_model(model, config):\n  if isinstance(config, LoRAConfig):\n    return inject_lora(model, config)\n  elif isinstance(config, PrefixTuningConfig):\n    return inject_prefix_tuning(model, config)" }
+      ],
+      resources: [
+        { type: "repo", name: "huggingface/peft", detail: "github.com · Reference implementation to study" },
+        { type: "paper", name: "Prefix-Tuning — Li & Liang 2021", detail: "arxiv.org/abs/2101.00190" },
+        { type: "paper", name: "(IA)³ — Liu et al. 2022", detail: "arxiv.org/abs/2205.05638" }
+      ],
+      difficulty: 3, hours: "25–40 hrs", lang: "Python/PyTorch"
+    }
+  },
+  {
+    id: 41, num: "41", tier: 2, cat: "rag",
+    title: "Text-to-SQL Engine",
+    sub: "Natural language database queries",
+    tagline: "Convert natural language to SQL: schema linking, few-shot prompting with similar examples (via RAG), query execution, and error correction loop.",
+    stack: ["Python", "SQLite", "LLM API"],
+    time: "1 week",
+    deps: ["RAG Pipeline", "Function Calling Router"],
+    guide: {
+      overview: "Text-to-SQL is the most deployed LLM application in enterprises. Build: schema serialization, few-shot example retrieval (similar queries from a library), SQL generation, execution, and self-correction on errors.",
+      steps: [
+        { n: "01", title: "Schema serialization", desc: "Serialize DB schema as structured text. Include table names, column names, types, and sample rows. This is the most impactful context for SQL generation.", code: "def serialize_schema(conn):\n  tables = conn.execute(\"SELECT name FROM sqlite_master WHERE type='table'\").fetchall()\n  schema_str = \"\"\n  for (table,) in tables:\n    cols = conn.execute(f\"PRAGMA table_info({table})\").fetchall()\n    schema_str += f\"Table: {table}\\nColumns: \"\n    schema_str += ', '.join(f\"{c[1]} ({c[2]})\" for c in cols) + \"\\n\"\n    rows = conn.execute(f\"SELECT * FROM {table} LIMIT 3\").fetchall()\n    schema_str += f\"Sample: {rows}\\n\"\n  return schema_str" },
+        { n: "02", title: "Few-shot example retrieval", desc: "Build a library of (NL question, SQL) pairs. Embed questions, retrieve k most similar examples for each new query. Dramatically improves generation quality.", code: "" },
+        { n: "03", title: "Self-correction loop", desc: "Execute generated SQL. On error: include error message + query in follow-up prompt asking model to fix. 1-2 correction rounds handle 90% of errors.", code: "def execute_with_correction(query, nl, schema, max_retries=2):\n  for i in range(max_retries + 1):\n    try: return conn.execute(query).fetchall()\n    except Exception as e:\n      if i == max_retries: raise\n      query = llm(f\"SQL error: {e}\\nFix: {query}\")" },
+        { n: "04", title: "Eval on Spider/WikiSQL", desc: "Measure execution accuracy (correct answer) vs exact match (exact SQL). Run on Spider benchmark for complex multi-table queries.", code: "" }
+      ],
+      resources: [
+        { type: "paper", name: "Spider: A Large-Scale Text-to-SQL Benchmark", detail: "arxiv.org/abs/1809.08887" },
+        { type: "blog", name: "Building a Text-to-SQL System — Defog.ai", detail: "defog.ai/blog · Production-grade techniques" },
+        { type: "repo", name: "defog-ai/sqlcoder", detail: "github.com · Fine-tuned model + prompting" }
+      ],
+      difficulty: 2, hours: "20–30 hrs", lang: "Python"
+    }
+  },
+  {
+    id: 42, num: "42", tier: 2, cat: "arch",
+    title: "Recommendation System",
+    sub: "Two-tower architecture",
+    tagline: "Build a two-tower neural recommendation system: user tower + item tower trained with contrastive loss. Implement ANN retrieval for real-time serving.",
+    stack: ["Python", "PyTorch", "Qdrant"],
+    time: "1–2 weeks",
+    deps: ["Vector Database", "CLIP implementation"],
+    guide: {
+      overview: "Two-tower models (YouTube DNN, DSSM) train separate user and item encoders end-to-end. At inference, pre-compute item embeddings and use ANN for sub-millisecond retrieval. This architecture serves billions of recommendations per day.",
+      steps: [
+        { n: "01", title: "User and item towers", desc: "User tower: embed user features (history, demographics, context) → MLP → d-dim vector. Item tower: embed item features (id, text, categories) → MLP → d-dim vector.", code: "class UserTower(nn.Module):\n  def __init__(self):\n    self.user_embed = nn.Embedding(n_users, 64)\n    self.mlp = MLP([64+feature_dim, 256, 128, 64])\n  def forward(self, user_id, features):\n    x = torch.cat([self.user_embed(user_id), features], dim=-1)\n    return F.normalize(self.mlp(x), dim=-1)" },
+        { n: "02", title: "In-batch negative sampling", desc: "Use other items in the batch as negatives. Softmax loss over batch. Hard negative mining: sample near-miss items to improve embedding quality.", code: "def contrastive_loss(user_emb, item_emb, temp=0.1):\n  # user_emb: (B, d), item_emb: (B, d)\n  logits = user_emb @ item_emb.T / temp  # (B, B)\n  labels = torch.arange(B)\n  return F.cross_entropy(logits, labels)" },
+        { n: "03", title: "Serving: pre-compute + ANN", desc: "Pre-compute all item embeddings nightly. Store in Qdrant. At query time: encode user, ANN search top-k items in < 5ms.", code: "" },
+        { n: "04", title: "Re-ranking stage", desc: "ANN retrieves 100-1000 candidates. Re-rank with cross-attention or point-wise MLP that takes (user, item) pair. Optimize for business objective.", code: "" }
+      ],
+      resources: [
+        { type: "paper", name: "Deep Neural Networks for YouTube Recommendations", detail: "dl.acm.org/doi/10.1145/2959100.2959190 · Classic" },
+        { type: "paper", name: "Sampling-Bias-Corrected Neural Modeling for Large-Scale Rec — Yi et al. 2019", detail: "dl.acm.org/doi/10.1145/3298689.3346996" },
+        { type: "blog", name: "RecSys Deep Dive — Eugene Yan", detail: "eugeneyan.com · Best practical RecSys blog" }
+      ],
+      difficulty: 2, hours: "25–40 hrs", lang: "Python/PyTorch"
+    }
+  },
+  {
+    id: 43, num: "43", tier: 2, cat: "arch",
+    title: "Embedding Model",
+    sub: "Train a dense retrieval model",
+    tagline: "Fine-tune a bi-encoder for dense retrieval using contrastive learning on MSMARCO. Implement hard negative mining, in-batch negatives, and GradCache for large batches.",
+    stack: ["Python", "PyTorch", "sentence-transformers"],
+    time: "1–2 weeks",
+    deps: ["CLIP implementation"],
+    guide: {
+      overview: "Dense retrieval models (DPR, E5, BGE) encode queries and passages independently. Train with in-batch negatives + hard negatives mined from BM25. The model powers your RAG pipeline's retrieval quality.",
+      steps: [
+        { n: "01", title: "Bi-encoder architecture", desc: "Query encoder and passage encoder (shared or separate weights). Mean pool + L2 normalize. Trained to maximize similarity for relevant pairs.", code: "" },
+        { n: "02", title: "Hard negative mining", desc: "Use BM25 to find passages that look relevant but aren't. These are the hardest negatives. Mix BM25 negatives with in-batch random negatives.", code: "" },
+        { n: "03", title: "GradCache for large batches", desc: "Gradient accumulation for contrastive loss requires large batches (1024+). GradCache decouples embedding computation from loss computation to enable this.", code: "" },
+        { n: "04", title: "BEIR benchmark evaluation", desc: "Zero-shot retrieval across 18 diverse datasets. Measures generalization. Compare your model to E5, BGE, and Contriever.", code: "" }
+      ],
+      resources: [
+        { type: "paper", name: "Dense Passage Retrieval — Karpukhin et al. 2020", detail: "arxiv.org/abs/2004.04906" },
+        { type: "paper", name: "E5: Text Embeddings by Weakly-Supervised Contrastive Pre-training", detail: "arxiv.org/abs/2212.03533" },
+        { type: "repo", name: "UKPLab/sentence-transformers", detail: "github.com · Training pipeline for bi-encoders" }
+      ],
+      difficulty: 2, hours: "20–35 hrs", lang: "Python/PyTorch"
+    }
+  },
+  {
+    id: 44, num: "44", tier: 2, cat: "inference",
+    title: "Logit Processor",
+    sub: "Sampling strategies from scratch",
+    tagline: "Build the complete sampling pipeline: temperature scaling, top-k, top-p (nucleus), min-p, typical sampling, repetition penalty, and frequency penalty.",
+    stack: ["Python", "PyTorch"],
+    time: "2–3 days",
+    deps: ["Transformer from Scratch"],
+    guide: {
+      overview: "Every LLM inference stack needs a logit processing pipeline. Build a composable chain of processors applied before final sampling. Understanding each processor helps you tune generation quality.",
+      steps: [
+        { n: "01", title: "Temperature + top-k", desc: "Temperature: divide logits by T (< 1 sharpens, > 1 flattens). Top-k: zero out all but top-k logits before softmax.", code: "def temperature_scale(logits, T=1.0):\n  return logits / T\n\ndef top_k_filter(logits, k=50):\n  topk = torch.topk(logits, k)\n  mask = torch.full_like(logits, -float('inf'))\n  mask.scatter_(-1, topk.indices, topk.values)\n  return mask" },
+        { n: "02", title: "Top-p (nucleus) sampling", desc: "Sort by probability descending. Keep tokens until cumulative probability > p. This is more adaptive than top-k (automatically more/less restrictive).", code: "def top_p_filter(logits, p=0.9):\n  probs = F.softmax(logits, dim=-1)\n  sorted_probs, sorted_idx = torch.sort(probs, descending=True)\n  cumsum = sorted_probs.cumsum(dim=-1)\n  # Remove tokens that cause cumsum > p\n  remove = cumsum - sorted_probs > p\n  sorted_probs[remove] = 0\n  logits.scatter_(-1, sorted_idx, sorted_probs.log())\n  return logits" },
+        { n: "03", title: "Repetition penalty", desc: "Penalize tokens already in context. Divide logits of appeared tokens by penalty factor (> 1). Prevents repetitive loops.", code: "def repetition_penalty(logits, input_ids, penalty=1.3):\n  score = logits.gather(-1, input_ids.unsqueeze(0))\n  score = torch.where(score < 0, score * penalty, score / penalty)\n  return logits.scatter_(-1, input_ids.unsqueeze(0), score)" },
+        { n: "04", title: "Composable processor chain", desc: "LogitsProcessorList that applies processors in sequence. Mirror HuggingFace's generate() interface.", code: "" }
+      ],
+      resources: [
+        { type: "blog", name: "The Art of Sampling — Lilian Weng", detail: "lilianweng.github.io · Survey of all sampling methods" },
+        { type: "repo", name: "huggingface/transformers — LogitsProcessors", detail: "github.com · generation/logits_process.py" }
+      ],
+      difficulty: 1, hours: "8–14 hrs", lang: "Python/PyTorch"
+    }
+  },
+  {
+    id: 45, num: "45", tier: 3, cat: "optim",
+    title: "Softmax Kernel Optimization",
+    sub: "Online + fused CUDA softmax",
+    tagline: "Implement numerically stable online softmax in CUDA. Fuse with subsequent operations. Implement the 3-pass → 2-pass → 1-pass optimization progression.",
+    stack: ["CUDA", "C++"],
+    time: "1 week",
+    deps: ["Matrix Multiplication Kernel", "Flash Attention Kernel"],
+    guide: {
+      overview: "Softmax is in every attention layer. The naive 3-pass implementation (max, sum, normalize) is bandwidth-bound. Milakov & Gimelshein (2018) showed how to fuse into a single pass with online computation of max and sum simultaneously.",
+      steps: [
+        { n: "01", title: "Numerically stable 3-pass softmax", desc: "Pass 1: find max. Pass 2: compute exp(x-max) and sum. Pass 3: normalize. Three separate kernel launches.", code: "// Pass 1: max reduction\nfloat max_val = -INFINITY;\nfor (int i = 0; i < N; i++) max_val = max(max_val, x[i]);\n// Pass 2: exp and sum  \nfloat sum = 0;\nfor (int i = 0; i < N; i++) sum += expf(x[i] - max_val);\n// Pass 3: normalize\nfor (int i = 0; i < N; i++) y[i] = expf(x[i]-max_val)/sum;" },
+        { n: "02", title: "Online softmax (2-pass equivalent in 1-pass)", desc: "Maintain running max m_i and rescaled sum d_i. Update both as new elements arrive. Single pass, fused.", code: "// Online update:\n// new_m = max(m, x_i)\n// d = d * exp(m - new_m) + exp(x_i - new_m)\n// m = new_m" },
+        { n: "03", title: "Warp-level reduction", desc: "Use CUDA warp shuffle instructions (__shfl_xor_sync) for fast intra-warp max and sum reduction. Avoid shared memory for small N.", code: "" },
+        { n: "04", title: "Fused softmax + matmul", desc: "This is the FlashAttention insight applied to softmax alone. Benchmark throughput vs PyTorch's torch.nn.functional.softmax.", code: "" }
+      ],
+      resources: [
+        { type: "paper", name: "Online normalizer calculation for softmax — Milakov & Gimelshein 2018", detail: "arxiv.org/abs/1805.02867" },
+        { type: "blog", name: "Faster softmax in CUDA — Horace He", detail: "Detailed blog on fused softmax implementation" }
+      ],
+      difficulty: 4, hours: "25–40 hrs", lang: "CUDA"
+    }
+  },
+  {
+    id: 46, num: "46", tier: 3, cat: "training",
+    title: "Adversarial Attack Generator",
+    sub: "Red-teaming and robustness",
+    tagline: "Build automated red-teaming: FGSM and PGD for vision models, prompt injection attacks for LLMs, GCG suffix optimization, and transferability analysis.",
+    stack: ["Python", "PyTorch"],
+    time: "1 week",
+    deps: ["LLM Eval Harness", "Guardrails System"],
+    guide: {
+      overview: "Adversarial attacks reveal model vulnerabilities. For vision: FGSM/PGD perturbs pixels imperceptibly. For LLMs: GCG finds suffixes that cause harmful outputs. Automated red-teaming is now a job requirement for AI safety roles.",
+      steps: [
+        { n: "01", title: "FGSM (vision)", desc: "One-step gradient attack. Perturb image in the direction of gradient of loss w.r.t. input. Constrain within L∞ ball of radius ε.", code: "def fgsm(model, x, y, eps=0.03):\n  x.requires_grad_(True)\n  loss = F.cross_entropy(model(x), y)\n  loss.backward()\n  x_adv = x + eps * x.grad.sign()\n  return x_adv.clamp(0, 1).detach()" },
+        { n: "02", title: "PGD (projected gradient descent)", desc: "Multi-step FGSM with projection back into L∞ ball. Much stronger attack. 20-40 steps is standard.", code: "def pgd(model, x, y, eps=0.03, alpha=0.01, steps=20):\n  x_adv = x.clone().detach().requires_grad_(True)\n  for _ in range(steps):\n    loss = F.cross_entropy(model(x_adv), y)\n    loss.backward()\n    x_adv = x_adv + alpha * x_adv.grad.sign()\n    x_adv = torch.clamp(x_adv, x-eps, x+eps).clamp(0,1)\n    x_adv = x_adv.detach().requires_grad_(True)\n  return x_adv" },
+        { n: "03", title: "GCG for LLMs", desc: "Greedy Coordinate Gradient: find a suffix that when appended to any prompt causes harmful output. Optimize over discrete token space using gradient approximation.", code: "" },
+        { n: "04", title: "Automated red-team pipeline", desc: "Generate adversarial prompts → test against guardrails → log bypasses → create test dataset → track model robustness over time.", code: "" }
+      ],
+      resources: [
+        { type: "paper", name: "GCG: Universal and Transferable Adversarial Attacks on LLMs — Zou et al. 2023", detail: "arxiv.org/abs/2307.15043" },
+        { type: "paper", name: "Towards Deep Learning Models Resistant to Adversarial Attacks (PGD) — Madry 2017", detail: "arxiv.org/abs/1706.06083" }
+      ],
+      difficulty: 3, hours: "25–40 hrs", lang: "Python/PyTorch"
+    }
+  },
+  {
+    id: 47, num: "47", tier: 3, cat: "multimodal",
+    title: "Audio Spectrogram Transformer",
+    sub: "AST for audio classification",
+    tagline: "Apply Vision Transformer directly to log-mel spectrograms for audio classification. Fine-tune on AudioSet or ESC-50. Enable cross-modal attention with text.",
+    stack: ["Python", "PyTorch", "torchaudio"],
+    time: "1–2 weeks",
+    deps: ["Vision Transformer", "Whisper-style ASR"],
+    guide: {
+      overview: "Audio Spectrogram Transformer (Gong et al., 2021) treats log-mel spectrograms as images and applies ViT directly. Achieves SOTA on AudioSet. The architecture bridges audio and vision modalities for unified multi-modal models.",
+      steps: [
+        { n: "01", title: "Spectrogram preprocessing", desc: "128 mel filterbanks, 25ms window, 10ms hop. Normalize. Optionally use SpecAugment (frequency/time masking) for regularization.", code: "" },
+        { n: "02", title: "2D patch embedding for audio", desc: "Treat spectrogram (freq × time) as image. Patches of size 16×16 in freq-time space. Overlap patches improve performance.", code: "" },
+        { n: "03", title: "Pre-trained ViT initialization", desc: "Initialize from ImageNet-pretrained ViT. Adapt positional embeddings via interpolation. Audio-specific PE adds time and frequency PE separately.", code: "" },
+        { n: "04", title: "Multi-label classification", desc: "AudioSet has 527 sound classes with multi-label annotations. Use BCE loss, not cross-entropy. Evaluate with mAP.", code: "" }
+      ],
+      resources: [
+        { type: "paper", name: "AST: Audio Spectrogram Transformer — Gong et al. 2021", detail: "arxiv.org/abs/2104.01778" },
+        { type: "repo", name: "YuanGongND/ast", detail: "github.com · Official AST code" }
+      ],
+      difficulty: 2, hours: "20–30 hrs", lang: "Python/PyTorch"
+    }
+  },
+  {
+    id: 48, num: "48", tier: 4, cat: "arch",
+    title: "Neural Architecture Search",
+    sub: "Automated model design",
+    tagline: "Implement differentiable NAS (DARTS): define a supernet with all candidate operations, use gradient-based architecture search, and derive the final discrete architecture.",
+    stack: ["Python", "PyTorch"],
+    time: "2–3 weeks",
+    deps: ["Transformer from Scratch", "LoRA Trainer"],
+    guide: {
+      overview: "DARTS (Liu et al., 2019) makes NAS differentiable by using soft attention weights over candidate operations. Train both architecture parameters (α) and weight parameters (w) simultaneously with bilevel optimization.",
+      steps: [
+        { n: "01", title: "Mixed operation", desc: "Each edge in the computation graph is a mixture of operations: conv3x3, conv5x5, skip, maxpool, etc. Forward = weighted sum by softmax(α).", code: "class MixedOp(nn.Module):\n  def __init__(self, ops):\n    self.ops = nn.ModuleList(ops)\n    self.alpha = nn.Parameter(torch.zeros(len(ops)))\n\n  def forward(self, x):\n    weights = F.softmax(self.alpha, dim=0)\n    return sum(w * op(x) for w, op in zip(weights, self.ops))" },
+        { n: "02", title: "Bilevel optimization", desc: "Inner: optimize weights w with SGD on train set. Outer: optimize α with Adam on val set. Alternate every step.", code: "" },
+        { n: "03", title: "Architecture derivation", desc: "After training: argmax over α to get discrete architecture. Retrain from scratch with derived architecture.", code: "" },
+        { n: "04", title: "Efficient NAS with weight sharing", desc: "DARTS trains one supernet with shared weights. Alternative: evolutionary search over tokenized architectures (GPT for NAS).", code: "" }
+      ],
+      resources: [
+        { type: "paper", name: "DARTS: Differentiable Architecture Search — Liu et al. 2019", detail: "arxiv.org/abs/1806.09055" },
+        { type: "paper", name: "EfficientNet — Tan & Le 2019", detail: "arxiv.org/abs/1905.11946 · NAS-discovered scaling" }
+      ],
+      difficulty: 5, hours: "50–80 hrs", lang: "Python/PyTorch"
+    }
+  },
+  {
+    id: 49, num: "49", tier: 3, cat: "training",
+    title: "Model Distillation Pipeline",
+    sub: "Knowledge distillation",
+    tagline: "Distill a large teacher model into a smaller student. Implement response distillation, feature matching, attention transfer, and DistilBERT-style progressive shrinking.",
+    stack: ["Python", "PyTorch"],
+    time: "1–2 weeks",
+    deps: ["Small Language Model", "LoRA Trainer"],
+    guide: {
+      overview: "Knowledge distillation (Hinton et al., 2015) trains a small student to mimic a large teacher's soft outputs (not hard labels). The temperature-scaled probabilities contain rich inter-class similarity information the student learns from.",
+      steps: [
+        { n: "01", title: "Response distillation loss", desc: "KL divergence between teacher and student soft predictions. Temperature T smooths the distribution. L = T² * KL(σ(z_t/T) || σ(z_s/T)) + (1-α) * CE(y, z_s).", code: "def distillation_loss(student_logits, teacher_logits, labels,\n                      T=4.0, alpha=0.7):\n  soft_loss = F.kl_div(\n    F.log_softmax(student_logits/T, dim=-1),\n    F.softmax(teacher_logits/T, dim=-1),\n    reduction='batchmean'\n  ) * T * T\n  hard_loss = F.cross_entropy(student_logits, labels)\n  return alpha * soft_loss + (1-alpha) * hard_loss" },
+        { n: "02", title: "Feature matching (intermediate layers)", desc: "Minimize MSE between teacher and student hidden states at matched layers. Requires a projection layer if dimensions differ.", code: "" },
+        { n: "03", title: "Attention transfer", desc: "Distill attention maps: align student attention heads to teacher heads. Improves transfer of structural knowledge.", code: "" },
+        { n: "04", title: "Speculative decoding with distilled draft", desc: "Use your distilled model as the draft model in speculative decoding. The domain match between teacher and distilled student improves acceptance rates.", code: "" }
+      ],
+      resources: [
+        { type: "paper", name: "Distilling the Knowledge in a Neural Network — Hinton et al. 2015", detail: "arxiv.org/abs/1503.02531 · Original paper" },
+        { type: "paper", name: "DistilBERT — Sanh et al. 2019", detail: "arxiv.org/abs/1910.01108" },
+        { type: "paper", name: "TinyLLaMA — Zhang et al. 2024", detail: "arxiv.org/abs/2401.02385 · Modern distillation" }
+      ],
+      difficulty: 2, hours: "20–35 hrs", lang: "Python/PyTorch"
+    }
+  },
+  {
+    id: 50, num: "50", tier: 2, cat: "data",
+    title: "Feature Store",
+    sub: "Online + offline feature serving",
+    tagline: "Build a feature store with offline (batch) and online (low-latency) serving. Point-in-time correct joins, feature versioning, and a Python SDK for registering features.",
+    stack: ["Python", "Redis", "Postgres", "Kafka"],
+    time: "1–2 weeks",
+    deps: ["Data Curation Pipeline"],
+    guide: {
+      overview: "Feature stores (Feast, Tecton) bridge ML model serving and data engineering. Core concepts: feature views (logical features), entity keys (user_id, item_id), offline store (historical for training), online store (low-latency for serving).",
+      steps: [
+        { n: "01", title: "Feature registry", desc: "Python SDK to declare feature views: feature names, types, entity, source (Kafka topic or batch job), TTL.", code: "@feature_view(\n  entities=[user],\n  online=True, ttl=timedelta(days=1)\n)\nclass UserActivityFeatures:\n  click_count_1h: int\n  last_seen: datetime\n  avg_session_duration: float" },
+        { n: "02", title: "Offline store (point-in-time joins)", desc: "Given training dataset with timestamps, join correct feature values as of each timestamp. Prevents future data leakage.", code: "" },
+        { n: "03", title: "Online store (real-time serving)", desc: "Redis hash per entity key. Sub-millisecond feature lookup by entity key. Materialization job syncs offline → online.", code: "def get_features(entity_key, feature_names):\n  data = redis.hgetall(f'features:{entity_key}')\n  return {k: data[k] for k in feature_names}" },
+        { n: "04", title: "Streaming feature computation", desc: "Consume Kafka events, compute features (windowed aggregations), write to online store. Faust or Flink for stateful stream processing.", code: "" }
+      ],
+      resources: [
+        { type: "repo", name: "feast-dev/feast", detail: "github.com · Reference feature store" },
+        { type: "blog", name: "Building a Feature Store — Hopsworks", detail: "hopsworks.ai/blog · Architecture deep dive" },
+        { type: "blog", name: "Feature Store for ML — Feast docs", detail: "docs.feast.dev · Concepts and architecture" }
+      ],
+      difficulty: 3, hours: "30–50 hrs", lang: "Python"
+    }
+  },
+  {
+    id: 51, num: "51", tier: 3, cat: "systems",
+    title: "Vector Database Driver",
+    sub: "Client library from scratch",
+    tagline: "Build a client library for a vector database: connection pooling, async operations, batch upserts, retry logic, collection management, and a query DSL.",
+    stack: ["Python/Rust", "gRPC/REST"],
+    time: "1 week",
+    deps: ["Vector Database", "Inference Server"],
+    guide: {
+      overview: "Build a Python (or Rust) client driver for your HNSW vector database. Implement connection pooling, async support, retry with exponential backoff, batch operations, and a Pythonic query builder.",
+      steps: [
+        { n: "01", title: "Transport layer (gRPC or REST)", desc: "Define protobuf schemas or JSON API. Implement async HTTP/gRPC client. Handle authentication, TLS, and connection reuse.", code: "class VectorDBClient:\n  def __init__(self, url, api_key=None):\n    self._session = aiohttp.ClientSession(\n      base_url=url,\n      headers={'Authorization': f'Bearer {api_key}'}\n    )" },
+        { n: "02", title: "Connection pool", desc: "Maintain pool of connections. Queue requests when all connections busy. Max pool size, idle timeout, health checks.", code: "" },
+        { n: "03", title: "Retry + circuit breaker", desc: "Exponential backoff with jitter for transient failures. Circuit breaker opens after N consecutive failures, fails fast until recovery probe.", code: "async def with_retry(fn, max_retries=3, base_delay=0.1):\n  for attempt in range(max_retries):\n    try: return await fn()\n    except TransientError as e:\n      if attempt == max_retries - 1: raise\n      await asyncio.sleep(base_delay * (2**attempt) * (0.5+random.random()))" },
+        { n: "04", title: "Query DSL", desc: "Fluent builder API: collection.query(vector).filter(category='news').limit(10).with_payload(['title', 'url']).execute()", code: "" }
+      ],
+      resources: [
+        { type: "repo", name: "qdrant/qdrant-client", detail: "github.com · Study the async client architecture" },
+        { type: "docs", name: "gRPC Python docs", detail: "grpc.io/docs/languages/python" },
+        { type: "blog", name: "Building a Database Driver — Percona", detail: "Connection pooling patterns" }
+      ],
+      difficulty: 3, hours: "20–35 hrs", lang: "Python or Rust"
+    }
+  }
+];
+
+// CAT COLORS
+const CAT_COLORS = {
+  foundations: '#f0c040',
+  inference: '#3fb950',
+  training: '#ff7b72',
+  arch: '#79c0ff',
+  systems: '#ffa657',
+  rag: '#d2a8ff',
+  multimodal: '#56d364',
+  optim: '#f0883e',
+  data: '#58a6ff'
+};
+
+const TIER_COLORS = { 1: '#f0c040', 2: '#e07020', 3: '#c03050', 4: '#7040e0' };
+
+let activeCat = 'all';
+let activeTiers = new Set();
+let doneSet = new Set(JSON.parse(localStorage.getItem('byodone') || '[]'));
+
+function renderCards() {
+  const grid = document.getElementById('grid');
+  grid.querySelectorAll('.project-card').forEach(c => c.remove());
+
+  PROJECTS.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'project-card' + (doneSet.has(p.id) ? ' done' : '');
+    card.dataset.id = p.id;
+    card.dataset.cat = p.cat;
+    card.dataset.tier = p.tier;
+    card.style.borderLeftColor = TIER_COLORS[p.tier];
+
+    card.innerHTML = `
+      <div class="card-meta">
+        <span class="card-num">#${p.num}</span>
+        <div class="card-badges">
+          <span class="badge tier-badge-${p.tier}">T${p.tier}</span>
+          <span class="badge cat-badge" style="background:${CAT_COLORS[p.cat]}22;color:${CAT_COLORS[p.cat]};border:1px solid ${CAT_COLORS[p.cat]}44">${p.cat.toUpperCase()}</span>
+        </div>
+      </div>
+      <div class="card-title">${p.title} <span style="font-weight:400;font-size:0.8rem;color:var(--muted)">${p.sub}</span></div>
+      <div class="card-tagline">${p.tagline}</div>
+      <div class="card-stack">${p.stack.map(s => `<span class="stack-tag">${s}</span>`).join('')}</div>
+      <div class="card-footer">
+        <span class="card-time">⏱ ${p.time}</span>
+        <span class="card-deps">${p.deps.length ? '← ' + p.deps.join(', ') : ''}</span>
+        <button class="done-btn" onclick="toggleDone(event, ${p.id})">${doneSet.has(p.id) ? '✓' : '○'}</button>
+      </div>
+    `;
+    card.addEventListener('click', (e) => {
+      if (!e.target.classList.contains('done-btn')) openModal(p.id);
+    });
+    grid.appendChild(card);
+  });
+  applyFilters();
+  updateProgress();
+}
+
+function applyFilters() {
+  const q = document.getElementById('searchBox').value.toLowerCase();
+  let visibleCount = 0;
+
+  document.querySelectorAll('.project-card').forEach(card => {
+    const p = PROJECTS.find(x => x.id == card.dataset.id);
+    const catMatch = activeCat === 'all' || card.dataset.cat === activeCat;
+    const tierMatch = activeTiers.size === 0 || activeTiers.has(parseInt(card.dataset.tier));
+    const searchMatch = !q || p.title.toLowerCase().includes(q) || p.tagline.toLowerCase().includes(q) || p.stack.some(s => s.toLowerCase().includes(q));
+
+    if (catMatch && tierMatch && searchMatch) {
+      card.classList.remove('hidden');
+      visibleCount++;
+    } else {
+      card.classList.add('hidden');
+    }
+  });
+
+  const empty = document.getElementById('emptyState');
+  empty.style.display = visibleCount === 0 ? 'block' : 'none';
+}
+
+function setCat(cat, btn) {
+  activeCat = cat;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters();
+}
+
+function toggleTier(tier, btn) {
+  if (activeTiers.has(tier)) {
+    activeTiers.delete(tier);
+    btn.classList.remove('active');
+  } else {
+    activeTiers.add(tier);
+    btn.classList.add('active');
+  }
+  applyFilters();
+}
+
+function toggleDone(e, id) {
+  e.stopPropagation();
+  if (doneSet.has(id)) doneSet.delete(id);
+  else doneSet.add(id);
+  localStorage.setItem('byodone', JSON.stringify([...doneSet]));
+  const card = document.querySelector(`.project-card[data-id="${id}"]`);
+  card.classList.toggle('done');
+  card.querySelector('.done-btn').textContent = doneSet.has(id) ? '✓' : '○';
+  updateProgress();
+}
+
+function updateProgress() {
+  const pct = (doneSet.size / 51) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('doneCount').textContent = doneSet.size;
+  document.getElementById('countLabel').textContent = `${doneSet.size} / 51 DONE`;
+}
+
+function openModal(id) {
+  const p = PROJECTS.find(x => x.id === id);
+  const g = p.guide;
+
+  document.getElementById('modalTitle').textContent = p.title + ' — ' + p.sub;
+  document.getElementById('modalBadges').innerHTML = `
+    <span class="badge tier-badge-${p.tier}">TIER ${p.tier}</span>
+    <span class="badge cat-badge" style="background:${CAT_COLORS[p.cat]}22;color:${CAT_COLORS[p.cat]};border:1px solid ${CAT_COLORS[p.cat]}44">${p.cat.toUpperCase()}</span>
+    <span class="badge" style="background:rgba(255,255,255,0.05);color:var(--muted)">${g.lang}</span>
+    <span class="badge" style="background:rgba(255,255,255,0.05);color:var(--muted)">${g.hours}</span>
+  `;
+
+  const diffBars = Array.from({length: 5}, (_, i) =>
+    `<div class="diff-seg ${i < g.difficulty ? 'filled' : ''}"></div>`
+  ).join('');
+
+  document.getElementById('modalBody').innerHTML = `
+    <div>
+      <div class="modal-section-title">Overview</div>
+      <p style="font-size:0.82rem;color:var(--muted);line-height:1.7">${g.overview}</p>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-box">
+        <div class="info-label">Time Estimate</div>
+        <div class="info-val">${g.hours}</div>
+      </div>
+      <div class="info-box">
+        <div class="info-label">Difficulty</div>
+        <div class="info-val" style="display:flex;align-items:center;gap:6px">${diffBars} <span style="font-size:0.7rem;color:var(--muted)">${g.difficulty}/5</span></div>
+      </div>
+      <div class="info-box">
+        <div class="info-label">Language</div>
+        <div class="info-val">${g.lang}</div>
+      </div>
+      <div class="info-box">
+        <div class="info-label">Prerequisites</div>
+        <div class="info-val" style="font-size:0.7rem;font-weight:400;line-height:1.4">${p.deps.length ? p.deps.join(', ') : 'None'}</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="modal-section-title">Implementation Steps</div>
+      ${g.steps.map(s => `
+        <div class="guide-step">
+          <div class="step-num">${s.n}</div>
+          <div class="step-content">
+            <div class="step-title">${s.title}</div>
+            <div class="step-desc">${s.desc}</div>
+            ${s.code ? `<div class="step-code">${escapeHtml(s.code)}</div>` : ''}
+          </div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div>
+      <div class="modal-section-title">Resources</div>
+      <div class="resource-list">
+        ${g.resources.map(r => `
+          <div class="resource-item">
+            <span class="resource-type rtype-${r.type}">${r.type}</span>
+            <div class="resource-text">
+              <div class="resource-name">${r.name}</div>
+              <div class="resource-detail">${r.detail}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div style="padding-top:8px;display:flex;gap:12px">
+      <button class="btn btn-primary" style="font-family:var(--mono);font-size:0.65rem;padding:10px 20px;cursor:pointer" onclick="toggleDoneFromModal(${p.id})">
+        ${doneSet.has(p.id) ? '✓ Mark Incomplete' : '○ Mark Complete'}
+      </button>
+    </div>
+  `;
+
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function toggleDoneFromModal(id) {
+  if (doneSet.has(id)) doneSet.delete(id);
+  else doneSet.add(id);
+  localStorage.setItem('byodone', JSON.stringify([...doneSet]));
+  const card = document.querySelector(`.project-card[data-id="${id}"]`);
+  if (card) {
+    card.classList.toggle('done');
+    card.querySelector('.done-btn').textContent = doneSet.has(id) ? '✓' : '○';
+  }
+  updateProgress();
+  openModal(id); // refresh modal button
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function closeModalOnBg(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+function escapeHtml(text) {
+  return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function initLocalStorage() {
+  try { return true; } catch { return false; }
+}
+
+// Make localStorage work in this context
+const localStorageMock = { data: {} };
+try {
+  localStorage.getItem('test');
+} catch(e) {
+  window.localStorage = {
+    getItem: k => localStorageMock.data[k] || null,
+    setItem: (k, v) => { localStorageMock.data[k] = v; }
+  };
+}
+
+renderCards();
+</script>
+</body>
+</html>
