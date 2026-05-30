@@ -200,6 +200,7 @@ h1 .dim    { color: var(--muted); font-weight: 400; }
 .tracker-link[data-kind="dp"]:hover  { border-color: var(--purple); color: var(--purple); }
 .tracker-link[data-kind="mc"]:hover  { border-color: var(--accent); color: var(--accent); }
 .tracker-link[data-kind="cc"]:hover  { border-color: var(--blue);   color: var(--blue); }
+.tracker-link[data-kind="am"]:hover  { border-color: var(--green);  color: var(--green); }
 .tracker-link[data-kind="md"]:hover  { border-color: var(--blue);   color: var(--blue); }
 
 .activity {
