@@ -3,16 +3,16 @@
 ## Week 1: Core Java Fundamentals (Tasks 1-35)
 
 ### Basic Syntax & Data Types (1-10)
-1. Write a "Hello, World!" program and compile it from command line
-2. Declare and initialize variables of all primitive types (int, long, float, double, boolean, char, byte, short)
-3. Create a program demonstrating type casting (implicit and explicit)
-4. Write a program using arithmetic, comparison, and logical operators
-5. Create a calculator program using switch statement
-6. Write a program that takes user input using Scanner class
-7. Demonstrate string operations (concatenation, substring, length, charAt)
+1. **DONE** Write a "Hello, World!" program and compile it from command line
+2. **DONE** Declare and initialize variables of all primitive types (int, long, float, double, boolean, char, byte, short)
+3. **DONE** Create a program demonstrating type casting (implicit and explicit)
+4. **DONE** Write a program using arithmetic, comparison, and logical operators
+5. **DONE** Create a calculator program using switch statement
+6. **DONE** Write a program that takes user input using Scanner class
+7. **DONE** Demonstrate string operations (concatenation, substring, length, charAt)
 8. Create a program using StringBuilder vs String for performance comparison
 9. Write a program demonstrating autoboxing and unboxing
-10. Create an array manipulation program (sort, search, reverse)
+10. **DONE** Create an array manipulation program (sort, search, reverse)
 
 ### Control Flow & Loops (11-18)
 11. Write nested if-else statements for grade calculation
