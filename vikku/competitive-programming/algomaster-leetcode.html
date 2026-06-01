@@ -132,6 +132,37 @@ footer b{color:var(--mut);font-weight:600}
 </style>
 </head>
 <body>
+<!-- riop-ns -->
+<script>
+/*
+ * Per-person localStorage namespacing — see .tools/namespace-storage.py.
+ */
+(function () {
+  var PEOPLE  = ['ihba7991', 'vikku'];
+  var PERSON  = (location.pathname.split('/').filter(Boolean)
+                 .find(function (s) { return PEOPLE.indexOf(s) !== -1; })) || 'default';
+  var NS_KEYS = ['byodone', 'byo-be-done', 'byo-fafo-done',
+                 'dp-done', 'mc-done', 'cc-done', 'am-done'];
+  function ns(k) { return NS_KEYS.indexOf(k) !== -1 ? (PERSON + ':' + k) : k; }
+  var proto = Storage.prototype;
+  var oGet  = proto.getItem;
+  var oSet  = proto.setItem;
+  var oDel  = proto.removeItem;
+  proto.getItem    = function (k)    { return oGet.call(this, ns(k)); };
+  proto.setItem    = function (k, v) { return oSet.call(this, ns(k), v); };
+  proto.removeItem = function (k)    { return oDel.call(this, ns(k)); };
+  try {
+    NS_KEYS.forEach(function (k) {
+      var personKey = PERSON + ':' + k;
+      if (oGet.call(localStorage, personKey) === null) {
+        var legacy = oGet.call(localStorage, k);
+        if (legacy !== null) oSet.call(localStorage, personKey, legacy);
+      }
+    });
+  } catch (_) { /* private mode / quota issues — ignore */ }
+})();
+</script>
+
 <div class="wrap">
   <aside id="nav"></aside>
   <main>

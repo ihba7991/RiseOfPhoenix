@@ -243,11 +243,47 @@ document.getElementById('list').addEventListener('click', e => {
 render();
 """
 
+NS_SNIPPET = """<!-- riop-ns -->
+<script>
+/*
+ * Per-person localStorage namespacing — see .tools/namespace-storage.py.
+ */
+(function () {
+  var PEOPLE  = ['ihba7991', 'vikku'];
+  var PERSON  = (location.pathname.split('/').filter(Boolean)
+                 .find(function (s) { return PEOPLE.indexOf(s) !== -1; })) || 'default';
+  var NS_KEYS = ['byodone', 'byo-be-done', 'byo-fafo-done',
+                 'dp-done', 'mc-done', 'cc-done', 'am-done'];
+  function ns(k) { return NS_KEYS.indexOf(k) !== -1 ? (PERSON + ':' + k) : k; }
+  var proto = Storage.prototype;
+  var oGet  = proto.getItem;
+  var oSet  = proto.setItem;
+  var oDel  = proto.removeItem;
+  proto.getItem    = function (k)    { return oGet.call(this, ns(k)); };
+  proto.setItem    = function (k, v) { return oSet.call(this, ns(k), v); };
+  proto.removeItem = function (k)    { return oDel.call(this, ns(k)); };
+  try {
+    NS_KEYS.forEach(function (k) {
+      var personKey = PERSON + ':' + k;
+      if (oGet.call(localStorage, personKey) === null) {
+        var legacy = oGet.call(localStorage, k);
+        if (legacy !== null) oSet.call(localStorage, personKey, legacy);
+      }
+    });
+  } catch (_) { /* private mode / quota issues — ignore */ }
+})();
+</script>
+"""
+
+
 def patch_html(src_html: str, data: list[dict]) -> str:
     """Return modified HTML with augmented CSS + new render JS + back link."""
 
     # 1) Inject extra CSS just before </style>
     html = src_html.replace("</style>", EXTRA_CSS + "</style>", 1)
+
+    # 2) Inject the namespacing snippet right after <body> so it runs first.
+    html = html.replace("<body>", "<body>\n" + NS_SNIPPET, 1)
 
     # 3) Replace DATA with the id-augmented version (so notes anchors work).
     new_data_literal = "const DATA = " + json.dumps(data, separators=(", ", ": ")) + ";\n"
