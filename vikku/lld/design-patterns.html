@@ -44,6 +44,45 @@ footer a{color:var(--blue);text-decoration:none}
 </style>
 </head>
 <body>
+<!-- riop-ns -->
+<script>
+/*
+ * Per-person localStorage namespacing.
+ *
+ * The trackers live at /<person>/<...>/<file>.html on a shared origin,
+ * so without this every tracker key (e.g. 'am-done', 'dp-done') would
+ * be shared across people. We rewrite getItem/setItem/removeItem to
+ * prefix the person's folder name when it sees one of our known keys.
+ */
+(function () {
+  var PEOPLE  = ['ihba7991', 'vikku'];
+  var PERSON  = (location.pathname.split('/').filter(Boolean)
+                 .find(function (s) { return PEOPLE.indexOf(s) !== -1; })) || 'default';
+  var NS_KEYS = ['byodone', 'byo-be-done', 'byo-fafo-done',
+                 'dp-done', 'mc-done', 'cc-done', 'am-done'];
+  function ns(k) { return NS_KEYS.indexOf(k) !== -1 ? (PERSON + ':' + k) : k; }
+
+  var proto = Storage.prototype;
+  var oGet  = proto.getItem;
+  var oSet  = proto.setItem;
+  var oDel  = proto.removeItem;
+  proto.getItem    = function (k)    { return oGet.call(this, ns(k)); };
+  proto.setItem    = function (k, v) { return oSet.call(this, ns(k), v); };
+  proto.removeItem = function (k)    { return oDel.call(this, ns(k)); };
+
+  // One-time migration: any shared-key values become the person's values.
+  try {
+    NS_KEYS.forEach(function (k) {
+      var personKey = PERSON + ':' + k;
+      if (oGet.call(localStorage, personKey) === null) {
+        var legacy = oGet.call(localStorage, k);
+        if (legacy !== null) oSet.call(localStorage, personKey, legacy);
+      }
+    });
+  } catch (_) { /* private mode / quota issues — ignore */ }
+})();
+</script>
+
 <header>
   <h1><span class="accent">DESIGN</span> <span class="dim">PATTERNS</span></h1>
   <div class="meta">GoF · 23 patterns · Creational · Structural · Behavioral</div>
