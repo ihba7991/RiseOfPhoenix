@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LLD — Quick Recall</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap');
+:root{
+  --bg:#080c10;--surface:#0d1117;--surface2:#161b22;--border:#21262d;
+  --text:#e6edf3;--muted:#7d8590;--dim:#3d444d;
+  --accent:#f0c040;--green:#3fb950;--blue:#79c0ff;--purple:#d2a8ff;--orange:#ff7b72;
+  --mono:'Space Mono',monospace;--display:'Syne',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:100vh;padding-bottom:60px}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.08) 2px,rgba(0,0,0,.08) 4px);pointer-events:none;z-index:9999}
+header{padding:48px 40px 28px;border-bottom:1px solid var(--border);position:relative;overflow:hidden}
+header::before{content:'QUICK RECALL';position:absolute;top:-10px;right:-20px;font-family:var(--display);font-size:9rem;font-weight:800;color:rgba(255,255,255,.02);letter-spacing:-.05em;white-space:nowrap;pointer-events:none}
+h1{font-family:var(--display);font-size:clamp(2rem,4vw,3rem);font-weight:800;line-height:1;letter-spacing:-.02em}
+h1 .accent{color:var(--accent)}
+h1 .dim{color:var(--muted);font-weight:400}
+.meta{font-size:.7rem;color:var(--muted);letter-spacing:.12em;margin-top:14px;text-transform:uppercase;line-height:1.8}
+.lede{font-size:.78rem;color:var(--muted);margin-top:14px;line-height:1.7;max-width:760px}
+.lede b{color:var(--text)}
+nav.toc{padding:18px 40px;border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:8px}
+nav.toc a{font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-decoration:none;border:1px solid var(--border);background:var(--surface2);padding:6px 10px;border-radius:2px;transition:all .15s}
+nav.toc a:hover{border-color:var(--accent);color:var(--accent)}
+main{padding:24px 40px 60px}
+section.block{margin-bottom:34px;scroll-margin-top:20px}
+h2.sec{font-family:var(--display);font-size:1.1rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text);margin-bottom:6px;display:flex;align-items:center;gap:10px}
+h2.sec .dot{width:9px;height:9px;border-radius:1px;background:var(--accent)}
+h2.sec[data-c="struct"] .dot{background:var(--blue)}
+h2.sec[data-c="behav"] .dot{background:var(--purple)}
+h2.sec[data-c="conc"] .dot{background:var(--green)}
+h2.sec[data-c="diag"] .dot{background:var(--orange)}
+.sub{font-size:.7rem;color:var(--muted);margin-bottom:14px;line-height:1.6}
+table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--border);border-radius:3px;overflow:hidden;font-size:.72rem}
+th,td{text-align:left;padding:9px 11px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.55}
+th{font-family:var(--display);text-transform:uppercase;letter-spacing:.08em;font-size:.62rem;color:var(--muted);background:var(--surface2)}
+tr:last-child td{border-bottom:none}
+td .pat{font-family:var(--display);font-weight:700;color:var(--text);white-space:nowrap}
+td .hook{color:var(--blue)}
+td.pri{white-space:nowrap;color:var(--accent);font-size:.66rem}
+code{background:var(--surface2);border:1px solid var(--border);border-radius:2px;padding:1px 5px;font-size:.92em;color:var(--purple)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:16px 18px;font-size:.74rem;line-height:1.75}
+.card.tight{margin-top:12px}
+.card b{color:var(--accent);font-family:var(--display)}
+.card ul{margin:6px 0 0 18px}
+.card li{margin:4px 0}
+.callout{border-left:3px solid var(--accent);background:var(--surface2);padding:10px 14px;font-size:.72rem;line-height:1.7;border-radius:0 2px 2px 0;margin-top:12px}
+pre.code{background:#0a0e13;border:1px solid var(--border);border-radius:3px;padding:14px 16px;overflow:auto;font-size:.72rem;line-height:1.6;color:var(--text);margin-top:12px}
+pre.code .c{color:var(--muted)}
+pre.code .k{color:var(--orange)}
+.diagram-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:16px;margin-top:8px}
+.diagram{background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:14px}
+.diagram h3{font-family:var(--display);font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
+.diagram .dnote{font-size:.66rem;color:var(--muted);margin-bottom:8px;line-height:1.55}
+.diagram.wide{grid-column:1/-1}
+.mermaid{background:transparent;text-align:center;font-size:.8rem}
+footer{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-top:1px solid var(--border);padding:8px 24px;display:flex;justify-content:space-between;align-items:center;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);z-index:500}
+footer a{color:var(--blue);text-decoration:none}
+@media (max-width:600px){header,main,nav.toc{padding-left:18px;padding-right:18px}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1><span class="accent">LLD</span> <span class="dim">QUICK RECALL</span></h1>
+  <div class="meta">23 GoF patterns · Concurrency · Class diagrams · interview cheat sheet</div>
+  <div class="lede">Don't memorize definitions — memorize the <b>problem signal</b>. The interviewer describes a problem; your job is to hear the smell and reach for the pattern. Drill the ⭐⭐⭐ rows first. <b>Priority:</b> ⭐⭐⭐ know cold · ⭐⭐ know the trigger · ⭐ recognize the name.</div>
+</header>
+
+<nav class="toc">
+  <a href="#creational">Creational</a>
+  <a href="#structural">Structural</a>
+  <a href="#behavioral">Behavioral</a>
+  <a href="#cold">8 to know cold</a>
+  <a href="#disambig">Disambiguation</a>
+  <a href="#diagrams">Class diagrams</a>
+  <a href="#example">Worked example</a>
+  <a href="#concurrency">Concurrency</a>
+</nav>
+
+<main>
+
+<!-- CREATIONAL -->
+<section class="block" id="creational">
+  <h2 class="sec"><span class="dot"></span>Creational — how objects get made</h2>
+  <table>
+    <tr><th>Pattern</th><th>Problem signal (the smell)</th><th>Mechanism</th><th>Hook</th><th class="pri">Pri</th></tr>
+    <tr><td><span class="pat">Singleton</span></td><td>"Exactly one instance, global access" — config, connection pool, logger</td><td>Private constructor + static accessor; control instantiation</td><td class="hook">One and only one</td><td class="pri">⭐⭐⭐</td></tr>
+    <tr><td><span class="pat">Factory Method</span></td><td>"Create an object but let subclasses decide which" — type known at runtime</td><td>Defer instantiation to a <code>create()</code> overridden per subclass</td><td class="hook">Subclass picks the product</td><td class="pri">⭐⭐⭐</td></tr>
+    <tr><td><span class="pat">Abstract Factory</span></td><td>"Create <i>families</i> of related objects that must match" — UI kits, DB drivers</td><td>Factory of factories; one call returns a coherent set</td><td class="hook">Factory of factories</td><td class="pri">⭐⭐</td></tr>
+    <tr><td><span class="pat">Builder</span></td><td>"Object with many optional params / step-by-step construction" — telescoping constructors</td><td>Fluent <code>.setX().build()</code>; separates construction from representation</td><td class="hook">Step-by-step, fluent</td><td class="pri">⭐⭐⭐</td></tr>
+    <tr><td><span class="pat">Prototype</span></td><td>"Cloning is cheaper than constructing from scratch"</td><td>Implement <code>clone()</code>; copy an existing instance</td><td class="hook">Copy, don't build</td><td class="pri">⭐</td></tr>
+  </table>
+</section>
+
+<!-- STRUCTURAL -->
+<section class="block" id="structural">
+  <h2 class="sec" data-c="struct"><span class="dot"></span>Structural — how objects are composed</h2>
+  <table>
+    <tr><th>Pattern</th><th>Problem signal (the smell)</th><th>Mechanism</th><th>Hook</th><th class="pri">Pri</th></tr>
+    <tr><td><span class="pat">Adapter</span></td><td>"Two incompatible interfaces need to talk" — legacy/3rd-party API</td><td>Wrapper translates one interface into another</td><td class="hook">Power plug adapter</td><td class="pri">⭐⭐⭐</td></tr>
+    <tr><td><span class="pat">Decorator</span></td><td>"Add behavior at runtime without subclass explosion" — add-ons, toppings</td><td>Wrap object in same-interface wrappers, stack them</td><td class="hook">Russian dolls / toppings</td><td class="pri">⭐⭐⭐</td></tr>
+    <tr><td><span class="pat">Facade</span></td><td>"Simplify a messy complex subsystem behind one door"</td><td>Single high-level interface over many classes</td><td class="hook">One front door</td><td class="pri">⭐⭐</td></tr>
+    <tr><td><span class="pat">Proxy</span></td><td>"Control access to an object" — lazy load, caching, access control, remote</td><td>Stand-in with same interface; intercepts calls</td><td class="hook">Stand-in / gatekeeper</td><td class="pri">⭐⭐</td></tr>
+    <tr><td><span class="pat">Composite</span></td><td>"Treat individual objects and groups uniformly" — trees, file systems, menus</td><td>Leaf + container share an interface; recurse</td><td class="hook">Tree where node == leaf</td><td class="pri">⭐⭐</td></tr>
+    <tr><td><span class="pat">Bridge</span></td><td>"Two dimensions vary independently" — shape × color, device × remote</td><td>Split abstraction from implementation, compose them</td><td class="hook">Two axes, one bridge</td><td class="pri">⭐</td></tr>
+    <tr><td><span class="pat">Flyweight</span></td><td>"Tons of objects, mostly shared state, memory blows up"</td><td>Share intrinsic state; pass extrinsic state in</td><td class="hook">Share the common part</td><td class="pri">⭐</td></tr>
+  </table>
+</section>
+
+<!-- BEHAVIORAL -->
+<section class="block" id="behavioral">
+  <h2 class="sec" data-c="behav"><span class="dot"></span>Behavioral — how objects interact</h2>
+  <table>
+    <tr><th>Pattern</th><th>Problem signal (the smell)</th><th>Mechanism</th><th>Hook</th><th class="pri">Pri</th></tr>
+    <tr><td><span class="pat">Strategy</span></td><td>"Multiple interchangeable algorithms, swap at runtime" — payment, sort, pricing</td><td>Encapsulate each algo behind a common interface, inject it</td><td class="hook">Swappable algorithm</td><td class="pri">⭐⭐⭐</td></tr>
+    <tr><td><span class="pat">Observer</span></td><td>"When X changes, notify many dependents" — events, pub/sub, UI updates</td><td>Subject keeps subscriber list, pushes updates</td><td class="hook">Subscribe / notify</td><td class="pri">⭐⭐⭐</td></tr>
+    <tr><td><span class="pat">State</span></td><td>"Behavior changes based on internal state" — order lifecycle, vending machine</td><td>Each state is a class; object delegates to current state</td><td class="hook">Behavior changes with mode</td><td class="pri">⭐⭐⭐</td></tr>
+    <tr><td><span class="pat">Command</span></td><td>"Encapsulate a request as an object" — undo/redo, queues, scheduling</td><td>Wrap action + params in a command object with <code>execute()</code></td><td class="hook">Action as an object</td><td class="pri">⭐⭐</td></tr>
+    <tr><td><span class="pat">Chain of Resp.</span></td><td>"Pass request along handlers until one handles it" — middleware, approvals</td><td>Linked handlers, each decides handle-or-pass</td><td class="hook">Pass the buck down the chain</td><td class="pri">⭐⭐</td></tr>
+    <tr><td><span class="pat">Template Method</span></td><td>"Fixed algorithm skeleton, vary a few steps" — frameworks, pipelines</td><td>Base defines skeleton, subclasses fill <code>hook()</code> steps</td><td class="hook">Fill-in-the-blanks recipe</td><td class="pri">⭐⭐</td></tr>
+    <tr><td><span class="pat">Iterator</span></td><td>"Traverse a collection without exposing internals"</td><td>Provide <code>hasNext()/next()</code> over any structure</td><td class="hook">Cursor over a collection</td><td class="pri">⭐⭐</td></tr>
+    <tr><td><span class="pat">Mediator</span></td><td>"Many objects talk to each other → spaghetti" — chat room, ATC</td><td>Central hub coordinates; objects only know the mediator</td><td class="hook">Air traffic controller</td><td class="pri">⭐</td></tr>
+    <tr><td><span class="pat">Memento</span></td><td>"Save &amp; restore an object's state" — snapshots, checkpoints, undo</td><td>Capture state in an opaque token, restore later</td><td class="hook">Save point</td><td class="pri">⭐</td></tr>
+    <tr><td><span class="pat">Visitor</span></td><td>"Add operations to a class hierarchy without changing it"</td><td>Externalize operation into a visitor; <code>accept(visitor)</code></td><td class="hook">Guest who acts on each element</td><td class="pri">⭐</td></tr>
+    <tr><td><span class="pat">Interpreter</span></td><td>"Evaluate sentences in a small language/grammar" — expr eval, rules engine</td><td>Class per grammar rule, recurse over a parse tree</td><td class="hook">Tiny language evaluator</td><td class="pri">⭐</td></tr>
+  </table>
+</section>
+
+<!-- 8 TO KNOW COLD -->
+<section class="block" id="cold">
+  <h2 class="sec" data-c="behav"><span class="dot"></span>The 8 to know cold</h2>
+  <div class="card">
+    <b>Singleton · Factory Method · Builder · Adapter · Decorator · Strategy · Observer · State.</b>
+    If asked "design X," these cover ~80% of LLD answers. Strategy + State + Observer alone solve a huge fraction of "design a vending machine / parking lot / order system" prompts.
+  </div>
+</section>
+
+<!-- DISAMBIGUATION -->
+<section class="block" id="disambig">
+  <h2 class="sec" data-c="behav"><span class="dot"></span>Fast disambiguation — the pairs people confuse</h2>
+  <div class="card">
+    <ul>
+      <li><b>Strategy vs State:</b> Strategy = <i>you</i> pick the algorithm and it doesn't change itself. State = the object <i>transitions</i> itself between behaviors.</li>
+      <li><b>Decorator vs Proxy:</b> Both wrap. Decorator <i>adds</i> behavior; Proxy <i>controls access</i> (same behavior, gated).</li>
+      <li><b>Factory Method vs Abstract Factory:</b> Factory Method = one product, subclass decides. Abstract Factory = a <i>family</i> of products that must be consistent.</li>
+      <li><b>Adapter vs Facade:</b> Adapter makes one incompatible thing fit; Facade simplifies many things behind one interface.</li>
+      <li><b>Decorator vs Chain of Responsibility:</b> Decorator — everyone in the stack acts. Chain — one handler acts, then it stops (or passes).</li>
+    </ul>
+  </div>
+</section>
+
+<!-- CLASS DIAGRAMS -->
+<section class="block" id="diagrams">
+  <h2 class="sec" data-c="diag"><span class="dot"></span>Class diagrams — the core patterns</h2>
+  <div class="sub">Read the arrows: <code>&lt;|..</code> implements · <code>&lt;|--</code> inherits · <code>o--&gt;</code> "has a" reference · <code>..&gt;</code> uses/creates.</div>
+  <div class="diagram-grid">
+
+    <div class="diagram">
+      <h3>Strategy</h3>
+      <div class="dnote">Swap the algorithm at runtime via a common interface.</div>
+      <pre class="mermaid">
+classDiagram
+    class PaymentStrategy {
+        &lt;&lt;interface&gt;&gt;
+        +pay(amount)
+    }
+    class CreditCardStrategy
+    class UpiStrategy
+    class PaymentContext {
+        -PaymentStrategy strategy
+        +setStrategy(s)
+        +checkout(amount)
+    }
+    PaymentStrategy &lt;|.. CreditCardStrategy
+    PaymentStrategy &lt;|.. UpiStrategy
+    PaymentContext o--> PaymentStrategy
+      </pre>
+    </div>
+
+    <div class="diagram">
+      <h3>Observer</h3>
+      <div class="dnote">Subject pushes updates to a list of subscribers.</div>
+      <pre class="mermaid">
+classDiagram
+    class Subject {
+        &lt;&lt;interface&gt;&gt;
+        +subscribe(o)
+        +unsubscribe(o)
+        +notifyAll()
+    }
+    class Observer {
+        &lt;&lt;interface&gt;&gt;
+        +update(event)
+    }
+    class NewsAgency
+    class EmailSubscriber
+    Subject &lt;|.. NewsAgency
+    Observer &lt;|.. EmailSubscriber
+    NewsAgency o--> "0..*" Observer
+      </pre>
+    </div>
+
+    <div class="diagram">
+      <h3>State</h3>
+      <div class="dnote">Object delegates to its current state; states transition.</div>
+      <pre class="mermaid">
+classDiagram
+    class OrderState {
+        &lt;&lt;interface&gt;&gt;
+        +next(o)
+        +cancel(o)
+    }
+    class PlacedState
+    class ShippedState
+    class DeliveredState
+    class Order {
+        -OrderState state
+        +setState(s)
+        +next()
+    }
+    OrderState &lt;|.. PlacedState
+    OrderState &lt;|.. ShippedState
+    OrderState &lt;|.. DeliveredState
+    Order o--> OrderState
+    PlacedState ..> ShippedState
+    ShippedState ..> DeliveredState
+      </pre>
+    </div>
+
+    <div class="diagram">
+      <h3>Factory Method</h3>
+      <div class="dnote">Subclass decides which concrete product to create.</div>
+      <pre class="mermaid">
+classDiagram
+    class Product {
+        &lt;&lt;interface&gt;&gt;
+        +use()
+    }
+    class ConcreteA
+    class ConcreteB
+    class Creator {
+        &lt;&lt;abstract&gt;&gt;
+        +createProduct()* Product
+        +doWork()
+    }
+    class CreatorA
+    class CreatorB
+    Product &lt;|.. ConcreteA
+    Product &lt;|.. ConcreteB
+    Creator &lt;|-- CreatorA
+    Creator &lt;|-- CreatorB
+    CreatorA ..> ConcreteA
+    CreatorB ..> ConcreteB
+      </pre>
+    </div>
+
+    <div class="diagram">
+      <h3>Builder</h3>
+      <div class="dnote">Fluent, step-by-step construction of a complex object.</div>
+      <pre class="mermaid">
+classDiagram
+    class Pizza {
+        -String size
+        -List toppings
+        -boolean cheeseBurst
+    }
+    class PizzaBuilder {
+        +size(s) PizzaBuilder
+        +addTopping(t) PizzaBuilder
+        +cheeseBurst(b) PizzaBuilder
+        +build() Pizza
+    }
+    PizzaBuilder ..> Pizza
+      </pre>
+    </div>
+
+    <div class="diagram">
+      <h3>Decorator</h3>
+      <div class="dnote">Wrap same-interface objects to stack behavior.</div>
+      <pre class="mermaid">
+classDiagram
+    class Beverage {
+        &lt;&lt;interface&gt;&gt;
+        +cost()
+        +description()
+    }
+    class Espresso
+    class CondimentDecorator {
+        &lt;&lt;abstract&gt;&gt;
+        #Beverage wrapped
+        +cost()
+    }
+    class MilkDecorator
+    class CaramelDecorator
+    Beverage &lt;|.. Espresso
+    Beverage &lt;|.. CondimentDecorator
+    CondimentDecorator &lt;|-- MilkDecorator
+    CondimentDecorator &lt;|-- CaramelDecorator
+    CondimentDecorator o--> Beverage
+      </pre>
+    </div>
+
+    <div class="diagram">
+      <h3>Adapter</h3>
+      <div class="dnote">Translate one interface into the one clients expect.</div>
+      <pre class="mermaid">
+classDiagram
+    class Target {
+        &lt;&lt;interface&gt;&gt;
+        +request()
+    }
+    class Adaptee {
+        +specificRequest()
+    }
+    class Adapter {
+        -Adaptee adaptee
+        +request()
+    }
+    Target &lt;|.. Adapter
+    Adapter o--> Adaptee
+      </pre>
+    </div>
+
+    <div class="diagram">
+      <h3>Singleton</h3>
+      <div class="dnote">Private constructor; one static, volatile instance.</div>
+      <pre class="mermaid">
+classDiagram
+    class Config {
+        -static volatile Config instance
+        -Config()
+        +static get() Config
+    }
+    Config --> Config : single instance
+      </pre>
+    </div>
+
+  </div>
+</section>
+
+<!-- WORKED EXAMPLE -->
+<section class="block" id="example">
+  <h2 class="sec" data-c="diag"><span class="dot"></span>Worked example — the <code>GMan</code> project (this repo)</h2>
+  <div class="sub">A robot (<code>Gman</code>) moves Source → Destination; we compute remaining power. Clean Entity / Model / Utils layering — a good "show me how you'd structure a small LLD" answer.</div>
+  <div class="diagram wide">
+    <pre class="mermaid">
+classDiagram
+    class Gman {
+        -Source source
+        -Destination destination
+        -String directionFacing
+    }
+    class Source {
+        -int coordinateX
+        -int coordinateY
+    }
+    class Destination {
+        -int coordinateX
+        -int coordinateY
+    }
+    class CostModel {
+        -int travellingCost
+        -int turningCost
+        -int totalAvailablePower
+    }
+    class PowerConsumedCalculator {
+        -Gman gman
+        -CostModel costModel
+        +calculatePowerConsumed() int
+        +remainingPower() int
+    }
+    class Main {
+        +main(args)
+    }
+    Gman o--> Source
+    Gman o--> Destination
+    PowerConsumedCalculator o--> Gman
+    PowerConsumedCalculator o--> CostModel
+    Main ..> Gman
+    Main ..> CostModel
+    Main ..> PowerConsumedCalculator
+    </pre>
+  </div>
+  <div class="callout">
+    <b>Why it scores:</b> entities hold state, the calculator holds logic (SRP) · clear package layering · a new command is a new <code>case</code>, a different cost scheme is a new <code>CostModel</code> — a natural seam to introduce <b>Strategy</b> if turn/distance rules diverge.
+  </div>
+</section>
+
+<!-- CONCURRENCY -->
+<section class="block" id="concurrency">
+  <h2 class="sec" data-c="conc"><span class="dot"></span>Concurrency — Java backend cheat sheet</h2>
+
+  <div class="card">
+    <b>Core mental model</b>
+    <ul>
+      <li><b>Race condition:</b> outcome depends on thread timing on shared mutable state.</li>
+      <li><b>Visibility vs atomicity:</b> <code>volatile</code> gives <i>visibility</i> but NOT <i>atomicity</i> (<code>i++</code> is still 3 ops). <code>synchronized</code>/locks give both.</li>
+      <li><b>Happens-before:</b> JMM rule that makes one thread's writes visible to another — via <code>synchronized</code>, <code>volatile</code>, <code>Thread.start/join</code>, final fields.</li>
+    </ul>
+  </div>
+
+  <table class="tight" style="margin-top:14px">
+    <tr><th>Tool</th><th>Use when</th><th>Note</th></tr>
+    <tr><td><code>synchronized</code></td><td>Simple mutual exclusion on a block/method</td><td>Reentrant; releases on exit/exception; can't try-or-timeout</td></tr>
+    <tr><td><code>ReentrantLock</code></td><td>Need <code>tryLock</code>, timeout, interruptible, or fairness</td><td>Must <code>unlock()</code> in <code>finally</code></td></tr>
+    <tr><td><code>ReadWriteLock</code></td><td>Many readers, few writers</td><td>Readers share; writer exclusive</td></tr>
+    <tr><td><code>volatile</code></td><td>One thread writes a flag, others read it</td><td>Visibility only, NOT compound actions</td></tr>
+    <tr><td><code>Atomic*</code></td><td>Lock-free counters / CAS updates</td><td><code>incrementAndGet</code>, <code>compareAndSet</code></td></tr>
+    <tr><td><code>Semaphore</code></td><td>Limit N concurrent users of a resource</td><td><code>acquire()/release()</code>; rate/pool limiting</td></tr>
+    <tr><td><code>CountDownLatch</code></td><td>Wait for N tasks to finish once</td><td>One-shot, can't reset</td></tr>
+    <tr><td><code>CyclicBarrier</code></td><td>N threads wait for each other, repeatedly</td><td>Reusable; optional barrier action</td></tr>
+    <tr><td><code>BlockingQueue</code></td><td>Producer-consumer — <b>prefer over wait/notify</b></td><td><code>put()/take()</code> block automatically</td></tr>
+    <tr><td><code>ConcurrentHashMap</code></td><td>Concurrent map access</td><td>Don't external-lock a plain HashMap</td></tr>
+    <tr><td><code>ExecutorService</code></td><td>Anything real — don't <code>new Thread()</code></td><td><code>Executors.newFixedThreadPool(n)</code></td></tr>
+    <tr><td><code>CompletableFuture</code></td><td>Async composition, chaining, combining</td><td><code>thenApply</code>, <code>thenCompose</code>, <code>allOf</code></td></tr>
+  </table>
+
+  <div class="card tight">
+    <b>Deadlock — break any one of the 4</b>
+    <div>Mutual exclusion · Hold-and-wait · No preemption · Circular wait. &nbsp;<b style="color:var(--text)">Most common fix:</b> global <b>lock ordering</b> so circular wait can't form, or <code>tryLock</code> + timeout + back off.</div>
+  </div>
+
+  <div class="card tight">
+    <b>Patterns interviewers ask you to build</b>
+    <ul>
+      <li><b>Producer–Consumer</b> → <code>BlockingQueue</code> (clean) or <code>wait/notify</code> in a <code>while</code> loop.</li>
+      <li><b>Bounded resource / connection pool</b> → <code>Semaphore(n)</code>.</li>
+      <li><b>Rate limiter</b> → token bucket with <code>AtomicLong</code> + timestamps, or <code>Semaphore</code> + scheduled refill.</li>
+      <li><b>Thread-safe Singleton</b> → <code>enum</code> (simplest) or double-checked locking with <code>volatile</code> instance.</li>
+      <li><b>Wait for parallel tasks</b> → <code>CountDownLatch</code> (one-shot) or <code>CompletableFuture.allOf</code>.</li>
+    </ul>
+  </div>
+
+  <div class="callout">Double-checked locking Singleton — know how to write this:</div>
+  <pre class="code"><span class="k">class</span> Config {
+  <span class="k">private static volatile</span> Config instance;   <span class="c">// volatile is REQUIRED</span>
+  <span class="k">private</span> Config() {}
+  <span class="k">static</span> Config get() {
+    <span class="k">if</span> (instance == null) {                  <span class="c">// 1st check, no lock</span>
+      <span class="k">synchronized</span> (Config.class) {
+        <span class="k">if</span> (instance == null) {              <span class="c">// 2nd check, under lock</span>
+          instance = <span class="k">new</span> Config();
+        }
+      }
+    }
+    <span class="k">return</span> instance;
+  }
+}</pre>
+  <div class="sub" style="margin-top:8px">Why <code>volatile</code>: without it another thread can see a non-null but partially-constructed object due to instruction reordering.</div>
+
+  <div class="card tight">
+    <b>Gotchas to say out loud in interviews</b>
+    <ul>
+      <li><code>i++</code> is not atomic. <code>volatile</code> won't save it — use <code>AtomicInteger</code> or a lock.</li>
+      <li><code>HashMap</code> under concurrent writes can corrupt / infinite-loop — use <code>ConcurrentHashMap</code>.</li>
+      <li>Don't swallow <code>InterruptedException</code> — restore the flag: <code>Thread.currentThread().interrupt()</code>.</li>
+      <li>Prefer high-level (<code>ExecutorService</code>, <code>BlockingQueue</code>, <code>CompletableFuture</code>) over raw threads + <code>wait/notify</code>. Signals senior judgment.</li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div>LLD · Quick Recall</div>
+  <div><a href="../../index.html">← Dashboard</a></div>
+</footer>
+
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'dark',
+    themeVariables: {
+      fontFamily: "'Space Mono', monospace",
+      primaryColor: '#161b22',
+      primaryBorderColor: '#f0c040',
+      primaryTextColor: '#e6edf3',
+      lineColor: '#7d8590',
+      classText: '#e6edf3'
+    }
+  });
+</script>
+</body>
+</html>
