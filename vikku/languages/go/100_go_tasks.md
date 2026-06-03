@@ -15,7 +15,7 @@
 10. Write a for loop that prints numbers 1-100, but print "Fizz" for multiples of 3, "Buzz" for 5, "FizzBuzz" for both
 
 ### Functions & Error Handling (11-20)
-11. Write a function that divides two numbers and returns an error if divisor is zero
+11. **DONE** Write a function that divides two numbers and returns an error if divisor is zero
 12. Create a function with variadic parameters that sums any number of integers
 13. Write a function that returns a closure (function that increments a counter)
 14. Create a recursive function to calculate factorial
