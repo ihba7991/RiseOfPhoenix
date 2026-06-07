@@ -20,8 +20,7 @@ from pathlib import Path
 
 MARKER = "<!-- riop-ns -->"
 
-# Tracker files maintained by hand (the AlgoMaster file is regenerated
-# by .tools/build-algomaster.py and patched separately there).
+# Tracker files maintained by hand.
 TARGETS = [
     "ihba7991/ai/build-your-own-ai.html",
     "ihba7991/languages/build-your-own-backend-frontend.html",
@@ -41,7 +40,7 @@ NS_SNIPPET = MARKER + """
  * Per-person localStorage namespacing.
  *
  * The trackers live at /<person>/<...>/<file>.html on a shared origin,
- * so without this every tracker key (e.g. 'am-done', 'dp-done') would
+ * so without this every tracker key (e.g. 'dp-done', 'mc-done') would
  * be shared across people. We rewrite getItem/setItem/removeItem to
  * prefix the person's folder name when it sees one of our known keys.
  */
@@ -50,7 +49,7 @@ NS_SNIPPET = MARKER + """
   var PERSON  = (location.pathname.split('/').filter(Boolean)
                  .find(function (s) { return PEOPLE.indexOf(s) !== -1; })) || 'default';
   var NS_KEYS = ['byodone', 'byo-be-done', 'byo-fafo-done',
-                 'dp-done', 'mc-done', 'cc-done', 'am-done'];
+                 'dp-done', 'mc-done', 'cc-done'];
   function ns(k) { return NS_KEYS.indexOf(k) !== -1 ? (PERSON + ':' + k) : k; }
 
   var proto = Storage.prototype;
