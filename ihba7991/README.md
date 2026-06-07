@@ -3,7 +3,6 @@
 Layout mirrors the repo root:
 
 - `ai/` — `build-your-own-ai.html` tracker
-- `competitive-programming/`
 - `hld/`
 - `lld/`
 - `languages/`

@@ -613,7 +613,7 @@ h1 .dim { color: var(--muted); font-weight: 400; }
  * Per-person localStorage namespacing.
  *
  * The trackers live at /<person>/<...>/<file>.html on a shared origin,
- * so without this every tracker key (e.g. 'am-done', 'dp-done') would
+ * so without this every tracker key (e.g. 'dp-done', 'mc-done') would
  * be shared across people. We rewrite getItem/setItem/removeItem to
  * prefix the person's folder name when it sees one of our known keys.
  */
@@ -622,7 +622,7 @@ h1 .dim { color: var(--muted); font-weight: 400; }
   var PERSON  = (location.pathname.split('/').filter(Boolean)
                  .find(function (s) { return PEOPLE.indexOf(s) !== -1; })) || 'default';
   var NS_KEYS = ['byodone', 'byo-be-done', 'byo-fafo-done',
-                 'dp-done', 'mc-done', 'cc-done', 'am-done'];
+                 'dp-done', 'mc-done', 'cc-done'];
   function ns(k) { return NS_KEYS.indexOf(k) !== -1 ? (PERSON + ':' + k) : k; }
 
   var proto = Storage.prototype;
