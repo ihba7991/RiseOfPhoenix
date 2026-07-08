@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DSA Patterns — LeetCode</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap');
+:root{
+  --bg:#080c10;--surface:#0d1117;--surface2:#161b22;--border:#21262d;
+  --text:#e6edf3;--muted:#7d8590;--dim:#3d444d;
+  --accent:#f0c040;--green:#3fb950;--blue:#79c0ff;--purple:#d2a8ff;--orange:#ff7b72;--pink:#ff9ecd;
+  --mono:'Space Mono',monospace;--display:'Syne',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:100vh;padding-bottom:60px}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.08) 2px,rgba(0,0,0,.08) 4px);pointer-events:none;z-index:9999}
+header{padding:48px 40px 24px;border-bottom:1px solid var(--border);position:relative;overflow:hidden}
+header::before{content:'PATTERNS';position:absolute;top:-10px;right:-20px;font-family:var(--display);font-size:9rem;font-weight:800;color:rgba(255,255,255,.02);letter-spacing:-.05em;white-space:nowrap;pointer-events:none}
+h1{font-family:var(--display);font-size:clamp(2rem,4vw,3rem);font-weight:800;line-height:1;letter-spacing:-.02em}
+h1 .accent{color:var(--accent)}
+h1 .dim{color:var(--muted);font-weight:400}
+.meta{font-size:.7rem;color:var(--muted);letter-spacing:.12em;margin-top:12px;text-transform:uppercase}
+.lede{font-size:.76rem;color:var(--muted);margin-top:12px;line-height:1.7;max-width:820px}
+.lede b{color:var(--text)}
+.bar{height:3px;background:var(--border);margin-top:16px;border-radius:2px;overflow:hidden}
+.bar > div{height:100%;background:linear-gradient(90deg,var(--purple),var(--blue),var(--green),var(--accent));width:0;transition:width .3s}
+main{padding:22px 40px 60px;display:grid;grid-template-columns:repeat(auto-fill,minmax(430px,1fr));gap:16px}
+.pat{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:16px 18px}
+.pat-head{display:flex;align-items:baseline;gap:10px;margin-bottom:3px}
+.pat-idx{font-family:var(--display);font-size:.9rem;font-weight:800;color:var(--dim);min-width:26px}
+.pat-name{font-family:var(--display);font-size:1rem;font-weight:800;letter-spacing:.01em}
+.pat-count{margin-left:auto;font-size:.62rem;color:var(--muted);white-space:nowrap}
+.pat-hint{font-size:.7rem;color:var(--muted);line-height:1.55;margin:4px 0 12px;padding-left:36px}
+.probs{display:flex;flex-direction:column;gap:5px}
+.prob{display:flex;align-items:center;gap:9px;padding:6px 8px;border-radius:3px;border:1px solid var(--border);background:var(--surface2);transition:border-color .15s}
+.prob:hover{border-color:var(--cat)}
+.prob .cb{width:15px;height:15px;border:1px solid var(--dim);border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.55rem;color:var(--green);cursor:pointer}
+.prob.done .cb{background:rgba(63,185,80,.15);border-color:var(--green)}
+.prob .num{font-size:.66rem;font-weight:700;color:var(--cat);min-width:38px}
+.prob a.tt{font-size:.72rem;color:var(--text);text-decoration:none;flex:1;line-height:1.4}
+.prob a.tt:hover{text-decoration:underline;text-decoration-color:var(--cat)}
+.prob.done a.tt{color:var(--muted);text-decoration:line-through}
+.prob .ext{font-size:.6rem;color:var(--dim);text-decoration:none}
+.prob .ext:hover{color:var(--cat)}
+footer{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-top:1px solid var(--border);padding:8px 24px;display:flex;justify-content:space-between;align-items:center;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);z-index:500}
+footer a{color:var(--blue);text-decoration:none}
+@media (max-width:600px){header,main{padding-left:18px;padding-right:18px}main{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<!-- riop-ns: per-person localStorage namespacing -->
+<script>
+(function () {
+  var PEOPLE  = ['ihba7991', 'vikku'];
+  var PERSON  = (location.pathname.split('/').filter(Boolean)
+                 .find(function (s) { return PEOPLE.indexOf(s) !== -1; })) || 'default';
+  var NS_KEYS = ['dsa-done'];
+  function ns(k){ return NS_KEYS.indexOf(k) !== -1 ? (PERSON + ':' + k) : k; }
+  var proto=Storage.prototype, oGet=proto.getItem, oSet=proto.setItem, oDel=proto.removeItem;
+  proto.getItem=function(k){return oGet.call(this,ns(k));};
+  proto.setItem=function(k,v){return oSet.call(this,ns(k),v);};
+  proto.removeItem=function(k){return oDel.call(this,ns(k));};
+})();
+</script>
+
+<header>
+  <h1><span class="accent">DSA</span> <span class="dim">PATTERNS</span></h1>
+  <div class="meta">30 patterns · 180 curated LeetCode problems · pattern &rarr; practice</div>
+  <div class="lede">Recognize the <b>pattern</b>, not the problem. Each row links straight to LeetCode &mdash; tick a box to mark it solved (saved to your browser, per person). 180 hand-picked problems, 6 per pattern.</div>
+  <div class="bar"><div id="progressBar"></div></div>
+</header>
+
+<main id="grid"></main>
+
+<footer>
+  <div><span id="doneCount">0</span> / <span id="totalCount">0</span> solved</div>
+  <div><a href="../../index.html">&larr; Dashboard</a></div>
+</footer>
+
+<script>
+const CAT_COLOR={arrays:'var(--accent)',search:'var(--blue)',list:'var(--orange)',stack:'var(--purple)',
+  heap:'var(--green)',greedy:'var(--pink)',tree:'var(--green)',backtrack:'var(--purple)',
+  graph:'var(--blue)',trie:'var(--accent)',bit:'var(--orange)',dp:'var(--purple)'};
+const PATTERNS=[
+  {name:'Sliding Window',cat:'arrays',hint:'Contiguous subarray/substring with a window that grows or shrinks on a condition.',probs:[{n:3,s:'longest-substring-without-repeating-characters',t:'Longest Substring Without Repeating Characters'},{n:76,s:'minimum-window-substring',t:'Minimum Window Substring'},{n:209,s:'minimum-size-subarray-sum',t:'Minimum Size Subarray Sum'},{n:424,s:'longest-repeating-character-replacement',t:'Longest Repeating Character Replacement'},{n:567,s:'permutation-in-string',t:'Permutation In String'},{n:904,s:'fruit-into-baskets',t:'Fruit Into Baskets'}]},
+  {name:'Two Pointers',cat:'arrays',hint:'Sorted array or pair/triple sums; converge two indices, often from the ends.',probs:[{n:11,s:'container-with-most-water',t:'Container With Most Water'},{n:15,s:'3sum',t:'3Sum'},{n:16,s:'3sum-closest',t:'3Sum Closest'},{n:18,s:'4sum',t:'4Sum'},{n:42,s:'trapping-rain-water',t:'Trapping Rain Water'},{n:167,s:'two-sum-ii-input-array-is-sorted',t:'Two Sum II Input Array Is Sorted'}]},
+  {name:'Fast / Slow Pointers',cat:'list',hint:'Cycle detection & middle of a linked list — Floyd\'s tortoise & hare.',probs:[{n:141,s:'linked-list-cycle',t:'Linked List Cycle'},{n:142,s:'linked-list-cycle-ii',t:'Linked List Cycle II'},{n:19,s:'remove-nth-node-from-end-of-list',t:'Remove Nth Node From End Of List'},{n:876,s:'middle-of-the-linked-list',t:'Middle Of The Linked List'},{n:160,s:'intersection-of-two-linked-lists',t:'Intersection Of Two Linked Lists'},{n:234,s:'palindrome-linked-list',t:'Palindrome Linked List'}]},
+  {name:'Binary Search on Sorted Data',cat:'search',hint:'Search a sorted / rotated array in O(log n).',probs:[{n:33,s:'search-in-rotated-sorted-array',t:'Search In Rotated Sorted Array'},{n:34,s:'find-first-and-last-position-of-element-in-sorted-array',t:'Find First And Last Position Of Element In Sorted Array'},{n:35,s:'search-insert-position',t:'Search Insert Position'},{n:153,s:'find-minimum-in-rotated-sorted-array',t:'Find Minimum In Rotated Sorted Array'},{n:162,s:'find-peak-element',t:'Find Peak Element'},{n:704,s:'binary-search',t:'Binary Search'}]},
+  {name:'Binary Search on Answer',cat:'search',hint:'Monotonic feasibility — binary search over the answer space, not the array.',probs:[{n:875,s:'koko-eating-bananas',t:'Koko Eating Bananas'},{n:1011,s:'capacity-to-ship-packages-within-d-days',t:'Capacity To Ship Packages Within D Days'},{n:410,s:'split-array-largest-sum',t:'Split Array Largest Sum'},{n:774,s:'minimize-max-distance-to-gas-station',t:'Minimize Max Distance To Gas Station'},{n:1283,s:'find-the-smallest-divisor-given-a-threshold',t:'Find The Smallest Divisor Given A Threshold'},{n:1482,s:'minimum-number-of-days-to-make-m-bouquets',t:'Minimum Number Of Days To Make M Bouquets'}]},
+  {name:'Hashing / Frequency Maps',cat:'arrays',hint:'O(1) lookup, grouping, and counting with a map or set.',probs:[{n:1,s:'two-sum',t:'Two Sum'},{n:49,s:'group-anagrams',t:'Group Anagrams'},{n:128,s:'longest-consecutive-sequence',t:'Longest Consecutive Sequence'},{n:217,s:'contains-duplicate',t:'Contains Duplicate'},{n:242,s:'valid-anagram',t:'Valid Anagram'},{n:347,s:'top-k-frequent-elements',t:'Top K Frequent Elements'}]},
+  {name:'Prefix Sum / Running Sum',cat:'arrays',hint:'Range-sum queries and subarray-sum-equals-k via running totals.',probs:[{n:303,s:'range-sum-query-immutable',t:'Range Sum Query Immutable'},{n:560,s:'subarray-sum-equals-k',t:'Subarray Sum Equals K'},{n:724,s:'find-pivot-index',t:'Find Pivot Index'},{n:930,s:'binary-subarrays-with-sum',t:'Binary Subarrays With Sum'},{n:974,s:'subarray-sums-divisible-by-k',t:'Subarray Sums Divisible By K'},{n:523,s:'continuous-subarray-sum',t:'Continuous Subarray Sum'}]},
+  {name:'Difference Array / Range Updates',cat:'arrays',hint:'Many range updates, one final read — bump endpoints, then sweep.',probs:[{n:370,s:'range-addition',t:'Range Addition'},{n:1094,s:'car-pooling',t:'Car Pooling'},{n:1109,s:'corporate-flight-bookings',t:'Corporate Flight Bookings'},{n:1893,s:'check-if-all-the-integers-in-a-range-are-covered',t:'Check If All The Integers In A Range Are Covered'},{n:1943,s:'describe-the-painting',t:'Describe The Painting'},{n:2381,s:'shifting-letters-ii',t:'Shifting Letters II'}]},
+  {name:'Monotonic Stack',cat:'stack',hint:'Next greater / smaller element; histogram spans.',probs:[{n:739,s:'daily-temperatures',t:'Daily Temperatures'},{n:496,s:'next-greater-element-i',t:'Next Greater Element I'},{n:503,s:'next-greater-element-ii',t:'Next Greater Element II'},{n:84,s:'largest-rectangle-in-histogram',t:'Largest Rectangle In Histogram'},{n:85,s:'maximal-rectangle',t:'Maximal Rectangle'},{n:901,s:'online-stock-span',t:'Online Stock Span'}]},
+  {name:'Monotonic Queue / Deque',cat:'stack',hint:'Sliding-window max/min in O(n) with a deque.',probs:[{n:239,s:'sliding-window-maximum',t:'Sliding Window Maximum'},{n:862,s:'shortest-subarray-with-sum-at-least-k',t:'Shortest Subarray With Sum At Least K'},{n:1425,s:'constrained-subsequence-sum',t:'Constrained Subsequence Sum'},{n:1438,s:'longest-continuous-subarray-with-absolute-diff-less-than-or-equal-to-limit',t:'Longest Continuous Subarray With Absolute Diff Less Than Or Equal To Limit'},{n:1499,s:'max-value-of-equation',t:'Max Value Of Equation'},{n:1696,s:'jump-game-vi',t:'Jump Game VI'}]},
+  {name:'Heap / Top K',cat:'heap',hint:'K largest / smallest or streaming order with a priority queue.',probs:[{n:215,s:'kth-largest-element-in-an-array',t:'Kth Largest Element In An Array'},{n:347,s:'top-k-frequent-elements',t:'Top K Frequent Elements'},{n:692,s:'top-k-frequent-words',t:'Top K Frequent Words'},{n:703,s:'kth-largest-element-in-a-stream',t:'Kth Largest Element In A Stream'},{n:973,s:'k-closest-points-to-origin',t:'K Closest Points To Origin'},{n:1046,s:'last-stone-weight',t:'Last Stone Weight'}]},
+  {name:'Intervals',cat:'greedy',hint:'Merge, insert, or count overlaps after sorting by start/end.',probs:[{n:56,s:'merge-intervals',t:'Merge Intervals'},{n:57,s:'insert-interval',t:'Insert Interval'},{n:252,s:'meeting-rooms',t:'Meeting Rooms'},{n:253,s:'meeting-rooms-ii',t:'Meeting Rooms II'},{n:435,s:'non-overlapping-intervals',t:'Non Overlapping Intervals'},{n:452,s:'minimum-number-of-arrows-to-burst-balloons',t:'Minimum Number Of Arrows To Burst Balloons'}]},
+  {name:'Greedy Scheduling / Sorting',cat:'greedy',hint:'Sort, then take the locally optimal choice — jumps, tasks, partitions.',probs:[{n:45,s:'jump-game-ii',t:'Jump Game II'},{n:55,s:'jump-game',t:'Jump Game'},{n:406,s:'queue-reconstruction-by-height',t:'Queue Reconstruction By Height'},{n:621,s:'task-scheduler',t:'Task Scheduler'},{n:763,s:'partition-labels',t:'Partition Labels'},{n:134,s:'gas-station',t:'Gas Station'}]},
+  {name:'Linked List Manipulation',cat:'list',hint:'Pointer surgery — reverse, merge, reorder in place.',probs:[{n:21,s:'merge-two-sorted-lists',t:'Merge Two Sorted Lists'},{n:23,s:'merge-k-sorted-lists',t:'Merge K Sorted Lists'},{n:24,s:'swap-nodes-in-pairs',t:'Swap Nodes In Pairs'},{n:25,s:'reverse-nodes-in-k-group',t:'Reverse Nodes In K Group'},{n:92,s:'reverse-linked-list-ii',t:'Reverse Linked List II'},{n:138,s:'copy-list-with-random-pointer',t:'Copy List With Random Pointer'}]},
+  {name:'Tree DFS',cat:'tree',hint:'Recurse down paths — depth, path sums, diameter.',probs:[{n:104,s:'maximum-depth-of-binary-tree',t:'Maximum Depth Of Binary Tree'},{n:112,s:'path-sum',t:'Path Sum'},{n:113,s:'path-sum-ii',t:'Path Sum II'},{n:543,s:'diameter-of-binary-tree',t:'Diameter Of Binary Tree'},{n:124,s:'binary-tree-maximum-path-sum',t:'Binary Tree Maximum Path Sum'},{n:226,s:'invert-binary-tree',t:'Invert Binary Tree'}]},
+  {name:'Tree BFS / Level Order',cat:'tree',hint:'Level-order traversal with a queue.',probs:[{n:102,s:'binary-tree-level-order-traversal',t:'Binary Tree Level Order Traversal'},{n:103,s:'binary-tree-zigzag-level-order-traversal',t:'Binary Tree Zigzag Level Order Traversal'},{n:199,s:'binary-tree-right-side-view',t:'Binary Tree Right Side View'},{n:515,s:'find-largest-value-in-each-tree-row',t:'Find Largest Value In Each Tree Row'},{n:637,s:'average-of-levels-in-binary-tree',t:'Average Of Levels In Binary Tree'},{n:116,s:'populating-next-right-pointers-in-each-node',t:'Populating Next Right Pointers In Each Node'}]},
+  {name:'BST Problems',cat:'tree',hint:'Exploit the in-order sortedness of a binary search tree.',probs:[{n:98,s:'validate-binary-search-tree',t:'Validate Binary Search Tree'},{n:99,s:'recover-binary-search-tree',t:'Recover Binary Search Tree'},{n:230,s:'kth-smallest-element-in-a-bst',t:'Kth Smallest Element In A BST'},{n:235,s:'lowest-common-ancestor-of-a-binary-search-tree',t:'Lowest Common Ancestor Of A Binary Search Tree'},{n:450,s:'delete-node-in-a-bst',t:'Delete Node In A BST'},{n:700,s:'search-in-a-binary-search-tree',t:'Search In A Binary Search Tree'}]},
+  {name:'Backtracking Basics',cat:'backtrack',hint:'Enumerate permutations / subsets / combinations.',probs:[{n:46,s:'permutations',t:'Permutations'},{n:47,s:'permutations-ii',t:'Permutations II'},{n:77,s:'combinations',t:'Combinations'},{n:78,s:'subsets',t:'Subsets'},{n:90,s:'subsets-ii',t:'Subsets II'},{n:39,s:'combination-sum',t:'Combination Sum'}]},
+  {name:'Backtracking with Constraints',cat:'backtrack',hint:'Prune the search tree with validity checks.',probs:[{n:40,s:'combination-sum-ii',t:'Combination Sum II'},{n:17,s:'letter-combinations-of-a-phone-number',t:'Letter Combinations Of A Phone Number'},{n:79,s:'word-search',t:'Word Search'},{n:131,s:'palindrome-partitioning',t:'Palindrome Partitioning'},{n:51,s:'n-queens',t:'N Queens'},{n:52,s:'n-queens-ii',t:'N Queens II'}]},
+  {name:'Graph BFS / DFS',cat:'graph',hint:'Flood fill & connected components on a grid or graph.',probs:[{n:200,s:'number-of-islands',t:'Number Of Islands'},{n:695,s:'max-area-of-island',t:'Max Area Of Island'},{n:733,s:'flood-fill',t:'Flood Fill'},{n:994,s:'rotting-oranges',t:'Rotting Oranges'},{n:1091,s:'shortest-path-in-binary-matrix',t:'Shortest Path In Binary Matrix'},{n:1254,s:'number-of-closed-islands',t:'Number Of Closed Islands'}]},
+  {name:'Topological Sort / DAG',cat:'graph',hint:'Order a DAG and detect cycles — Kahn or DFS.',probs:[{n:207,s:'course-schedule',t:'Course Schedule'},{n:210,s:'course-schedule-ii',t:'Course Schedule II'},{n:802,s:'find-eventual-safe-states',t:'Find Eventual Safe States'},{n:1462,s:'course-schedule-iv',t:'Course Schedule IV'},{n:1203,s:'sort-items-by-groups-respecting-dependencies',t:'Sort Items By Groups Respecting Dependencies'},{n:2115,s:'find-all-possible-recipes-from-given-supplies',t:'Find All Possible Recipes From Given Supplies'}]},
+  {name:'Union Find / DSU',cat:'graph',hint:'Connectivity & grouping with path compression.',probs:[{n:547,s:'number-of-provinces',t:'Number Of Provinces'},{n:684,s:'redundant-connection',t:'Redundant Connection'},{n:1319,s:'number-of-operations-to-make-network-connected',t:'Number Of Operations To Make Network Connected'},{n:1579,s:'remove-max-number-of-edges-to-keep-graph-fully-traversable',t:'Remove Max Number Of Edges To Keep Graph Fully Traversable'},{n:990,s:'satisfiability-of-equality-equations',t:'Satisfiability Of Equality Equations'},{n:1202,s:'smallest-string-with-swaps',t:'Smallest String With Swaps'}]},
+  {name:'Shortest Path',cat:'graph',hint:'Dijkstra / Bellman-Ford / BFS on weighted graphs.',probs:[{n:743,s:'network-delay-time',t:'Network Delay Time'},{n:787,s:'cheapest-flights-within-k-stops',t:'Cheapest Flights Within K Stops'},{n:1514,s:'path-with-maximum-probability',t:'Path With Maximum Probability'},{n:1631,s:'path-with-minimum-effort',t:'Path With Minimum Effort'},{n:1334,s:'find-the-city-with-the-smallest-number-of-neighbors-at-a-threshold-distance',t:'Find The City With The Smallest Number Of Neighbors At A Threshold Distance'},{n:1976,s:'number-of-ways-to-arrive-at-destination',t:'Number Of Ways To Arrive At Destination'}]},
+  {name:'MST / Graph Greedy',cat:'graph',hint:'Minimum spanning tree — Kruskal or Prim.',probs:[{n:1584,s:'min-cost-to-connect-all-points',t:'Min Cost To Connect All Points'},{n:1135,s:'connecting-cities-with-minimum-cost',t:'Connecting Cities With Minimum Cost'},{n:1168,s:'optimize-water-distribution-in-a-village',t:'Optimize Water Distribution In A Village'},{n:1489,s:'find-critical-and-pseudo-critical-edges-in-minimum-spanning-tree',t:'Find Critical And Pseudo Critical Edges In Minimum Spanning Tree'},{n:778,s:'swim-in-rising-water',t:'Swim In Rising Water'},{n:1102,s:'path-with-maximum-minimum-value',t:'Path With Maximum Minimum Value'}]},
+  {name:'Trie',cat:'trie',hint:'Prefix tree for word lookup & autocomplete.',probs:[{n:208,s:'implement-trie-prefix-tree',t:'Implement Trie Prefix Tree'},{n:211,s:'design-add-and-search-words-data-structure',t:'Design Add And Search Words Data Structure'},{n:212,s:'word-search-ii',t:'Word Search II'},{n:648,s:'replace-words',t:'Replace Words'},{n:677,s:'map-sum-pairs',t:'Map Sum Pairs'},{n:1268,s:'search-suggestions-system',t:'Search Suggestions System'}]},
+  {name:'Bit Manipulation',cat:'bit',hint:'XOR tricks, bit counting, masks.',probs:[{n:136,s:'single-number',t:'Single Number'},{n:137,s:'single-number-ii',t:'Single Number II'},{n:191,s:'number-of-1-bits',t:'Number Of 1 Bits'},{n:338,s:'counting-bits',t:'Counting Bits'},{n:268,s:'missing-number',t:'Missing Number'},{n:190,s:'reverse-bits',t:'Reverse Bits'}]},
+  {name:'1D DP Basics',cat:'dp',hint:'Linear state — climb / rob / coin / LIS.',probs:[{n:70,s:'climbing-stairs',t:'Climbing Stairs'},{n:198,s:'house-robber',t:'House Robber'},{n:213,s:'house-robber-ii',t:'House Robber II'},{n:322,s:'coin-change',t:'Coin Change'},{n:279,s:'perfect-squares',t:'Perfect Squares'},{n:300,s:'longest-increasing-subsequence',t:'Longest Increasing Subsequence'}]},
+  {name:'Knapsack / Subset DP',cat:'dp',hint:'Choose items under a capacity or target sum.',probs:[{n:416,s:'partition-equal-subset-sum',t:'Partition Equal Subset Sum'},{n:494,s:'target-sum',t:'Target Sum'},{n:518,s:'coin-change-ii',t:'Coin Change II'},{n:474,s:'ones-and-zeroes',t:'Ones And Zeroes'},{n:1049,s:'last-stone-weight-ii',t:'Last Stone Weight II'},{n:879,s:'profitable-schemes',t:'Profitable Schemes'}]},
+  {name:'Grid DP',cat:'dp',hint:'2D table — paths, squares, falling path.',probs:[{n:62,s:'unique-paths',t:'Unique Paths'},{n:63,s:'unique-paths-ii',t:'Unique Paths II'},{n:64,s:'minimum-path-sum',t:'Minimum Path Sum'},{n:221,s:'maximal-square',t:'Maximal Square'},{n:931,s:'minimum-falling-path-sum',t:'Minimum Falling Path Sum'},{n:120,s:'triangle',t:'Triangle'}]},
+  {name:'String DP / Sequence DP',cat:'dp',hint:'Two-sequence DP — LCS, edit distance.',probs:[{n:1143,s:'longest-common-subsequence',t:'Longest Common Subsequence'},{n:72,s:'edit-distance',t:'Edit Distance'},{n:115,s:'distinct-subsequences',t:'Distinct Subsequences'},{n:583,s:'delete-operation-for-two-strings',t:'Delete Operation For Two Strings'},{n:97,s:'interleaving-string',t:'Interleaving String'},{n:1312,s:'minimum-insertion-steps-to-make-a-string-palindrome',t:'Minimum Insertion Steps To Make A String Palindrome'}]}
+];
+const STORAGE_KEY='dsa-done';
+function loadDone(){try{return new Set(JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'));}catch(_){return new Set();}}
+function saveDone(s){try{localStorage.setItem(STORAGE_KEY,JSON.stringify([...s]));}catch(_){}}
+const done=loadDone();
+const grid=document.getElementById('grid');
+let TOTAL=0; PATTERNS.forEach(p=>TOTAL+=p.probs.length);
+
+function render(){
+  grid.innerHTML='';
+  PATTERNS.forEach((p,i)=>{
+    const color=CAT_COLOR[p.cat]||'var(--accent)';
+    const solved=p.probs.filter(pr=>done.has(pr.n)).length;
+    const card=document.createElement('div');
+    card.className='pat'; card.style.setProperty('--cat',color);
+    let rows='';
+    p.probs.forEach(pr=>{
+      const isDone=done.has(pr.n);
+      const url='https://leetcode.com/problems/'+pr.s+'/';
+      rows+=`<div class="prob${isDone?' done':''}" data-n="${pr.n}">
+        <div class="cb">${isDone?'✓':''}</div>
+        <span class="num">#${pr.n}</span>
+        <a class="tt" href="${url}" target="_blank" rel="noopener">${pr.t}</a>
+        <a class="ext" href="${url}" target="_blank" rel="noopener">&#8599;</a>
+      </div>`;
+    });
+    card.innerHTML=`
+      <div class="pat-head">
+        <span class="pat-idx">${String(i+1).padStart(2,'0')}</span>
+        <span class="pat-name">${p.name}</span>
+        <span class="pat-count">${solved}/${p.probs.length}</span>
+      </div>
+      <div class="pat-hint">${p.hint}</div>
+      <div class="probs">${rows}</div>`;
+    grid.appendChild(card);
+  });
+  document.getElementById('totalCount').textContent=TOTAL;
+  document.getElementById('doneCount').textContent=done.size;
+  document.getElementById('progressBar').style.width=(100*done.size/TOTAL)+'%';
+}
+
+grid.addEventListener('click',e=>{
+  const cb=e.target.closest('.cb'); if(!cb) return;
+  const row=cb.closest('.prob'); const n=Number(row.dataset.n);
+  if(done.has(n)) done.delete(n); else done.add(n);
+  saveDone(done); render();
+});
+
+render();
+</script>
+</body>
+</html>
