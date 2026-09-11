@@ -1,0 +1,81 @@
+name: Amul protein stock watch
+
+on:
+  schedule:
+    # Every 10 minutes. GitHub runs scheduled jobs on a best-effort basis and
+    # can delay them under load, so treat this as "roughly every 10 min".
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Check stock and print the result, but don't message Telegram"
+        type: boolean
+        default: false
+      force_notify:
+        description: "Send a message even if the pack was already in stock"
+        type: boolean
+        default: false
+      dump:
+        description: "Print raw product JSON (for debugging the API shape)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+# Never let a slow run overlap the next tick.
+concurrency:
+  group: amul-stock
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r .tools/amul-notify/requirements.txt
+
+      - name: Run logic tests
+        run: python .tools/amul-notify/test_logic.py
+
+      # State lives in the Actions cache so restock alerts fire once per
+      # restock instead of every 10 minutes. Caches can't be updated in place,
+      # so save under a unique key and restore by prefix.
+      - name: Restore previous stock state
+        uses: actions/cache/restore@v4
+        with:
+          path: .amul-state
+          key: amul-state-${{ github.run_id }}
+          restore-keys: |
+            amul-state-
+
+      - name: Check stock
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          AMUL_PINCODE: ${{ vars.AMUL_PINCODE || '560100' }}
+          AMUL_STORE: ${{ vars.AMUL_STORE }}
+          AMUL_STATE_FILE: .amul-state/state.json
+        run: |
+          python .tools/amul-notify/check_stock.py \
+            ${{ inputs.dry_run && '--dry-run' || '' }} \
+            ${{ inputs.force_notify && '--force-notify' || '' }} \
+            ${{ inputs.dump && '--dump' || '' }}
+
+      - name: Save stock state
+        # Persist even if the check failed, so a transient error doesn't
+        # replay an alert that was already sent.
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: .amul-state
+          key: amul-state-${{ github.run_id }}

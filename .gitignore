@@ -7,3 +7,10 @@ _site/
 
 # macOS junk
 .DS_Store
+
+# Python bytecode
+__pycache__/
+*.pyc
+
+# Local stock-notifier state (persisted via the Actions cache in CI)
+.amul-state/
